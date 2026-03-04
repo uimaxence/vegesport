@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #E8450E;
+  --color-primary-light: #FF6B3D;
+  --color-primary-dark: #C13A0A;
+  --color-secondary: #2D6A4F;
+  --color-secondary-light: #40916C;
+  --color-accent: #F4A261;
+  --color-bg: #FAFAF8;
+  --color-bg-warm: #F5F0EB;
+  --color-text: #1A1A1A;
+  --color-text-light: #6B6B6B;
+  --color-border: #E8E4DF;
+  --font-sans: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-display: 'Instrument Serif', Georgia, serif;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@keyframes hero-gradient {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(4px, -6px) scale(1.02); }
+  66% { transform: translate(-3px, 4px) scale(0.98); }
+}
+
+@keyframes hero-text-in {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Planning drag & drop */
+@keyframes planning-card-land {
+  0% { transform: scale(1.08); box-shadow: 0 12px 24px -8px rgb(0 0 0 / 0.2); }
+  60% { transform: scale(1.02); }
+  100% { transform: scale(1); box-shadow: none; }
+}
+
+.planning-cell {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.planning-cell.is-drag-source {
+  opacity: 0.4;
+  transform: scale(0.97);
+}
+
+.planning-cell.is-drop-target {
+  transform: scale(1.03);
+  background-color: rgb(232 69 14 / 0.08);
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.planning-cell.just-landed {
+  animation: planning-card-land 0.4s ease-out;
+}
