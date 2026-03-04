@@ -15,7 +15,7 @@ const categoryShowcase = [
 ];
 
 export default function Home() {
-  usePageMeta('VégéSport — Recettes végétariennes pour sportifs', 'Recettes végétariennes et végétaliennes riches en protéines pour sportifs. Planning repas hebdomadaire, liste de courses et conseils nutrition sportive végétale.', true);
+  usePageMeta('et si mamie était végé ? — Recettes végétariennes', 'Recettes végétariennes et végétaliennes riches en protéines pour sportifs. Planning repas hebdomadaire, liste de courses et conseils nutrition sportive végétale.', true);
   const { recipes, articles, loading, error } = useData();
 
   function getCategoryCount(cat) {

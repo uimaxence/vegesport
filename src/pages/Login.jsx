@@ -5,7 +5,7 @@ import { usePageMeta } from '../hooks/usePageMeta';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export default function Login() {
-  usePageMeta('Connexion', 'Connecte-toi à ton compte VégéSport pour sauvegarder tes favoris et tes plannings.');
+  usePageMeta('Connexion', 'Connecte-toi à ton compte et si mamie était végé ? pour sauvegarder tes favoris et tes plannings.');
   const { setUserLocal } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -83,7 +83,7 @@ export default function Login() {
     <div className="px-6 lg:px-8 py-20">
       <div className="max-w-sm mx-auto">
         <div className="text-center mb-10">
-          <Link to="/" className="font-display text-3xl text-primary italic">VégéSport</Link>
+          <Link to="/" aria-label="et si mamie était végé ?"><img src="/logo.svg" alt="et si mamie était végé ?" className="h-12 w-auto" /></Link>
           <p className="mt-2 text-sm text-text-light">
             {isLogin ? 'Content de te revoir' : 'Rejoins la communauté'}
           </p>

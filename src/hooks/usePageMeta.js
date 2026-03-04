@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const DEFAULT_TITLE = 'VégéSport — Recettes végétariennes pour sportifs';
+const DEFAULT_TITLE = 'et si mamie était végé ? — Recettes végétariennes';
 const DEFAULT_DESCRIPTION =
   'Recettes végétariennes et végétaliennes riches en protéines pour sportifs. Planning repas hebdomadaire, liste de courses et conseils nutrition sportive végétale.';
 
@@ -8,7 +8,7 @@ const DEFAULT_DESCRIPTION =
  * Met à jour le titre et la meta description de la page (SEO).
  * @param {string} [title] - Titre de la page (suffixe ou titre complet)
  * @param {string} [description] - Meta description
- * @param {boolean} [fullTitle=false] - Si true, title est le titre complet ; sinon on fait "title | VégéSport"
+ * @param {boolean} [fullTitle=false] - Si true, title est le titre complet ; sinon on fait "title | et si mamie était végé ?"
  */
 export function usePageMeta(title, description, fullTitle = false) {
   useEffect(() => {
@@ -17,7 +17,7 @@ export function usePageMeta(title, description, fullTitle = false) {
     const prevContent = prevMeta?.getAttribute('content');
 
     if (title) {
-      document.title = fullTitle ? title : `${title} | VégéSport`;
+      document.title = fullTitle ? title : `${title} | et si mamie était végé ?`;
     }
     if (description) {
       let el = document.querySelector('meta[name="description"]');

@@ -7,7 +7,7 @@ import { objectives } from '../data/recipes';
 import RecipeCard from '../components/RecipeCard';
 
 export default function Profile({ user, favorites, savedPlannings }) {
-  usePageMeta('Mon profil', 'Tes recettes favorites, plannings sauvegardés et badges VégéSport.');
+  usePageMeta('Mon profil', 'Tes recettes favorites, plannings sauvegardés et badges et si mamie était végé ?.');
   const { signOut } = useAuth();
   const { recipes, loading, error } = useData();
   if (!user) {

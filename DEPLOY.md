@@ -1,4 +1,4 @@
-# Mise en production — VégéSport
+# Mise en production — et si mamie était végé ?
 
 ## Sécurité
 

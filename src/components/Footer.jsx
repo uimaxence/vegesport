@@ -6,8 +6,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
-            <Link to="/" className="font-display text-2xl text-primary italic">
-              VégéSport
+            <Link to="/" className="inline-block">
+              <img src="/logo.svg" alt="et si mamie était végé ?" className="h-10 w-auto" />
             </Link>
             <p className="mt-3 text-sm text-text-light leading-relaxed">
               Recettes végétariennes et végétaliennes riches en protéines, conçues pour les sportifs.
@@ -47,7 +47,7 @@ export default function Footer() {
         </p>
         <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-text-light">
-            &copy; {new Date().getFullYear()} VégéSport — Nutrition végétale pour sportifs.
+            &copy; {new Date().getFullYear()} et si mamie était végé ? — Recettes végétariennes.
           </p>
           <p className="text-xs text-text-light">
             by M+&copy;
