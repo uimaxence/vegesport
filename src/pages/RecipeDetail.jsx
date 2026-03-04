@@ -3,6 +3,7 @@ import { ArrowLeft, Clock, Flame, Heart, Users, ChefHat, X, Check } from 'lucide
 import { useState, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { getSlug } from '../lib/slug';
 import RecipeCard from '../components/RecipeCard';
 
 function parseIngredient(ing) {
@@ -24,6 +25,21 @@ function parseIngredient(ing) {
   }
   const name = parts.slice(i).join(' ').trim();
   return { qty, name: name || s };
+}
+
+/** Met à l'échelle la quantité d'un ingrédient (ex. "80g flocons" -> "160g flocons" pour ratio 2). */
+function scaleIngredient(ing, ratio) {
+  if (ratio === 1) return ing;
+  const parsed = parseIngredient(ing);
+  if (!parsed.qty) return ing;
+  const match = parsed.qty.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
+  if (!match) return ing;
+  const num = parseFloat(match[1].replace(',', '.'));
+  const unit = match[2].trim();
+  const scaled = num * ratio;
+  const formatted = scaled % 1 === 0 ? String(Math.round(scaled)) : scaled.toFixed(1).replace('.', ',');
+  const newQty = unit ? `${formatted} ${unit}` : formatted;
+  return (newQty + ' ' + parsed.name).trim();
 }
 
 function StepWithQuantities({ stepText, ingredients }) {
@@ -75,9 +91,11 @@ function StepWithQuantities({ stepText, ingredients }) {
 }
 
 export default function RecipeDetail({ favorites, toggleFavorite }) {
-  const { id } = useParams();
+  const { slug } = useParams();
   const { recipes, loading, error } = useData();
-  const recipe = recipes.find((r) => r.id === parseInt(id, 10));
+  const recipe = recipes.find(
+    (r) => getSlug(r.title) === slug || String(r.id) === slug
+  );
   const [servings, setServings] = useState(recipe?.servings || 1);
   const [activeStep, setActiveStep] = useState(null);
   const [cookingMode, setCookingMode] = useState(false);
@@ -173,7 +191,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                         {checked[i] && <Check size={14} className="text-white" />}
                       </button>
                       <span className={`text-sm font-medium leading-snug ${checked[i] ? 'text-white/50 line-through' : 'text-white'}`}>
-                        {ing}
+                        {scaleIngredient(ing, ratio)}
                       </span>
                     </li>
                   ))}
@@ -181,7 +199,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
               </div>
             </>
           ) : (
-            <StepWithQuantities stepText={currentStepText} ingredients={recipe.ingredients} />
+            <StepWithQuantities stepText={currentStepText} ingredients={recipe.ingredients.map((ing) => scaleIngredient(ing, ratio))} />
           )}
         </div>
 
@@ -325,7 +343,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
               {recipe.ingredients.map((ingredient, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-text-light">
                   <span className="w-1.5 h-1.5 rounded-sm bg-primary/40 mt-1.5 flex-shrink-0" />
-                  {ingredient}
+                  {scaleIngredient(ingredient, ratio)}
                 </li>
               ))}
             </ul>

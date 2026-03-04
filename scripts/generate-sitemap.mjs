@@ -29,6 +29,16 @@ function loadEnv() {
 loadEnv();
 const baseUrl = (process.env.SITE_URL || process.env.VITE_PUBLIC_SITE_URL || SITE_URL).replace(/\/$/, '');
 
+function getSlug(title) {
+  if (!title || typeof title !== 'string') return '';
+  return title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 const staticRoutes = [
   { path: '', priority: '1.0', changefreq: 'weekly' },
   { path: '/recettes', priority: '0.9', changefreq: 'weekly' },
@@ -37,11 +47,11 @@ const staticRoutes = [
   { path: '/connexion', priority: '0.5', changefreq: 'monthly' },
 ];
 
-let recipeIds = [];
+let recipeSlugs = [];
 let articleIds = [];
 try {
   const { recipes } = await import('../src/data/recipes.js');
-  recipeIds = (recipes || []).map((r) => r.id);
+  recipeSlugs = (recipes || []).map((r) => getSlug(r.title)).filter(Boolean);
 } catch {
   // données peut être chargées depuis Supabase en prod, on garde les routes statiques
 }
@@ -52,7 +62,7 @@ try {
 
 const urls = [
   ...staticRoutes.map((r) => ({ loc: `${baseUrl}${r.path || '/'}`, priority: r.priority, changefreq: r.changefreq })),
-  ...recipeIds.map((id) => ({ loc: `${baseUrl}/recettes/${id}`, priority: '0.8', changefreq: 'monthly' })),
+  ...recipeSlugs.map((slug) => ({ loc: `${baseUrl}/recettes/${slug}`, priority: '0.8', changefreq: 'monthly' })),
   ...articleIds.map((id) => ({ loc: `${baseUrl}/blog/${id}`, priority: '0.7', changefreq: 'monthly' })),
 ];
 

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Download, Pin, RefreshCw, ShoppingCart, ChevronDown, Check, ArrowRight } from 'lucide-react';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { getSlug } from '../lib/slug';
 import { recipes } from '../data/recipes';
 import { defaultPlannings, days, mealTypes } from '../data/plannings';
 import { objectives, regimes } from '../data/recipes';
@@ -283,7 +284,7 @@ export default function Planning({ user, savePlanning }) {
                     >
                       {recipe && !isDragSource ? (
                         <>
-                          <Link to={`/recettes/${recipe.id}`} className="flex-1 min-w-0" onClick={(e) => e.stopPropagation()}>
+                          <Link to={`/recettes/${getSlug(recipe.title)}`} className="flex-1 min-w-0" onClick={(e) => e.stopPropagation()}>
                             <p className="text-xs font-medium text-text leading-snug hover:text-primary transition-colors line-clamp-2">
                               {recipe.title}
                             </p>

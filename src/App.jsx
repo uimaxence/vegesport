@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { DataProvider } from './context/DataContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Recipes from './pages/Recipes';
 import RecipeDetail from './pages/RecipeDetail';
@@ -17,6 +18,7 @@ function AppRoutes() {
 
   return (
     <>
+      <ScrollToTop />
       <Navbar user={user} />
       <main className="flex-1">
         <Routes>
@@ -24,7 +26,7 @@ function AppRoutes() {
           <Route path="/recettes" element={
             <Recipes favorites={favorites} toggleFavorite={toggleFavorite} />
           } />
-          <Route path="/recettes/:id" element={
+          <Route path="/recettes/:slug" element={
             <RecipeDetail favorites={favorites} toggleFavorite={toggleFavorite} />
           } />
           <Route path="/planning" element={

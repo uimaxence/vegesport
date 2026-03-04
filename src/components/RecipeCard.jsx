@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
+import { getSlug } from '../lib/slug';
 
 export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout = 'grid' }) {
   if (layout === 'compact') {
     return (
-      <Link to={`/recettes/${recipe.id}`} className="group flex items-center gap-4 py-3">
+      <Link to={`/recettes/${getSlug(recipe.title)}`} className="group flex items-center gap-4 py-3">
         <div className="w-16 h-16 rounded-sm overflow-hidden flex-shrink-0 bg-[#F5F0EB]">
           <img
             src={recipe.image}
@@ -26,7 +27,7 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
 
   return (
     <div className="group bg-[#F8F6F3] rounded-sm overflow-hidden border border-[#E8E4DF] hover:border-primary/30 transition-colors">
-      <Link to={`/recettes/${recipe.id}`} className="block">
+      <Link to={`/recettes/${getSlug(recipe.title)}`} className="block">
         {/* Image : environ 2/3 de la carte */}
         <div className="aspect-[4/3] relative bg-white overflow-hidden">
           <img
