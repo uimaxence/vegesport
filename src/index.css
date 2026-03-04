@@ -14,6 +14,7 @@
   --color-border: #E8E4DF;
   --font-sans: 'Space Grotesk', system-ui, -apple-system, sans-serif;
   --font-display: 'Instrument Serif', Georgia, serif;
+  --font-script: 'Caveat', cursive;
 }
 
 @layer base {
@@ -23,7 +24,67 @@
     color: var(--color-text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    position: relative;
   }
+  /* Légère texture papier (carnet de recettes) */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* Titre de section style carnet (la vague est en dessous via .deco-wave) */
+.recipe-section-title {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+/* Annotation manuscrite (typo script) */
+.recipe-annotation {
+  font-family: var(--font-script), cursive;
+  font-size: 1rem;
+  color: var(--color-text-light);
+  font-weight: 400;
+}
+
+/* Carte type fiche recette (double filet discret) */
+.recipe-card-frame {
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    inset 0 0 0 1px rgb(255 255 255 / 0.6),
+    0 1px 2px rgb(0 0 0 / 0.04);
+}
+
+/* Petit tampon / badge style carnet */
+.recipe-stamp {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.625rem;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  color: var(--color-text-light);
+  display: inline-block;
+  transform: rotate(-1.5deg);
+}
+
+/* Annotation script (petite note manuscrite) */
+.recipe-script-note {
+  font-family: var(--font-script), cursive;
+  font-size: 0.9375rem;
+  color: var(--color-text-light);
+  font-weight: 500;
 }
 
 @layer utilities {
@@ -72,4 +133,12 @@
 
 .planning-cell.just-landed {
   animation: planning-card-land 0.4s ease-out;
+}
+
+/* Ligne ondulée décorative (séparateur style carnet) */
+.deco-wave {
+  width: 48px;
+  height: 6px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 6'%3E%3Cpath fill='none' stroke='%23E8450E' stroke-width='1' d='M0 3q6-2 12 0t12 0t12 0t12 0'/%3E%3C/svg%3E") no-repeat center;
+  margin-top: 0.25rem;
 }

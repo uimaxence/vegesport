@@ -83,9 +83,10 @@ export default function Home() {
       </section>
 
       {/* Catégories centrées avec effectifs */}
-      <section className="px-6 lg:px-8 py-20 bg-bg-warm">
+      <section className="px-6 lg:px-8 py-20 bg-bg-warm relative">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs uppercase tracking-[0.2em] text-primary mb-12">Catégories</p>
+          <p className="recipe-section-title">Catégories</p>
+          <div className="deco-wave mx-auto mb-12" />
           <div className="space-y-3">
             {categoryShowcase.map((cat, i) => {
               const count = getCategoryCount(cat);
@@ -118,8 +119,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-primary mb-2">Sélection</p>
+              <p className="recipe-section-title">Sélection</p>
+              <div className="deco-wave mb-2" />
               <h2 className="font-display text-3xl sm:text-4xl text-text">Nos meilleures recettes végétariennes</h2>
+              <p className="recipe-annotation mt-1">Comme dans un carnet de recettes de grand-mère</p>
             </div>
             <Link to="/recettes" className="hidden sm:flex items-center gap-1 text-sm text-text-light hover:text-primary transition-colors">
               Toutes les recettes <ArrowRight size={14} />
@@ -178,7 +181,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-primary mb-2">Blog</p>
+              <p className="recipe-section-title">Blog</p>
+              <div className="deco-wave mb-2" />
               <h2 className="font-display text-3xl sm:text-4xl text-text">Conseils nutrition sportive végétale</h2>
             </div>
             <Link to="/blog" className="hidden sm:flex items-center gap-1 text-sm text-text-light hover:text-primary transition-colors">

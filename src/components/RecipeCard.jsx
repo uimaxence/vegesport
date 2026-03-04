@@ -26,7 +26,11 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
   }
 
   return (
-    <div className="group bg-[#F8F6F3] rounded-sm overflow-hidden border border-[#E8E4DF] hover:border-primary/30 transition-colors">
+    <div className="group bg-[#F8F6F3] rounded-sm overflow-hidden recipe-card-frame border border-[#E8E4DF] hover:border-primary/30 transition-colors relative">
+      {/* Coin type fiche recette (léger repli) */}
+      <div className="absolute top-0 right-0 w-5 h-5 z-10 pointer-events-none overflow-hidden rounded-tr-sm">
+        <div className="absolute -top-2 -right-2 w-4 h-4 rotate-45 bg-[#E8E4DF]/60 shadow-sm" />
+      </div>
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="block">
         {/* Image : environ 2/3 de la carte */}
         <div className="aspect-[4/3] relative bg-white overflow-hidden">
@@ -52,8 +56,8 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
           )}
         </div>
         {/* Contenu : titre, infos, tags */}
-        <div className="p-4">
-          <h3 className="font-semibold text-primary text-base leading-snug">
+        <div className="p-4 relative">
+          <h3 className="font-display text-lg text-primary leading-snug pr-6">
             {recipe.title}
           </h3>
           <p className="mt-1 text-sm font-semibold text-primary/90">
@@ -69,6 +73,7 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
               </span>
             ))}
           </div>
+          <span className="recipe-script-note absolute bottom-4 right-4 opacity-80">Recette</span>
         </div>
       </Link>
     </div>

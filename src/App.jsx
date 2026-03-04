@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { DataProvider } from './context/DataContext';
 import Navbar from './components/Navbar';
@@ -54,8 +55,9 @@ export default function App() {
     <Router>
       <AuthProvider>
         <DataProvider>
-          <div className="min-h-screen flex flex-col">
+          <div className="min-h-screen flex flex-col relative z-[1]">
             <AppRoutes />
+            <Analytics />
           </div>
         </DataProvider>
       </AuthProvider>

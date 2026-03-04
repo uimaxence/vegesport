@@ -42,7 +42,10 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p className="mt-8 text-center recipe-annotation text-text-light/80 text-lg">
+          Recettes de grand-mère, version sportive et 100 % végétale.
+        </p>
+        <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-text-light">
             &copy; {new Date().getFullYear()} VégéSport — Nutrition végétale pour sportifs.
           </p>

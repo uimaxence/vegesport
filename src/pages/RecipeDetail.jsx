@@ -257,16 +257,20 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           </div>
 
           <div className="lg:w-1/2">
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
               {recipe.tags.slice(0, 3).map(tag => (
                 <span key={tag} className="text-[10px] font-medium px-2.5 py-0.5 rounded-sm border border-border text-text-light">
                   {tag.replace('#', '')}
                 </span>
               ))}
+              <span className="recipe-stamp ml-1">Recette végétarienne</span>
             </div>
             <h1 className="font-display text-3xl sm:text-4xl text-text leading-tight">
               {recipe.title}
             </h1>
+            <p className="recipe-script-note mt-2 text-base">
+              {recipe.time <= 15 ? 'Rapide à faire !' : recipe.time <= 30 ? 'Parfait pour le soir' : 'À prévoir à l\'avance'}
+            </p>
 
             <div className="flex items-center gap-4 mt-4 text-sm text-text-light">
               <span className="flex items-center gap-1.5"><Clock size={15} /> {recipe.time} min</span>
@@ -292,8 +296,8 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
 
             {/* Servings */}
             <div className="mt-6 flex items-center gap-3">
-              <Users size={16} className="text-text-light" />
-              <span className="text-sm text-text-light">Portions :</span>
+              <Users size={16} className="text-text-light flex-shrink-0" />
+              <span className="recipe-annotation">Pour {servings} personne{servings > 1 ? 's' : ''}</span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setServings(Math.max(1, servings - 1))}
@@ -332,13 +336,15 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                 Mode cuisine
               </button>
             </div>
+            <p className="recipe-script-note mt-2 text-sm">Suis les étapes comme sur un carnet</p>
           </div>
         </div>
 
         {/* Ingredients & Steps */}
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-5 gap-10">
           <div className="lg:col-span-2">
-            <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-4">Ingrédients</h2>
+            <h2 className="recipe-section-title">Ingrédients</h2>
+            <div className="deco-wave mb-4" />
             <ul className="space-y-2.5">
               {recipe.ingredients.map((ingredient, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-text-light">
@@ -350,7 +356,8 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           </div>
 
           <div className="lg:col-span-3">
-            <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-4">Préparation</h2>
+            <h2 className="recipe-section-title">Préparation</h2>
+            <div className="deco-wave mb-4" />
             <ol className="space-y-4">
               {recipe.steps.map((step, i) => (
                 <li key={i} className="flex gap-4">
