@@ -67,8 +67,7 @@ export default function Login() {
 
   const handleGoogle = async () => {
     if (!isSupabaseConfigured() || !supabase) {
-      setUserLocal?.({ name: 'Utilisateur', email: 'user@google.com' });
-      navigate('/profil');
+      setError('Connexion Google indisponible : vérifie que VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY sont bien définis (ex. dans .env ou sur Vercel).');
       return;
     }
     setError('');
