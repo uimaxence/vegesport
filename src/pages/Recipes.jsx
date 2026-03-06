@@ -91,39 +91,39 @@ export default function Recipes({ favorites, toggleFavorite }) {
                   value={searchQuery}
                   onChange={(e) => updateFilter('search', e.target.value)}
                   placeholder="Tofu, lentilles, quinoa..."
-                  className="w-full pl-9 pr-3 py-2.5 bg-bg-warm border-0 rounded-sm text-sm placeholder:text-text-light/60 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full pl-9 pr-3 py-2.5 bg-black/[0.04] border border-transparent rounded-[10px] text-sm text-text placeholder:text-text-light/60 focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white"
                 />
               </div>
 
               {/* Categories */}
-              <div className="mb-8">
-                {categoriesWithCount.map(cat => (
-                  <button
-                    key={cat.id}
-                    onClick={() => updateFilter('categorie', cat.id === 'tous' ? '' : cat.id)}
-                    className={`flex items-center gap-2 w-full text-left py-1.5 text-sm transition-colors ${
-                      (activeCategory === cat.id) || (cat.id === 'tous' && !activeCategory)
-                        ? 'text-primary font-medium'
-                        : 'text-text-light hover:text-text'
-                    }`}
-                  >
-                    {cat.label}
-                    <span className="text-[10px] text-text-light/60">{cat.count}</span>
-                  </button>
-                ))}
+              <div className="mb-8 p-1 rounded-[10px] bg-black/[0.04]">
+                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-2 px-1">Catégorie</p>
+                {categoriesWithCount.map(cat => {
+                  const isActive = (activeCategory === cat.id) || (cat.id === 'tous' && !activeCategory);
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => updateFilter('categorie', cat.id === 'tous' ? '' : cat.id)}
+                      className={`flex items-center justify-between gap-2 w-full text-left py-2 px-2.5 rounded-lg text-sm transition-colors ${
+                        isActive ? 'bg-white text-text font-medium shadow-sm' : 'text-text-light hover:text-text'
+                      }`}
+                    >
+                      {cat.label}
+                      <span className="text-[10px] text-text-light/70">{cat.count}</span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Objectives */}
-              <div className="mb-8">
-                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-3">Objectif</p>
+              <div className="mb-8 p-1 rounded-[10px] bg-black/[0.04]">
+                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-2 px-1">Objectif</p>
                 {objectives.map(obj => (
                   <button
                     key={obj.id}
                     onClick={() => updateFilter('objectif', activeObjective === obj.id ? '' : obj.id)}
-                    className={`block w-full text-left py-1.5 text-sm transition-colors ${
-                      activeObjective === obj.id
-                        ? 'text-primary font-medium'
-                        : 'text-text-light hover:text-text'
+                    className={`block w-full text-left py-2 px-2.5 rounded-lg text-sm transition-colors ${
+                      activeObjective === obj.id ? 'bg-white text-text font-medium shadow-sm' : 'text-text-light hover:text-text'
                     }`}
                   >
                     {obj.label}
@@ -132,16 +132,14 @@ export default function Recipes({ favorites, toggleFavorite }) {
               </div>
 
               {/* Regime */}
-              <div className="mb-8">
-                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-3">Régime</p>
+              <div className="mb-8 p-1 rounded-[10px] bg-black/[0.04]">
+                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-2 px-1">Régime</p>
                 {regimes.map(reg => (
                   <button
                     key={reg.id}
                     onClick={() => updateFilter('regime', activeRegime === reg.id ? '' : reg.id)}
-                    className={`block w-full text-left py-1.5 text-sm transition-colors ${
-                      activeRegime === reg.id
-                        ? 'text-primary font-medium'
-                        : 'text-text-light hover:text-text'
+                    className={`block w-full text-left py-2 px-2.5 rounded-lg text-sm transition-colors ${
+                      activeRegime === reg.id ? 'bg-white text-text font-medium shadow-sm' : 'text-text-light hover:text-text'
                     }`}
                   >
                     {reg.label}
@@ -150,16 +148,14 @@ export default function Recipes({ favorites, toggleFavorite }) {
               </div>
 
               {/* Time */}
-              <div className="mb-8">
-                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-3">Temps</p>
+              <div className="mb-8 p-1 rounded-[10px] bg-black/[0.04]">
+                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-2 px-1">Temps</p>
                 {[{ id: '15', label: '< 15 min' }, { id: '30', label: '< 30 min' }].map(t => (
                   <button
                     key={t.id}
                     onClick={() => updateFilter('temps', activeTime === t.id ? '' : t.id)}
-                    className={`block w-full text-left py-1.5 text-sm transition-colors ${
-                      activeTime === t.id
-                        ? 'text-primary font-medium'
-                        : 'text-text-light hover:text-text'
+                    className={`block w-full text-left py-2 px-2.5 rounded-lg text-sm transition-colors ${
+                      activeTime === t.id ? 'bg-white text-text font-medium shadow-sm' : 'text-text-light hover:text-text'
                     }`}
                   >
                     {t.label}
@@ -169,21 +165,24 @@ export default function Recipes({ favorites, toggleFavorite }) {
 
               {/* Tags */}
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-3">Tags</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-2">Tags</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {tags.map(tag => (
-                    <button
-                      key={tag}
-                      onClick={() => updateFilter('tag', activeTag === tag ? '' : tag)}
-                      className={`text-[11px] px-2.5 py-1 rounded-sm border transition-colors ${
-                        activeTag === tag
-                          ? 'border-primary bg-primary/5 text-primary'
-                          : 'border-border text-text-light hover:border-text-light'
-                      }`}
-                    >
-                      {tag.replace('#', '')}
-                    </button>
-                  ))}
+                  {tags.map(tag => {
+                    const isActive = activeTag === tag;
+                    return (
+                      <button
+                        key={tag}
+                        onClick={() => updateFilter('tag', isActive ? '' : tag)}
+                        className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-colors ${
+                          isActive
+                            ? 'bg-white border-black/10 text-text font-medium shadow-sm'
+                            : 'bg-black/[0.04] border-transparent text-text-light hover:text-text hover:bg-black/[0.06]'
+                        }`}
+                      >
+                        {tag.replace('#', '')}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -199,7 +198,7 @@ export default function Recipes({ favorites, toggleFavorite }) {
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
-                  className="flex items-center gap-1 text-xs text-text-light hover:text-primary transition-colors"
+                  className="flex items-center gap-1 text-xs text-text-light hover:text-text transition-colors"
                 >
                   <X size={14} /> Effacer les filtres
                 </button>

@@ -263,7 +263,6 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                   {tag.replace('#', '')}
                 </span>
               ))}
-              <span className="recipe-stamp ml-1">Recette végétarienne</span>
             </div>
             <h1 className="font-display text-3xl sm:text-4xl text-text leading-tight">
               {recipe.title}

@@ -5,8 +5,8 @@ import { getSlug } from '../lib/slug';
 export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout = 'grid' }) {
   if (layout === 'compact') {
     return (
-      <Link to={`/recettes/${getSlug(recipe.title)}`} className="group flex items-center gap-4 py-3">
-        <div className="w-16 h-16 rounded-sm overflow-hidden flex-shrink-0 bg-[#F5F0EB]">
+      <Link to={`/recettes/${getSlug(recipe.title)}`} className="group flex items-center gap-4 py-3 rounded-xl hover:bg-black/[0.03] transition-colors -mx-1 px-1">
+        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-black/5">
           <img
             src={recipe.image}
             alt={recipe.title}
@@ -14,7 +14,7 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
           />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-primary truncate group-hover:text-primary-dark transition-colors">
+          <h3 className="text-sm font-medium text-text truncate group-hover:text-black transition-colors">
             {recipe.title}
           </h3>
           <p className="text-xs text-text-light mt-0.5">
@@ -26,18 +26,13 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
   }
 
   return (
-    <div className="group bg-[#F8F6F3] rounded-sm overflow-hidden recipe-card-frame border border-[#E8E4DF] hover:border-primary/30 transition-colors relative">
-      {/* Coin type fiche recette (léger repli) */}
-      <div className="absolute top-0 right-0 w-5 h-5 z-10 pointer-events-none overflow-hidden rounded-tr-sm">
-        <div className="absolute -top-2 -right-2 w-4 h-4 rotate-45 bg-[#E8E4DF]/60 shadow-sm" />
-      </div>
+    <div className="group overflow-hidden recipe-card-frame relative rounded-xl">
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="block">
-        {/* Image : environ 2/3 de la carte */}
-        <div className="aspect-[4/3] relative bg-white overflow-hidden">
+        <div className="aspect-[4/3] relative bg-[rgb(0,0,0,0.04)] overflow-hidden rounded-t-xl">
           <img
             src={recipe.image}
             alt={recipe.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
           {toggleFavorite && (
             <button
@@ -46,7 +41,7 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
                 e.stopPropagation();
                 toggleFavorite(recipe.id);
               }}
-              className="absolute top-3 right-3 p-2 rounded-sm bg-white/90 hover:bg-white transition-colors shadow-sm"
+              className="absolute top-3 right-3 p-2 rounded-lg bg-white/95 hover:bg-white transition-colors shadow-sm border border-black/5"
             >
               <Heart
                 size={16}
@@ -55,25 +50,23 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
             </button>
           )}
         </div>
-        {/* Contenu : titre, infos, tags */}
         <div className="p-4 relative">
-          <h3 className="font-display text-lg text-primary leading-snug pr-6">
+          <h3 className="font-display text-lg text-text leading-snug">
             {recipe.title}
           </h3>
-          <p className="mt-1 text-sm font-semibold text-primary/90">
+          <p className="mt-1 text-sm font-medium text-text-light">
             {recipe.time} min · {recipe.calories} kcal
           </p>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {recipe.tags.slice(0, 3).map(tag => (
               <span
                 key={tag}
-                className="text-[11px] font-medium px-2.5 py-1 rounded-sm bg-white border border-primary/40 text-primary"
+                className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-[rgb(0,0,0,0.05)] border border-black/8 text-text"
               >
                 {tag.replace('#', '')}
               </span>
             ))}
           </div>
-          <span className="recipe-script-note absolute bottom-4 right-4 opacity-80">Recette</span>
         </div>
       </Link>
     </div>

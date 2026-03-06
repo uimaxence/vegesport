@@ -57,12 +57,17 @@
   font-weight: 400;
 }
 
-/* Carte type fiche recette (double filet discret) */
+/* Carte type segmented UI : fond blanc, bordure grise, coins arrondis */
 .recipe-card-frame {
-  box-shadow:
-    0 0 0 1px var(--color-border),
-    inset 0 0 0 1px rgb(255 255 255 / 0.6),
-    0 1px 2px rgb(0 0 0 / 0.04);
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.04);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.recipe-card-frame:hover {
+  border-color: rgb(0 0 0 / 0.12);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.06);
 }
 
 /* Petit tampon / badge style carnet */
@@ -85,6 +90,53 @@
   font-size: 0.9375rem;
   color: var(--color-text-light);
   font-weight: 500;
+}
+
+/* Labels et champs des filtres Planning : plus petits pour hiérarchie */
+.planning-filter-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  margin-bottom: 0.375rem;
+  display: block;
+}
+.planning-filter-input {
+  font-size: 0.75rem;
+}
+
+/* Segmented controls & cards : fond gris clair, segment actif blanc, coins arrondis */
+.segment-group {
+  display: flex;
+  padding: 3px;
+  background-color: rgb(0 0 0 / 0.06);
+  border-radius: 10px;
+  gap: 0;
+}
+.segment-group--compact .segment-item {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.75rem;
+}
+.segment-item {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-light);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.segment-item:hover {
+  color: var(--color-text);
+}
+.segment-item.is-selected {
+  background: white;
+  color: var(--color-text);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
 }
 
 @layer utilities {
@@ -127,8 +179,8 @@
 
 .planning-cell.is-drop-target {
   transform: scale(1.03);
-  background-color: rgb(232 69 14 / 0.08);
-  box-shadow: 0 0 0 2px var(--color-primary);
+  background-color: rgb(0 0 0 / 0.04);
+  box-shadow: 0 0 0 2px var(--color-text);
 }
 
 .planning-cell.just-landed {
