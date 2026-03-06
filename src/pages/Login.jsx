@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -6,7 +6,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export default function Login() {
   usePageMeta('Connexion', 'Connecte-toi à ton compte et si mamie était végé ? pour sauvegarder tes favoris et tes plannings.');
-  const { setUserLocal } = useAuth();
+  const { user, setUserLocal } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,6 +14,10 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) navigate('/profil', { replace: true });
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,13 +74,17 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const { error: err } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+      const { error: err } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/profil`,
+        },
+      });
       if (err) throw err;
-      navigate('/profil');
     } catch (err) {
-      setError(err.message || 'Erreur Google.');
+      setError(err.message || 'Erreur de connexion avec Google.');
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

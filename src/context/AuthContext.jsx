@@ -140,7 +140,9 @@ export function AuthProvider({ children }) {
       ? {
           id: user.id || 'local',
           email: user.email,
-          name: user.user_metadata?.name ?? user.name ?? user.email?.split('@')[0] ?? 'Utilisateur',
+          name: user.user_metadata?.full_name ?? user.user_metadata?.name ?? user.name ?? user.email?.split('@')[0] ?? 'Utilisateur',
+          avatar: user.user_metadata?.avatar_url ?? user.user_metadata?.picture ?? null,
+          provider: user.app_metadata?.provider ?? 'email',
         }
       : null,
     favorites,

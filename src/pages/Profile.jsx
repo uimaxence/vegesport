@@ -29,12 +29,21 @@ export default function Profile({ user, favorites, savedPlannings }) {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-primary mb-2">Mon profil</p>
-            <h1 className="font-display text-3xl sm:text-4xl text-text">
-              Salut, {user.name}
-            </h1>
-            <p className="text-sm text-text-light mt-1">{user.email}</p>
+          <div className="flex items-center gap-4">
+            {user.avatar ? (
+              <img src={user.avatar} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" referrerPolicy="no-referrer" />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-display text-xl">
+                {user.name?.charAt(0)?.toUpperCase()}
+              </div>
+            )}
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-primary mb-1">Mon profil</p>
+              <h1 className="font-display text-3xl sm:text-4xl text-text">
+                Salut, {user.name}
+              </h1>
+              <p className="text-sm text-text-light mt-1">{user.email}</p>
+            </div>
           </div>
           <button
             onClick={signOut}
