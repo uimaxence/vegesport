@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Download, Lock, LockOpen, RefreshCw, ShoppingCart, ChevronDown, ChevronRight, Check, Copy, MoreVertical, X, Clock, Flame, Beef, Users, ExternalLink, Trash2, RotateCcw, Pencil, Plus, Loader2 } from 'lucide-react';
 import { usePageMeta } from '../hooks/usePageMeta';
 import Toast from '../components/Toast';
@@ -7,9 +7,35 @@ import { getSlug } from '../lib/slug';
 import { recipes } from '../data/recipes';
 import { defaultPlannings, days, mealTypes } from '../data/plannings';
 import { objectives, regimes } from '../data/recipes';
+import { useAuth } from '../context/AuthContext';
+
+function getTodayStr() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+/** Retourne true si le jour (lundi..dimanche) est avant aujourd'hui pour la semaine weekStart (YYYY-MM-DD). */
+function isDayPast(day, weekStart) {
+  if (!weekStart) return false;
+  const idx = days.indexOf(day);
+  if (idx < 0) return false;
+  const dateOfDay = new Date(weekStart);
+  dateOfDay.setDate(dateOfDay.getDate() + idx);
+  dateOfDay.setHours(0, 0, 0, 0);
+  return dateOfDay.getTime() < getTodayStr();
+}
 
 export default function Planning({ user, savePlanning }) {
   usePageMeta('Planning repas', 'Crée ton planning hebdomadaire de repas végétariens. Choisis ton objectif (prise de masse, sèche, endurance), génère et sauvegarde ton planning.');
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { savedPlannings, updatePlanning } = useAuth();
+
+  const editId = searchParams.get('edit');
+  const loadFromState = location.state?.loadPlanning;
+
   const [objective, setObjective] = useState('masse');
   const [regime, setRegime] = useState('vegetarien');
   const [niveau, setNiveau] = useState('amateur');
@@ -31,8 +57,9 @@ export default function Planning({ user, savePlanning }) {
   const [editingNote, setEditingNote] = useState(null);
   const [actionFeedback, setActionFeedback] = useState(null);
   const [hasSavedPlanning, setHasSavedPlanning] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [editingPlanningId, setEditingPlanningId] = useState(null);
+  const [editWeekStart, setEditWeekStart] = useState(null);
+  const [editInitDone, setEditInitDone] = useState(false);
 
   const requireAuthForAction = (intent) => {
     if (user) return false;
@@ -201,6 +228,11 @@ export default function Planning({ user, savePlanning }) {
 
   const handleDrop = (e, toDay, mealType) => {
     e.preventDefault();
+    if (editingPlanningId && isDayPast(toDay, editWeekStart)) {
+      setDragState({ day: null, mealType: null });
+      setHoverDrop({ day: null, mealType: null });
+      return;
+    }
     const fromDay = dragState.day;
     if (fromDay && fromDay !== toDay && dragState.mealType === mealType) {
       swapMeals(fromDay, toDay, mealType);
@@ -309,11 +341,30 @@ export default function Planning({ user, savePlanning }) {
 
   const doSavePlanning = () => {
     if (requireAuthForAction('save')) return;
+    const today = new Date();
+    const dateLabel = today.toLocaleDateString('fr-FR');
+    const day = today.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diff);
+    const weekStart = monday.toISOString().slice(0, 10);
+
+    if (editingPlanningId && updatePlanning) {
+      updatePlanning(editingPlanningId, {
+        meals: { ...planning },
+        label: dateLabel,
+        objective,
+        week_start: weekStart,
+      });
+      setActionFeedback('updated');
+      return;
+    }
     if (savePlanning) {
       savePlanning({
-        date: new Date().toLocaleDateString('fr-FR'),
+        date: dateLabel,
         objective,
-        meals: { ...planning }
+        meals: { ...planning },
+        weekStart,
       });
       setHasSavedPlanning(true);
       setActionFeedback('save');
@@ -333,6 +384,32 @@ export default function Planning({ user, savePlanning }) {
     }
     navigate('/planning', { replace: true, state: undefined });
   }, [user, location.state, navigate]);
+
+  // Charger un planning sauvegardé en mode édition (?edit=id ou state.loadPlanning)
+  useEffect(() => {
+    if (editInitDone) return;
+    setEditInitDone(true);
+    if (loadFromState && typeof loadFromState.meals === 'object') {
+      setPlanning(loadFromState.meals || defaultPlannings.masse.meals);
+      setObjective(loadFromState.objective || 'masse');
+      setGenerated(true);
+      const ws = loadFromState.weekStart || null;
+      setEditWeekStart(ws);
+      setEditingPlanningId(loadFromState.id || null);
+      return;
+    }
+    if (editId && savedPlannings?.length > 0) {
+      const found = savedPlannings.find((p) => p.id === editId);
+      if (found) {
+        setPlanning(found.meals || defaultPlannings.masse.meals);
+        setObjective(found.objective || 'masse');
+        setGenerated(true);
+        const ws = found.weekStart || null;
+        setEditWeekStart(ws);
+        setEditingPlanningId(found.id);
+      }
+    }
+  }, [editId, loadFromState, savedPlannings, editInitDone]);
 
 
   /* Niveaux d'activité pour le filtre */
@@ -461,6 +538,15 @@ export default function Planning({ user, savePlanning }) {
           {actionFeedback === 'download' && (
             <p>Ta liste de courses a été téléchargée.</p>
           )}
+          {actionFeedback === 'updated' && (
+            <p>
+              Modifications enregistrées.{' '}
+              <Link to="/profil" className="text-secondary font-medium hover:underline inline-flex items-center gap-1">
+                Voir ton planning
+                <ChevronRight size={14} />
+              </Link>
+            </p>
+          )}
         </Toast>
 
         {/* Header */}
@@ -473,6 +559,11 @@ export default function Planning({ user, savePlanning }) {
             Définis ton objectif sportif et ton régime alimentaire. On génère automatiquement tes menus
             végétariens riches en protéines pour 7 jours, avec la liste de courses complète à exporter.
           </p>
+          {editingPlanningId && (
+            <p className="mt-3 text-sm text-primary bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 max-w-xl">
+              Tu modifies un planning sauvegardé. Les jours déjà passés ne sont pas modifiables.
+            </p>
+          )}
         </div>
 
         {/* Settings — style segmented / champs neutres */}
@@ -633,23 +724,28 @@ export default function Planning({ user, savePlanning }) {
           <div className="min-w-[800px]">
             <div className="grid gap-2" style={{ gridTemplateColumns: `100px repeat(${days.length}, 1fr)` }}>
               <div />
-              {days.map(day => (
-                <div key={day} className="text-center">
-                  <div className="flex items-center justify-center gap-1.5">
-                    <p className={`text-sm font-medium uppercase tracking-wider capitalize ${skippedDays[day] ? 'text-text-light/40 line-through' : 'text-text-light'}`}>
-                      {day}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => toggleSkipDay(day)}
-                      className={`p-0.5 rounded transition-colors ${skippedDays[day] ? 'text-primary hover:text-primary-dark' : 'text-text-light/40 hover:text-text-light'}`}
-                      title={skippedDays[day] ? 'Réactiver ce jour' : 'Désactiver ce jour'}
-                    >
-                      {skippedDays[day] ? <RotateCcw size={11} /> : <X size={11} />}
-                    </button>
+              {days.map(day => {
+                const dayIsPast = editingPlanningId && isDayPast(day, editWeekStart);
+                return (
+                  <div key={day} className="text-center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <p className={`text-sm font-medium uppercase tracking-wider capitalize ${skippedDays[day] ? 'text-text-light/40 line-through' : 'text-text-light'} ${dayIsPast ? 'opacity-80' : ''}`}>
+                        {day}
+                      </p>
+                      {!dayIsPast && (
+                        <button
+                          type="button"
+                          onClick={() => toggleSkipDay(day)}
+                          className={`p-0.5 rounded transition-colors ${skippedDays[day] ? 'text-primary hover:text-primary-dark' : 'text-text-light/40 hover:text-text-light'}`}
+                          title={skippedDays[day] ? 'Réactiver ce jour' : 'Désactiver ce jour'}
+                        >
+                          {skippedDays[day] ? <RotateCcw size={11} /> : <X size={11} />}
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {activeMealTypes.map(mt => (
@@ -672,19 +768,20 @@ export default function Planning({ user, savePlanning }) {
                   const recipeId = planning[day]?.[mt.id];
                   const recipe = getRecipe(recipeId);
                   const isPinned = pinnedMeals[`${day}-${mt.id}`];
+                  const isPast = editingPlanningId && isDayPast(day, editWeekStart);
                   const isDragSource = dragState.day === day && dragState.mealType === mt.id;
-                  const isDropTarget = hoverDrop.day === day && hoverDrop.mealType === mt.id && !isDragSource;
+                  const isDropTarget = !isPast && hoverDrop.day === day && hoverDrop.mealType === mt.id && !isDragSource;
                   const isLanded = isInRecentlySwapped(day, mt.id);
 
                   return (
                     <div
                       key={day}
-                      draggable={!!recipe}
-                      onDragStart={(e) => recipe && handleDragStart(e, day, mt.id)}
+                      draggable={!!recipe && !isPast}
+                      onDragStart={(e) => !isPast && recipe && handleDragStart(e, day, mt.id)}
                       onDragEnd={handleDragEnd}
-                      onDragOver={(e) => handleDragOver(e, day, mt.id)}
+                      onDragOver={(e) => !isPast && handleDragOver(e, day, mt.id)}
                       onDrop={(e) => handleDrop(e, day, mt.id)}
-                      className={`planning-cell bg-white rounded-xl p-3 min-h-[120px] flex flex-col border border-[rgb(0,0,0,0.08)] ${recipe ? 'cursor-grab active:cursor-grabbing' : ''} ${
+                      className={`planning-cell bg-white rounded-xl p-3 min-h-[120px] flex flex-col border border-[rgb(0,0,0,0.08)] ${!isPast && recipe ? 'cursor-grab active:cursor-grabbing' : ''} ${isPast ? 'opacity-90 bg-black/[0.02]' : ''} ${
                         isDragSource ? 'is-drag-source' : ''
                       } ${isDropTarget ? 'is-drop-target' : ''} ${isLanded ? 'just-landed' : ''} ${
                         isPinned ? 'ring-1 ring-black/20' : ''
@@ -692,78 +789,79 @@ export default function Planning({ user, savePlanning }) {
                     >
                       {recipe && !isDragSource ? (
                         <>
-                          <div className="flex items-center justify-end gap-0.5 mb-1">
-                            <button
-                              type="button"
-                              onClick={(e) => { e.stopPropagation(); openDuplicatePanel(day, mt.id); }}
-                              className="p-1 rounded-sm text-text-light hover:text-text hover:bg-black/5 transition-colors"
-                              title="Dupliquer vers d'autres jours"
-                            >
-                              <Copy size={12} />
-                            </button>
-                            <div className="relative">
+                          {!isPast && (
+                            <div className="flex items-center justify-end gap-0.5 mb-1">
                               <button
                                 type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDupPanel({ day: null, mealType: null, selectedDays: [] });
-                                  setContextMenu(prev =>
-                                    prev.day === day && prev.mealType === mt.id
-                                      ? { day: null, mealType: null }
-                                      : { day, mealType: mt.id }
-                                  );
-                                }}
+                                onClick={(e) => { e.stopPropagation(); openDuplicatePanel(day, mt.id); }}
                                 className="p-1 rounded-sm text-text-light hover:text-text hover:bg-black/5 transition-colors"
+                                title="Dupliquer vers d'autres jours"
                               >
-                                <MoreVertical size={14} />
+                                <Copy size={12} />
                               </button>
-                              {contextMenu.day === day && contextMenu.mealType === mt.id && (
-                                <>
-                                  <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-sm shadow-lg overflow-hidden">
-                                    <button
-                                      type="button"
-                                      onClick={(e) => { e.stopPropagation(); togglePin(day, mt.id); setContextMenu({ day: null, mealType: null }); }}
-                                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
-                                    >
-                                      {isPinned ? <Lock size={12} /> : <LockOpen size={12} />}
-                                      {isPinned ? 'Déverrouiller' : 'Garder ce plat'}
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={(e) => { e.stopPropagation(); replaceRecipe(day, mt.id); setContextMenu({ day: null, mealType: null }); }}
-                                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
-                                    >
-                                      <RefreshCw size={12} />
-                                      Remplacer
-                                    </button>
-                                    <Link
-                                      to={`/recettes/${getSlug(recipe.title)}`}
-                                      onClick={(e) => { e.stopPropagation(); setContextMenu({ day: null, mealType: null }); }}
-                                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
-                                    >
-                                      <ExternalLink size={12} />
-                                      Ouvrir en détail
-                                    </Link>
-                                    <button
-                                      type="button"
-                                      onClick={(e) => { e.stopPropagation(); startEditNote(day, mt.id); removeMeal(day, mt.id); }}
-                                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
-                                    >
-                                      <Pencil size={12} />
-                                      Écrire ma recette
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={(e) => { e.stopPropagation(); removeMeal(day, mt.id); }}
-                                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors"
-                                    >
-                                      <Trash2 size={12} />
-                                      Supprimer
-                                    </button>
-                                  </div>
-                                  <div className="fixed inset-0 z-20" onClick={(e) => { e.stopPropagation(); closeAllMenus(); }} />
-                                </>
-                              )}
+                              <div className="relative">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDupPanel({ day: null, mealType: null, selectedDays: [] });
+                                    setContextMenu(prev =>
+                                      prev.day === day && prev.mealType === mt.id
+                                        ? { day: null, mealType: null }
+                                        : { day, mealType: mt.id }
+                                    );
+                                  }}
+                                  className="p-1 rounded-sm text-text-light hover:text-text hover:bg-black/5 transition-colors"
+                                >
+                                  <MoreVertical size={14} />
+                                </button>
+                                {contextMenu.day === day && contextMenu.mealType === mt.id && (
+                                  <>
+                                    <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-sm shadow-lg overflow-hidden">
+                                      <button
+                                        type="button"
+                                        onClick={(e) => { e.stopPropagation(); togglePin(day, mt.id); setContextMenu({ day: null, mealType: null }); }}
+                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
+                                      >
+                                        {isPinned ? <Lock size={12} /> : <LockOpen size={12} />}
+                                        {isPinned ? 'Déverrouiller' : 'Garder ce plat'}
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => { e.stopPropagation(); replaceRecipe(day, mt.id); setContextMenu({ day: null, mealType: null }); }}
+                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
+                                      >
+                                        <RefreshCw size={12} />
+                                        Remplacer
+                                      </button>
+                                      <Link
+                                        to={`/recettes/${getSlug(recipe.title)}`}
+                                        onClick={(e) => { e.stopPropagation(); setContextMenu({ day: null, mealType: null }); }}
+                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
+                                      >
+                                        <ExternalLink size={12} />
+                                        Ouvrir en détail
+                                      </Link>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => { e.stopPropagation(); startEditNote(day, mt.id); removeMeal(day, mt.id); }}
+                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
+                                      >
+                                        <Pencil size={12} />
+                                        Écrire ma recette
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => { e.stopPropagation(); removeMeal(day, mt.id); }}
+                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors"
+                                      >
+                                        <Trash2 size={12} />
+                                        Supprimer
+                                      </button>
+                                    </div>
+                                    <div className="fixed inset-0 z-20" onClick={(e) => { e.stopPropagation(); closeAllMenus(); }} />
+                                  </>
+                                )}
                               {dupPanel.day === day && dupPanel.mealType === mt.id && (
                                 <>
                                   <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-sm shadow-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
@@ -771,7 +869,7 @@ export default function Planning({ user, savePlanning }) {
                                       Dupliquer vers
                                     </p>
                                     <div className="px-2 py-1 space-y-0.5">
-                                      {days.filter(d => d !== day).map(d => (
+                                      {days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))).map(d => (
                                         <label
                                           key={d}
                                           className="flex items-center gap-2 px-1.5 py-1.5 rounded-sm hover:bg-black/5 cursor-pointer transition-colors"
@@ -789,7 +887,7 @@ export default function Planning({ user, savePlanning }) {
                                     <div className="px-2 pb-2 pt-1 flex gap-1.5">
                                       <button
                                         type="button"
-                                        onClick={() => setDupPanel(prev => ({ ...prev, selectedDays: days.filter(d => d !== day) }))}
+                                        onClick={() => setDupPanel(prev => ({ ...prev, selectedDays: days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))) }))}
                                         className="flex-1 text-[10px] py-1.5 text-text-light hover:text-text border border-border rounded-sm transition-colors"
                                       >
                                         Tous
@@ -808,23 +906,44 @@ export default function Planning({ user, savePlanning }) {
                                 </>
                               )}
                             </div>
+                            </div>
+                          )}
+                          <div className="w-full text-left flex-1 min-w-0">
+                            {isPast ? (
+                              <Link
+                                to={`/recettes/${getSlug(recipe.title)}`}
+                                className="block"
+                              >
+                                <p className="text-sm font-medium text-text leading-snug hover:underline transition-colors line-clamp-2">
+                                  {recipe.title}
+                                </p>
+                                <p className="text-xs text-text-light mt-1.5">
+                                  {recipe.protein}g prot · {recipe.calories} kcal · <span className="italic">jour passé</span>
+                                </p>
+                              </Link>
+                            ) : (
+                              <button
+                                type="button"
+                                className="w-full text-left"
+                                onClick={(e) => { e.stopPropagation(); setPreviewRecipe(recipe); }}
+                              >
+                                <p className="text-sm font-medium text-text leading-snug hover:underline transition-colors line-clamp-2">
+                                  {recipe.title}
+                                </p>
+                                <p className="text-xs text-text-light mt-1.5">
+                                  {recipe.protein}g prot · {recipe.calories} kcal
+                                </p>
+                              </button>
+                            )}
                           </div>
-                          <button
-                            type="button"
-                            className="w-full text-left flex-1 min-w-0"
-                            onClick={(e) => { e.stopPropagation(); setPreviewRecipe(recipe); }}
-                          >
-                            <p className="text-sm font-medium text-text leading-snug hover:underline transition-colors line-clamp-2">
-                              {recipe.title}
-                            </p>
-                            <p className="text-xs text-text-light mt-1.5">
-                              {recipe.protein}g prot · {recipe.calories} kcal
-                            </p>
-                          </button>
                         </>
                       ) : isDragSource ? (
                         <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-lg bg-black/5 text-text-light">
                           <p className="text-xs font-medium">Glissez vers un autre jour</p>
+                        </div>
+                      ) : isPast ? (
+                        <div className="flex-1 flex items-center justify-center text-text-light/40 text-xs italic">
+                          Jour passé
                         </div>
                       ) : (
                         <EmptyMealSlot cellKey={`${day}-${mt.id}`} day={day} mealType={mt.id} mealNotes={mealNotes} editingNote={editingNote} startEditNote={startEditNote} saveNote={saveNote} clearNote={clearNote} setEditingNote={setEditingNote} />
@@ -842,6 +961,7 @@ export default function Planning({ user, savePlanning }) {
           {days.map(day => {
             const isExpanded = expandedDay === day;
             const isSkipped = skippedDays[day];
+            const dayIsPast = editingPlanningId && isDayPast(day, editWeekStart);
             return (
               <div key={day} className={`rounded-xl border overflow-hidden transition-colors ${isSkipped ? 'border-dashed border-black/10 bg-black/[0.02]' : 'border-black/8 bg-white'}`}>
                 {/* Day header */}
@@ -854,7 +974,7 @@ export default function Planning({ user, savePlanning }) {
                     {!isSkipped && (
                       <ChevronRight size={16} className={`text-text-light transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                     )}
-                    <span className={`text-sm font-medium capitalize ${isSkipped ? 'text-text-light/40 line-through' : 'text-text'}`}>
+                    <span className={`text-sm font-medium capitalize ${isSkipped ? 'text-text-light/40 line-through' : 'text-text'} ${dayIsPast ? 'opacity-80' : ''}`}>
                       {day}
                     </span>
                     {!isSkipped && !isExpanded && (
@@ -866,14 +986,16 @@ export default function Planning({ user, savePlanning }) {
                       <span className="text-xs text-text-light/40 italic ml-1">Jour off</span>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); toggleSkipDay(day); }}
-                    className={`p-1.5 rounded-lg transition-colors ${isSkipped ? 'text-primary hover:bg-primary/10' : 'text-text-light/40 hover:text-red-500 hover:bg-red-50'}`}
-                    title={isSkipped ? 'Réactiver ce jour' : 'Désactiver ce jour'}
-                  >
-                    {isSkipped ? <RotateCcw size={14} /> : <Trash2 size={14} />}
-                  </button>
+                  {!dayIsPast && (
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); toggleSkipDay(day); }}
+                      className={`p-1.5 rounded-lg transition-colors ${isSkipped ? 'text-primary hover:bg-primary/10' : 'text-text-light/40 hover:text-red-500 hover:bg-red-50'}`}
+                      title={isSkipped ? 'Réactiver ce jour' : 'Désactiver ce jour'}
+                    >
+                      {isSkipped ? <RotateCcw size={14} /> : <Trash2 size={14} />}
+                    </button>
+                  )}
                 </button>
 
                 {/* Meals (expanded) */}
@@ -887,13 +1009,18 @@ export default function Planning({ user, savePlanning }) {
                       if (!recipe) return (
                         <div key={mt.id} className="rounded-lg bg-black/[0.02] border border-dashed border-black/8 p-3">
                           <span className="text-xs font-medium text-text-light/50 uppercase tracking-wider">{mt.label}</span>
-                          <EmptyMealSlot cellKey={cellKey} day={day} mealType={mt.id} mealNotes={mealNotes} editingNote={editingNote} startEditNote={startEditNote} saveNote={saveNote} clearNote={clearNote} setEditingNote={setEditingNote} />
+                          {dayIsPast ? (
+                            <p className="text-xs text-text-light/40 italic mt-1">Jour passé</p>
+                          ) : (
+                            <EmptyMealSlot cellKey={cellKey} day={day} mealType={mt.id} mealNotes={mealNotes} editingNote={editingNote} startEditNote={startEditNote} saveNote={saveNote} clearNote={clearNote} setEditingNote={setEditingNote} />
+                          )}
                         </div>
                       );
                       return (
-                        <div key={mt.id} className={`rounded-lg bg-black/[0.02] border border-black/8 p-3.5 ${isPinned ? 'ring-1 ring-black/20' : ''}`}>
+                        <div key={mt.id} className={`rounded-lg bg-black/[0.02] border border-black/8 p-3.5 ${isPinned ? 'ring-1 ring-black/20' : ''} ${dayIsPast ? 'opacity-90' : ''}`}>
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-xs font-medium text-text-light uppercase tracking-wider">{mt.label}</span>
+                            {!dayIsPast && (
                             <div className="flex items-center gap-0.5">
                               <button
                                 type="button"
@@ -972,7 +1099,7 @@ export default function Planning({ user, savePlanning }) {
                                         Dupliquer vers
                                       </p>
                                       <div className="px-2 py-1 space-y-0.5">
-                                        {days.filter(d => d !== day).map(d => (
+                                        {days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))).map(d => (
                                           <label
                                             key={d}
                                             className="flex items-center gap-2 px-1.5 py-1.5 rounded hover:bg-black/5 cursor-pointer transition-colors"
@@ -990,7 +1117,7 @@ export default function Planning({ user, savePlanning }) {
                                       <div className="px-2 pb-2 pt-1 flex gap-1.5">
                                         <button
                                           type="button"
-                                          onClick={() => setDupPanel(prev => ({ ...prev, selectedDays: days.filter(d => d !== day) }))}
+                                          onClick={() => setDupPanel(prev => ({ ...prev, selectedDays: days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))) }))}
                                           className="flex-1 text-[10px] py-1.5 text-text-light hover:text-text border border-border rounded transition-colors"
                                         >
                                           Tous
@@ -1010,7 +1137,14 @@ export default function Planning({ user, savePlanning }) {
                                 )}
                               </div>
                             </div>
+                            )}
                           </div>
+                          {dayIsPast ? (
+                            <Link to={`/recettes/${getSlug(recipe.title)}`} className="w-full text-left block">
+                              <p className="text-sm font-medium text-text leading-snug hover:underline line-clamp-2">{recipe.title}</p>
+                              <p className="text-xs text-text-light mt-1">{recipe.protein}g prot · {recipe.calories} kcal · <span className="italic">jour passé</span></p>
+                            </Link>
+                          ) : (
                           <button
                             type="button"
                             className="w-full text-left"
@@ -1023,6 +1157,7 @@ export default function Planning({ user, savePlanning }) {
                               {recipe.protein}g prot · {recipe.calories} kcal
                             </p>
                           </button>
+                          )}
                         </div>
                       );
                     })}
@@ -1047,7 +1182,7 @@ export default function Planning({ user, savePlanning }) {
             className="inline-flex items-center gap-2 px-5 py-3 bg-black/[0.04] text-text text-base font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
           >
             <Check size={18} />
-            {hasSavedPlanning ? 'Sauvegardé (voir sur mon profil)' : 'Sauvegarder'}
+            {editingPlanningId ? 'Enregistrer les modifications' : hasSavedPlanning ? 'Sauvegardé (voir sur mon profil)' : 'Sauvegarder'}
           </button>
           <button
             onClick={handleDownloadClick}

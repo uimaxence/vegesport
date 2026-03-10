@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
     if (!supabase || !userId) return [];
     const { data } = await supabase
       .from('plannings')
-      .select('id, label, objective, meals, created_at')
+      .select('id, label, objective, meals, created_at, week_start')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
     return (data || []).map((p) => ({
@@ -31,6 +31,7 @@ export function AuthProvider({ children }) {
       date: p.label || new Date(p.created_at).toLocaleDateString('fr-FR'),
       objective: p.objective || '',
       meals: p.meals || {},
+      weekStart: p.week_start || null,
     }));
   }, []);
 
@@ -99,15 +100,26 @@ export function AuthProvider({ children }) {
     [user?.id, favorites]
   );
 
+  /** Retourne le lundi (YYYY-MM-DD) de la semaine d'une date */
+  const getWeekStart = useCallback((d) => {
+    const date = new Date(d);
+    const day = date.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    date.setDate(date.getDate() + diff);
+    return date.toISOString().slice(0, 10);
+  }, []);
+
   const savePlanning = useCallback(
     async (planning) => {
+      const weekStart = planning.weekStart || getWeekStart(new Date());
       const entry = {
         label: planning.date,
         objective: planning.objective,
         meals: planning.meals || {},
+        week_start: weekStart,
       };
       setSavedPlannings((prev) => [
-        { id: null, date: planning.date, objective: planning.objective, meals: planning.meals },
+        { id: null, date: planning.date, objective: planning.objective, meals: planning.meals, weekStart },
         ...prev,
       ]);
       if (user?.id && supabase) {
@@ -119,6 +131,27 @@ export function AuthProvider({ children }) {
             )
           );
         }
+      }
+    },
+    [user?.id, getWeekStart]
+  );
+
+  const updatePlanning = useCallback(
+    async (planningId, payload) => {
+      const { meals, label, objective, week_start } = payload;
+      const updates = {};
+      if (meals !== undefined) updates.meals = meals;
+      if (label !== undefined) updates.label = label;
+      if (objective !== undefined) updates.objective = objective;
+      if (week_start !== undefined) updates.week_start = week_start;
+      if (Object.keys(updates).length === 0) return;
+      setSavedPlannings((prev) =>
+        prev.map((p) =>
+          p.id === planningId ? { ...p, ...updates, date: updates.label ?? p.date, weekStart: updates.week_start ?? p.weekStart } : p
+        )
+      );
+      if (user?.id && supabase) {
+        await supabase.from('plannings').update(updates).eq('id', planningId).eq('user_id', user.id);
       }
     },
     [user?.id]
@@ -150,6 +183,7 @@ export function AuthProvider({ children }) {
     loading,
     toggleFavorite,
     savePlanning,
+    updatePlanning,
     signOut,
     setUserLocal: isSupabaseConfigured() ? undefined : setUserLocal,
   };
