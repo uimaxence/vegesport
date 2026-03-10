@@ -45,10 +45,14 @@ export default function Navbar({ user }) {
             </Link>
             <Link
               to={user ? '/profil' : '/connexion'}
-              className="flex items-center gap-2 text-sm text-text-light hover:text-text transition-colors"
+              className={`flex items-center gap-2 text-sm transition-colors rounded-lg px-3 py-2 ${
+                user
+                  ? 'bg-secondary/10 text-secondary font-medium hover:bg-secondary/15 border border-secondary/20'
+                  : 'text-text-light hover:text-text'
+              }`}
             >
               <User size={18} />
-              <span>{user ? user.name : 'Connexion'}</span>
+              <span>{user ? (user.name ? `${user.name} · Mon profil` : 'Mon profil') : 'Connexion'}</span>
             </Link>
           </div>
 
@@ -79,9 +83,9 @@ export default function Navbar({ user }) {
             <Link
               to={user ? '/profil' : '/connexion'}
               onClick={() => setIsOpen(false)}
-              className="block py-2 text-sm text-text-light"
+              className={`block py-2 text-sm ${user ? 'text-secondary font-medium' : 'text-text-light'}`}
             >
-              {user ? 'Mon profil' : 'Connexion'}
+              {user ? (user.name ? `${user.name} · Mon profil` : 'Mon profil') : 'Connexion'}
             </Link>
           </div>
         </div>

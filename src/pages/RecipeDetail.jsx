@@ -71,7 +71,7 @@ function StepWithQuantities({ stepText, ingredients }) {
   }, [stepText, ingredients]);
 
   return (
-    <p className="font-display text-xl sm:text-2xl text-center text-white max-w-xl leading-relaxed">
+    <p className="font-display text-2xl sm:text-3xl lg:text-4xl text-center text-white max-w-2xl leading-relaxed">
       {segments.map((seg, i) =>
         seg.type === 'text' ? (
           <span key={i}>{seg.value}</span>
@@ -79,7 +79,7 @@ function StepWithQuantities({ stepText, ingredients }) {
           <span key={i}>
             {seg.name}
             {seg.qty && (
-              <span className="text-primary text-xs font-sans align-baseline ml-0.5 tabular-nums">
+              <span className="text-primary text-sm font-sans align-baseline ml-0.5 tabular-nums">
                 {' '}{seg.qty}
               </span>
             )}
@@ -158,39 +158,39 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
         <div className="flex justify-end p-4">
           <button
             onClick={() => { setCookingMode(false); setActiveStep(null); setCheckedIngredients([]); }}
-            className="text-white/70 hover:text-white text-sm flex items-center gap-1.5"
+            className="text-white/70 hover:text-white text-base flex items-center gap-2 py-2"
           >
-            <X size={18} /> Quitter le mode cuisine
+            <X size={20} /> Quitter le mode cuisine
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 pb-6 flex flex-col items-center justify-center">
-          <p className="text-xs uppercase tracking-[0.2em] text-primary-light mb-6">
+          <p className="text-sm uppercase tracking-[0.2em] text-primary-light mb-6">
             {isIngredientsStep ? 'Préparation' : `Étape ${stepIndex} sur ${totalSteps}`}
           </p>
 
           {isIngredientsStep ? (
             <>
-              <p className="font-display text-xl sm:text-2xl text-center text-white max-w-xl leading-relaxed mb-8">
+              <p className="font-display text-2xl sm:text-3xl text-center text-white max-w-xl leading-relaxed mb-8">
                 Vérifiez que vous avez tous les ingrédients
               </p>
-              <div className="w-full max-w-md rounded-sm bg-white/10 border border-white/20 p-4 sm:p-5">
-                <p className="text-xs uppercase tracking-wider text-white/60 mb-4">Ingrédients</p>
-                <ul className="space-y-2">
+              <div className="w-full max-w-lg rounded-lg bg-white/10 border border-white/20 p-5 sm:p-6">
+                <p className="text-sm uppercase tracking-wider text-white/60 mb-4">Ingrédients</p>
+                <ul className="space-y-3">
                   {recipe.ingredients.map((ing, i) => (
-                    <li key={i} className="flex items-center gap-3">
+                    <li key={i} className="flex items-center gap-4">
                       <button
                         type="button"
                         onClick={() => toggleCheck(i)}
-                        className={`flex-shrink-0 w-6 h-6 rounded-sm border-2 flex items-center justify-center transition-colors ${
+                        className={`flex-shrink-0 w-8 h-8 rounded-md border-2 flex items-center justify-center transition-colors ${
                           checked[i]
                             ? 'bg-primary border-primary'
                             : 'border-white/40 hover:border-white/60'
                         }`}
                       >
-                        {checked[i] && <Check size={14} className="text-white" />}
+                        {checked[i] && <Check size={18} className="text-white" />}
                       </button>
-                      <span className={`text-sm font-medium leading-snug ${checked[i] ? 'text-white/50 line-through' : 'text-white'}`}>
+                      <span className={`text-base sm:text-lg font-medium leading-snug ${checked[i] ? 'text-white/50 line-through' : 'text-white'}`}>
                         {scaleIngredient(ing, ratio)}
                       </span>
                     </li>
@@ -203,17 +203,17 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           )}
         </div>
 
-        <div className="flex-shrink-0 border-t border-white/10 bg-[#252525] px-4 py-4 sm:py-5">
-          <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
+        <div className="flex-shrink-0 border-t border-white/10 bg-[#252525] px-4 py-5 sm:py-6">
+          <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
             <button
               type="button"
               onClick={() => setActiveStep(Math.max(0, stepIndex - 1))}
               disabled={stepIndex === 0}
-              className="flex-shrink-0 px-4 py-3 rounded-sm text-sm font-medium text-white/90 hover:text-white disabled:opacity-30 disabled:pointer-events-none border border-white/20 hover:border-white/40 transition-colors"
+              className="flex-shrink-0 px-5 py-3.5 rounded-lg text-base font-medium text-white/90 hover:text-white disabled:opacity-30 disabled:pointer-events-none border border-white/20 hover:border-white/40 transition-colors"
             >
               ← Précédent
             </button>
-            <p className="flex-1 text-center text-sm text-white/90 line-clamp-2 min-w-0 px-2">
+            <p className="flex-1 text-center text-base sm:text-lg text-white/95 line-clamp-3 min-w-0 px-3 leading-snug">
               {isIngredientsStep ? 'Préparez les ingrédients' : currentStepText}
             </p>
             <button
@@ -227,7 +227,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                   setActiveStep(stepIndex + 1);
                 }
               }}
-              className="flex-shrink-0 px-5 py-3 rounded-sm text-sm font-medium bg-primary text-white hover:bg-primary-light transition-colors"
+              className="flex-shrink-0 px-6 py-3.5 rounded-lg text-base font-medium bg-primary text-white hover:bg-primary-light transition-colors"
             >
               {stepIndex >= totalSteps - 1 ? 'Terminer' : 'Suivant →'}
             </button>

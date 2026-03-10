@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -14,10 +14,18 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state && location.state.from) || '/profil';
+  const planningIntent = location.state && location.state.planningIntent;
 
   useEffect(() => {
-    if (user) navigate('/profil', { replace: true });
-  }, [user, navigate]);
+    if (user) {
+      navigate(from, {
+        replace: true,
+        state: planningIntent ? { planningIntent } : undefined,
+      });
+    }
+  }, [user, navigate, from, planningIntent]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +38,10 @@ export default function Login() {
           const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
           if (err) throw err;
           if (data?.session) {
-            navigate('/profil');
+            navigate(from, {
+              replace: true,
+              state: planningIntent ? { planningIntent } : undefined,
+            });
             return;
           }
         } else {
@@ -41,7 +52,10 @@ export default function Login() {
           });
           if (err) throw err;
           if (data?.session) {
-            navigate('/profil');
+            navigate(from, {
+              replace: true,
+              state: planningIntent ? { planningIntent } : undefined,
+            });
             return;
           }
           if (data?.user && !data.session) {
@@ -60,7 +74,10 @@ export default function Login() {
         name: isLogin ? email.split('@')[0] : name,
         email,
       });
-      navigate('/profil');
+      navigate(from, {
+        replace: true,
+        state: planningIntent ? { planningIntent } : undefined,
+      });
     }
     setLoading(false);
   };
@@ -90,7 +107,9 @@ export default function Login() {
     <div className="px-6 lg:px-8 py-20">
       <div className="max-w-sm mx-auto">
         <div className="text-center mb-10">
-          <Link to="/" aria-label="et si mamie était végé ?"><img src="/logo.svg" alt="et si mamie était végé ?" className="h-12 w-auto" /></Link>
+          <Link to="/" aria-label="et si mamie était végé ?">
+            <img src="/logo.svg" alt="et si mamie était végé ?" className="h-12 w-auto mx-auto" />
+          </Link>
           <p className="mt-2 text-sm text-text-light">
             {isLogin ? 'Content de te revoir' : 'Rejoins la communauté'}
           </p>
