@@ -2,10 +2,11 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Clock, Share2 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
+import ArticleBlocks from '../components/article/ArticleBlocks';
 
 export default function BlogArticle() {
   const { id } = useParams();
-  const { articles, loading, error } = useData();
+  const { articles, recipes, loading, error } = useData();
   const article = articles.find((a) => a.id === parseInt(id, 10));
 
   if (loading) {
@@ -31,7 +32,11 @@ export default function BlogArticle() {
     );
   }
 
-  usePageMeta(article.title, article.excerpt || article.content?.slice(0, 155) + '…');
+  usePageMeta(
+    article.metaTitle || article.title,
+    article.metaDescription || article.excerpt || (article.content ? article.content.slice(0, 155) + '…' : undefined),
+    Boolean(article.metaTitle)
+  );
 
   const otherArticles = articles.filter(a => a.id !== article.id).slice(0, 3);
 
@@ -60,10 +65,16 @@ export default function BlogArticle() {
           <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
         </div>
 
-        <div className="mt-10 prose prose-sm max-w-none">
-          <p className="text-text-light leading-relaxed whitespace-pre-line">
-            {article.content}
-          </p>
+        <div className="mt-10">
+          {Array.isArray(article.contentJson) && article.contentJson.length > 0 ? (
+            <ArticleBlocks blocks={article.contentJson} recipes={recipes} />
+          ) : (
+            <div className="prose prose-sm max-w-none">
+              <p className="text-text-light leading-relaxed whitespace-pre-line">
+                {article.content}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Comments placeholder */}

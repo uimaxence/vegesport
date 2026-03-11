@@ -4,6 +4,7 @@ import { Clock } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { blogCategories } from '../data/blog';
+import BlogSkeleton from '../components/skeleton/BlogSkeleton';
 
 export default function Blog() {
   usePageMeta('Blog', 'Conseils nutrition sportive végétale, meal prep, témoignages et comparatifs pour sportifs végétariens et végétaliens.');
@@ -17,13 +18,7 @@ export default function Blog() {
   const featured = articles[0];
   const rest = filtered.filter((a) => a.id !== featured?.id);
 
-  if (loading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <p className="text-text-light">Chargement du blog…</p>
-      </div>
-    );
-  }
+  if (loading) return <BlogSkeleton />;
   if (error) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-6">

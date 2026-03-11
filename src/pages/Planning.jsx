@@ -31,7 +31,7 @@ export default function Planning({ user, savePlanning }) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { savedPlannings, updatePlanning } = useAuth();
+  const { savedPlannings, updatePlanning, loading: authLoading } = useAuth();
 
   const editId = searchParams.get('edit');
   const loadFromState = location.state?.loadPlanning;
@@ -388,7 +388,6 @@ export default function Planning({ user, savePlanning }) {
   // Charger un planning sauvegardé en mode édition (?edit=id ou state.loadPlanning)
   useEffect(() => {
     if (editInitDone) return;
-    setEditInitDone(true);
     if (loadFromState && typeof loadFromState.meals === 'object') {
       setPlanning(loadFromState.meals || defaultPlannings.masse.meals);
       setObjective(loadFromState.objective || 'masse');
@@ -396,20 +395,28 @@ export default function Planning({ user, savePlanning }) {
       const ws = loadFromState.weekStart || null;
       setEditWeekStart(ws);
       setEditingPlanningId(loadFromState.id || null);
+      setEditInitDone(true);
       return;
     }
-    if (editId && savedPlannings?.length > 0) {
-      const found = savedPlannings.find((p) => p.id === editId);
-      if (found) {
-        setPlanning(found.meals || defaultPlannings.masse.meals);
-        setObjective(found.objective || 'masse');
-        setGenerated(true);
-        const ws = found.weekStart || null;
-        setEditWeekStart(ws);
-        setEditingPlanningId(found.id);
+    if (editId && !authLoading) {
+      if (savedPlannings?.length > 0) {
+        const found = savedPlannings.find((p) => p.id === editId);
+        if (found) {
+          setPlanning(found.meals || defaultPlannings.masse.meals);
+          setObjective(found.objective || 'masse');
+          setGenerated(true);
+          const ws = found.weekStart || null;
+          setEditWeekStart(ws);
+          setEditingPlanningId(found.id);
+        }
       }
+      setEditInitDone(true);
+      return;
     }
-  }, [editId, loadFromState, savedPlannings, editInitDone]);
+    if (!editId && !loadFromState) {
+      setEditInitDone(true);
+    }
+  }, [editId, loadFromState, savedPlannings, editInitDone, authLoading]);
 
 
   /* Niveaux d'activité pour le filtre */

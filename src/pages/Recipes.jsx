@@ -5,6 +5,7 @@ import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { categories, objectives, regimes, tags } from '../data/recipes';
 import RecipeCard from '../components/RecipeCard';
+import RecipesSkeleton from '../components/skeleton/RecipesSkeleton';
 
 export default function Recipes({ favorites, toggleFavorite }) {
   usePageMeta('Recettes', 'Toutes nos recettes végétariennes et végétaliennes pour sportifs. Filtres par objectif, régime et temps de préparation.');
@@ -56,13 +57,7 @@ export default function Recipes({ favorites, toggleFavorite }) {
     });
   }, [recipes, searchQuery, activeCategory, activeObjective, activeRegime, activeTag, activeTime]);
 
-  if (loading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <p className="text-text-light">Chargement des recettes…</p>
-      </div>
-    );
-  }
+  if (loading) return <RecipesSkeleton />;
   if (error) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-6">

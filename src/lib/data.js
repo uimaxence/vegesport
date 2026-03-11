@@ -2,6 +2,21 @@ import { supabase, isSupabaseConfigured } from './supabase';
 import { recipes as localRecipes } from '../data/recipes';
 import { articles as localArticles } from '../data/blog';
 
+const FETCH_TIMEOUT_MS = 4000;
+
+/** En développement (localhost), on utilise les données locales pour un chargement instantané. */
+const useLocalDataOnly = () =>
+  typeof import.meta !== 'undefined' && import.meta.env?.DEV === true;
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('timeout')), ms)
+    ),
+  ]);
+}
+
 function mapRecipeRow(row) {
   if (!row) return null;
   return {
@@ -32,35 +47,50 @@ function mapArticleRow(row) {
     id: row.id,
     title: row.title,
     excerpt: row.excerpt,
+    metaTitle: row.meta_title,
+    metaDescription: row.meta_description,
     category: row.category,
     date: row.date,
     readTime: row.read_time,
     image: row.image,
     author: row.author,
     content: row.content,
+    contentJson: row.content_json,
   };
 }
 
 export async function fetchRecipes() {
+  if (useLocalDataOnly()) return [...localRecipes];
   if (isSupabaseConfigured() && supabase) {
-    const { data, error } = await supabase
-      .from('recipes')
-      .select('*')
-      .order('id', { ascending: true });
-    if (error) throw error;
-    return (data || []).map(mapRecipeRow);
+    try {
+      const { data, error } = await withTimeout(
+        supabase.from('recipes').select('*').order('id', { ascending: true }),
+        FETCH_TIMEOUT_MS
+      );
+      if (error) throw error;
+      return (data || []).map(mapRecipeRow).filter(Boolean);
+    } catch (e) {
+      console.warn('fetchRecipes: fallback local', e?.message);
+      return [...localRecipes];
+    }
   }
   return [...localRecipes];
 }
 
 export async function fetchArticles() {
+  if (useLocalDataOnly()) return [...localArticles];
   if (isSupabaseConfigured() && supabase) {
-    const { data, error } = await supabase
-      .from('blog_articles')
-      .select('*')
-      .order('date', { ascending: false });
-    if (error) throw error;
-    return (data || []).map(mapArticleRow);
+    try {
+      const { data, error } = await withTimeout(
+        supabase.from('blog_articles').select('*').order('date', { ascending: false }),
+        FETCH_TIMEOUT_MS
+      );
+      if (error) throw error;
+      return (data || []).map(mapArticleRow).filter(Boolean);
+    } catch (e) {
+      console.warn('fetchArticles: fallback local', e?.message);
+      return [...localArticles];
+    }
   }
   return [...localArticles];
 }
