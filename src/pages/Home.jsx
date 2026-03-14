@@ -10,7 +10,7 @@ function HeroRecipeCard({ recipe }) {
   return (
     <Link
       to={`/recettes/${getSlug(recipe.title)}`}
-      className="group flex-shrink-0 w-[200px] block bg-white rounded-xl overflow-hidden shadow-sm border border-border hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+      className="group flex-shrink-0 w-[200px] snap-start block bg-white rounded-xl overflow-hidden shadow-sm border border-border hover:shadow-md transition-all duration-300 hover:-translate-y-1"
     >
       <div className="aspect-[3/4] overflow-hidden bg-bg-warm">
         <img
@@ -81,7 +81,7 @@ export default function Home() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative pt-20 pb-12 lg:pt-28 lg:pb-16 overflow-hidden">
+      <section className="relative pt-20 pb-12 lg:pt-28 lg:pb-16 overflow-hidden px-6 lg:px-10">
         <div className="absolute inset-0 bg-gradient-to-br from-bg-warm via-bg to-primary/5 animate-[hero-gradient_8s_ease-in-out_infinite]" />
         <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-[hero-float_6s_ease-in-out_infinite]" />
         <div className="absolute bottom-1/4 left-0 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-[hero-float_7s_ease-in-out_infinite_0.5s]" />
@@ -124,15 +124,26 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Droite : carousel — s'étend jusqu'au bord droit du viewport */}
-          <div className="flex-1 min-w-0 overflow-hidden animate-[hero-text-in_0.6s_ease-out_0.35s_both]">
+          {/* Droite : carousel — scroll horizontal mobile, s'étend jusqu'au bord desktop */}
+          <div className="flex-1 min-w-0 w-full lg:overflow-hidden animate-[hero-text-in_0.6s_ease-out_0.35s_both] -mx-6 px-6 lg:mx-0 lg:px-0">
             <div
-              className="flex gap-4 overflow-x-auto pb-3"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              className="flex gap-4 overflow-x-auto pb-3 pr-6 lg:pr-0 snap-x snap-mandatory"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch',
+              }}
             >
               {heroRecipes.map((recipe) => (
                 <HeroRecipeCard key={recipe.id} recipe={recipe} />
               ))}
+              <Link
+                to="/recettes"
+                className="flex-shrink-0 w-[200px] snap-start flex flex-col items-center justify-center gap-2 bg-white rounded-xl border-2 border-dashed border-border hover:border-primary hover:bg-primary/5 transition-all duration-300 min-h-[calc(200px*4/3+52px)]"
+              >
+                <span className="font-display text-sm text-text text-center px-3">Voir toutes les recettes</span>
+                <ArrowRight size={20} className="text-primary" />
+              </Link>
             </div>
           </div>
         </div>

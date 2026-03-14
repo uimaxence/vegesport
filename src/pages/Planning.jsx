@@ -686,21 +686,23 @@ export default function Planning({ user, savePlanning }) {
           )}
         </Toast>
 
-        {/* Header */}
-        <div className="max-w-2xl mb-12">
-          <p className="text-xs uppercase tracking-[0.2em] text-text-light mb-3">Programme alimentaire végétarien</p>
-          <h1 className="font-display text-4xl sm:text-5xl text-text">
-            Ton planning repas végétarien de la semaine
-          </h1>
-          <p className="mt-4 text-base sm:text-lg text-text-light leading-relaxed max-w-xl">
+        {/* Header — padding renforcé sur les titres */}
+        <div className="mb-16 flex flex-col lg:flex-row lg:items-start lg:gap-8 px-[10%] lg:px-[10%]">
+          <div className="lg:max-w-md shrink-0">
+            <p className="text-xs uppercase tracking-[0.2em] text-text-light mb-3">Programme alimentaire végétarien</p>
+            <h1 className="font-display text-3xl sm:text-4xl text-text">
+              Ton planning repas végétarien de la semaine
+            </h1>
+            {editingPlanningId && (
+              <p className="mt-3 text-sm text-primary bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 max-w-xl">
+                Tu modifies un planning sauvegardé. Les jours déjà passés ne sont pas modifiables.
+              </p>
+            )}
+          </div>
+          <p className="mt-4 lg:mt-9 lg:flex-1 lg:min-w-0 text-base sm:text-lg text-text-light leading-relaxed">
             Définis ton objectif sportif et ton régime alimentaire. On génère automatiquement tes menus
             végétariens riches en protéines pour 7 jours, avec la liste de courses complète à exporter.
           </p>
-          {editingPlanningId && (
-            <p className="mt-3 text-sm text-primary bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 max-w-xl">
-              Tu modifies un planning sauvegardé. Les jours déjà passés ne sont pas modifiables.
-            </p>
-          )}
         </div>
 
         {/* Settings — style segmented / champs neutres */}
@@ -806,17 +808,69 @@ export default function Planning({ user, savePlanning }) {
           </div>
         </div>
 
-        <button
-          onClick={generatePlanning}
-          disabled={isGenerating}
-          className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-white text-base font-medium rounded-sm hover:bg-primary-dark transition-colors mb-10 disabled:opacity-75 disabled:cursor-not-allowed"
-        >
-          {isGenerating
-            ? <Loader2 size={18} className="animate-spin" />
-            : <RefreshCw size={18} />
-          }
-          {isGenerating ? 'Génération…' : generated ? 'Regénérer' : 'Générer mon planning'}
-        </button>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-10">
+          <button
+            onClick={generatePlanning}
+            disabled={isGenerating}
+            className="inline-flex items-center gap-2 px-4 py-3 bg-primary text-white text-sm font-medium rounded-[10px] hover:bg-primary-dark transition-colors shrink-0 disabled:opacity-75 disabled:cursor-not-allowed"
+          >
+            {isGenerating
+              ? <Loader2 size={16} className="animate-spin" />
+              : <RefreshCw size={16} />
+            }
+            {isGenerating ? 'Génération…' : generated ? 'Regénérer' : 'Générer mon planning'}
+          </button>
+          <div className="flex flex-wrap gap-2 sm:gap-3">
+            <button
+              onClick={handleGroceryClick}
+              className="inline-flex items-center gap-2 px-4 py-3 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
+            >
+              <ShoppingCart size={16} />
+              {showGroceryList ? 'Masquer' : 'Liste de courses'}
+            </button>
+            <button
+              onClick={doSavePlanning}
+              className="inline-flex items-center gap-2 px-4 py-3 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
+            >
+              <Check size={16} />
+              {editingPlanningId ? 'Enregistrer' : hasSavedPlanning ? 'Sauvegardé' : 'Sauvegarder'}
+            </button>
+            <button
+              onClick={handleDownloadClick}
+              className="inline-flex items-center gap-2 px-4 py-3 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
+            >
+              <Download size={16} />
+              Télécharger liste
+            </button>
+            {hasGoogleCalendarConfig() ? (
+              <>
+                <button
+                  onClick={handleAddToGoogleCalendar}
+                  disabled={addingToGoogle}
+                  className="inline-flex items-center gap-2 px-4 py-3 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent disabled:opacity-60"
+                >
+                  {addingToGoogle ? <Loader2 size={16} className="animate-spin" /> : <Calendar size={16} />}
+                  {addingToGoogle ? 'Connexion…' : 'Google Calendar'}
+                </button>
+                <button
+                  onClick={handleAddToCalendar}
+                  className="inline-flex items-center gap-2 px-4 py-3 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
+                >
+                  <Download size={16} />
+                  .ics (Apple, Outlook)
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleAddToCalendar}
+                className="inline-flex items-center gap-2 px-4 py-3 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
+              >
+                <Calendar size={16} />
+                Calendrier
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Moyennes nutritionnelles vs besoins sportif */}
         {nutritionBars && (
@@ -1325,59 +1379,6 @@ export default function Planning({ user, savePlanning }) {
               </div>
             );
           })}
-        </div>
-
-        {/* Actions */}
-        <div className="mt-8 flex flex-wrap gap-3">
-          <button
-            onClick={handleGroceryClick}
-            className="inline-flex items-center gap-2 px-5 py-3 bg-black/[0.04] text-text text-base font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
-          >
-            <ShoppingCart size={18} />
-            {showGroceryList ? 'Masquer' : 'Liste de courses'}
-          </button>
-          <button
-            onClick={doSavePlanning}
-            className="inline-flex items-center gap-2 px-5 py-3 bg-black/[0.04] text-text text-base font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
-          >
-            <Check size={18} />
-            {editingPlanningId ? 'Enregistrer les modifications' : hasSavedPlanning ? 'Sauvegardé (voir sur mon profil)' : 'Sauvegarder'}
-          </button>
-          <button
-            onClick={handleDownloadClick}
-            className="inline-flex items-center gap-2 px-5 py-3 bg-black/[0.04] text-text text-base font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
-          >
-            <Download size={18} />
-            Télécharger la liste
-          </button>
-          {hasGoogleCalendarConfig() ? (
-            <>
-              <button
-                onClick={handleAddToGoogleCalendar}
-                disabled={addingToGoogle}
-                className="inline-flex items-center gap-2 px-5 py-3 bg-black/[0.04] text-text text-base font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent disabled:opacity-60"
-              >
-                {addingToGoogle ? <Loader2 size={18} className="animate-spin" /> : <Calendar size={18} />}
-                {addingToGoogle ? 'Connexion…' : 'Ajouter à Google Calendar'}
-              </button>
-              <button
-                onClick={handleAddToCalendar}
-                className="inline-flex items-center gap-2 px-5 py-3 bg-black/[0.04] text-text text-base font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
-              >
-                <Download size={18} />
-                Fichier .ics (Apple, Outlook)
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={handleAddToCalendar}
-              className="inline-flex items-center gap-2 px-5 py-3 bg-black/[0.04] text-text text-base font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
-            >
-              <Calendar size={18} />
-              Ajouter à mon calendrier
-            </button>
-          )}
-
         </div>
 
         {/* Grocery List */}

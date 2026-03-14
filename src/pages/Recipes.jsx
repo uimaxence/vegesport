@@ -75,9 +75,9 @@ export default function Recipes({ favorites, toggleFavorite }) {
     <div className="px-6 lg:px-8 py-12">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-12">
-          {/* Sidebar */}
+          {/* Sidebar — scroll indépendant des filtres en desktop */}
           <aside className="lg:w-56 flex-shrink-0">
-            <div className="sticky top-24">
+            <div className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
               {/* Search */}
               <div className="relative mb-8">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light" />
