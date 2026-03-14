@@ -1,10 +1,12 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Clock, Flame, Heart, Users, ChefHat, X, Check } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { ArrowLeft, Clock, Flame, Heart, Users, ChefHat, X, Check, Share2, Copy } from 'lucide-react';
+import { useState, useMemo, useCallback } from 'react';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { getSlug } from '../lib/slug';
 import RecipeCard from '../components/RecipeCard';
+import RecipeComments from '../components/RecipeComments';
 
 function parseIngredient(ing) {
   const s = ing.trim();
@@ -93,6 +95,7 @@ function StepWithQuantities({ stepText, ingredients }) {
 export default function RecipeDetail({ favorites, toggleFavorite }) {
   const { slug } = useParams();
   const { recipes, loading, error } = useData();
+  const { user } = useAuth();
   const recipe = recipes.find(
     (r) => getSlug(r.title) === slug || String(r.id) === slug
   );
@@ -128,6 +131,24 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
 
   const isFavorite = favorites.includes(recipe.id);
   const ratio = servings / recipe.servings;
+
+  const [shareStatus, setShareStatus] = useState(null); // null | 'copied' | 'shared'
+
+  const handleShare = useCallback(async () => {
+    const url = window.location.href;
+    const title = recipe.title;
+    const text = `${title} — recette végétarienne protéinée sur et si mamie était végé ?`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text, url });
+        setShareStatus('shared');
+      } catch { /* annulé par l'utilisateur */ }
+    } else {
+      await navigator.clipboard.writeText(url);
+      setShareStatus('copied');
+    }
+    setTimeout(() => setShareStatus(null), 2500);
+  }, [recipe.title]);
 
   const similar = recipes
     .filter(r => r.id !== recipe.id && r.objective.some(o => recipe.objective.includes(o)))
@@ -259,7 +280,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           <div className="lg:w-1/2">
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               {recipe.tags.slice(0, 3).map(tag => (
-                <span key={tag} className="text-[10px] font-medium px-2.5 py-0.5 rounded-sm border border-border text-text-light">
+                <span key={tag} className="text-[13px] font-medium px-2.5 py-0.5 rounded-sm border border-border text-text-light">
                   {tag.replace('#', '')}
                 </span>
               ))}
@@ -281,15 +302,15 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
             <div className="mt-6 grid grid-cols-3 gap-3">
               <div className="bg-bg-warm rounded-sm p-3 text-center">
                 <p className="text-lg font-medium text-primary">{Math.round(recipe.protein * ratio)}g</p>
-                <p className="text-[10px] uppercase tracking-wider text-text-light mt-0.5">Protéines</p>
+                <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Protéines</p>
               </div>
               <div className="bg-bg-warm rounded-sm p-3 text-center">
                 <p className="text-lg font-medium text-text">{Math.round(recipe.carbs * ratio)}g</p>
-                <p className="text-[10px] uppercase tracking-wider text-text-light mt-0.5">Glucides</p>
+                <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Glucides</p>
               </div>
               <div className="bg-bg-warm rounded-sm p-3 text-center">
                 <p className="text-lg font-medium text-text">{Math.round(recipe.fat * ratio)}g</p>
-                <p className="text-[10px] uppercase tracking-wider text-text-light mt-0.5">Lipides</p>
+                <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Lipides</p>
               </div>
             </div>
 
@@ -315,7 +336,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
             </div>
 
             {/* Actions */}
-            <div className="mt-6 flex gap-2">
+            <div className="mt-6 flex flex-wrap gap-2">
               <button
                 onClick={() => toggleFavorite(recipe.id)}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-sm text-sm border transition-colors ${
@@ -333,6 +354,18 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
               >
                 <ChefHat size={14} />
                 Mode cuisine
+              </button>
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-sm text-sm border border-border text-text-light hover:border-text transition-colors"
+              >
+                {shareStatus === 'copied' ? (
+                  <><Copy size={14} className="text-secondary" /> Lien copié !</>
+                ) : shareStatus === 'shared' ? (
+                  <><Check size={14} className="text-secondary" /> Partagé !</>
+                ) : (
+                  <><Share2 size={14} /> Partager</>
+                )}
               </button>
             </div>
             <p className="recipe-script-note mt-2 text-sm">Suis les étapes comme sur un carnet</p>
@@ -369,6 +402,9 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
             </ol>
           </div>
         </div>
+
+        {/* Commentaires */}
+        <RecipeComments recipeId={recipe.id} user={user} />
 
         {/* Similar */}
         {similar.length > 0 && (

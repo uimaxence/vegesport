@@ -7,6 +7,9 @@ import { usePageMeta } from '../hooks/usePageMeta';
 import { objectives } from '../data/recipes';
 import { days, mealTypes } from '../data/plannings';
 import RecipeCard from '../components/RecipeCard';
+import RepasDuMoment from '../components/dashboard/RepasDuMoment';
+import SuiviApportsChart from '../components/dashboard/SuiviApportsChart';
+import { getPlanningForCurrentWeek } from '../utils/dashboardPlanning';
 
 const MEALS_DONE_KEY = 'vegeprot_meals_done';
 
@@ -36,6 +39,9 @@ export default function Profile({ user, favorites, savedPlannings }) {
   const [expandedPlanningId, setExpandedPlanningId] = useState(null);
   const [mealsDone, setMealsDone] = useState(() => loadMealsDoneFromStorage(user?.id));
 
+  const currentPlanning = getPlanningForCurrentWeek(savedPlannings);
+  const getRecipe = (id) => recipes.find((r) => r.id === id);
+
   useEffect(() => {
     if (!user?.id) return;
     setMealsDone(loadMealsDoneFromStorage(user.id));
@@ -56,8 +62,6 @@ export default function Profile({ user, favorites, savedPlannings }) {
       },
     });
   };
-
-  const getRecipe = (id) => recipes.find((r) => r.id === id);
 
   const totalMealsDone = useMemo(() => {
     let n = 0;
@@ -112,6 +116,53 @@ export default function Profile({ user, favorites, savedPlannings }) {
             Déconnexion
           </button>
         </div>
+
+        {/* Dashboard semaine en cours */}
+        {currentPlanning && (() => {
+          const currentPlanningId = currentPlanning.id ?? `local-${currentPlanning.date}`;
+          const mealsDoneMap = mealsDone[currentPlanningId] || {};
+          return (
+            <div className="mb-12">
+              <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-4 flex items-center gap-2">
+                <Calendar size={13} />
+                Semaine en cours
+              </h2>
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+                <div className="lg:col-span-2">
+                  <RepasDuMoment
+                    planning={currentPlanning}
+                    getRecipe={getRecipe}
+                    mealsDoneMap={mealsDoneMap}
+                    onToggleDone={(day, mealTypeId) => toggleMealDone(currentPlanningId, day, mealTypeId)}
+                  />
+                </div>
+                <div className="lg:col-span-3">
+                  <SuiviApportsChart
+                    planning={currentPlanning}
+                    getRecipe={getRecipe}
+                    portions={2}
+                    mealsDoneMap={mealsDoneMap}
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {!currentPlanning && (
+          <div className="mb-12 rounded-xl border border-dashed border-border bg-bg-warm/50 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-text">Aucun planning pour cette semaine</p>
+              <p className="text-xs text-text-light mt-0.5">Crée ton planning pour voir ici le repas du moment et le suivi de tes apports.</p>
+            </div>
+            <Link
+              to="/planning"
+              className="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-medium rounded-sm hover:bg-primary-dark transition-colors"
+            >
+              Créer mon planning
+            </Link>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">

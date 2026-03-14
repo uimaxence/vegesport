@@ -61,7 +61,7 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
             {recipe.tags.slice(0, 3).map(tag => (
               <span
                 key={tag}
-                className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-[rgb(0,0,0,0.05)] border border-black/8 text-text"
+                className="text-[15px] font-medium px-2.5 py-1 rounded-lg bg-[rgb(0,0,0,0.05)] border border-black/8 text-text"
               >
                 {tag.replace('#', '')}
               </span>

@@ -104,7 +104,7 @@ export default function Recipes({ favorites, toggleFavorite }) {
                       }`}
                     >
                       {cat.label}
-                      <span className="text-[10px] text-text-light/70">{cat.count}</span>
+                      <span className="text-[13px] text-text-light/70">{cat.count}</span>
                     </button>
                   );
                 })}
@@ -168,7 +168,7 @@ export default function Recipes({ favorites, toggleFavorite }) {
                       <button
                         key={tag}
                         onClick={() => updateFilter('tag', isActive ? '' : tag)}
-                        className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-colors ${
+                        className={`text-[15px] px-2.5 py-1.5 rounded-lg border transition-colors ${
                           isActive
                             ? 'bg-white border-black/10 text-text font-medium shadow-sm'
                             : 'bg-black/[0.04] border-transparent text-text-light hover:text-text hover:bg-black/[0.06]'

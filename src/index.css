@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Police principale : titres et textes (fichier local public/typo/) */
+@font-face {
+  font-family: 'Contrail One';
+  src: url('/typo/ContrailOne-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-primary: #E8450E;
   --color-primary-light: #FF6B3D;
@@ -12,19 +21,37 @@
   --color-text: #1A1A1A;
   --color-text-light: #6B6B6B;
   --color-border: #E8E4DF;
-  --font-sans: 'Space Grotesk', system-ui, -apple-system, sans-serif;
-  --font-display: 'Instrument Serif', Georgia, serif;
+  /* Titres : Contrail One ; contraste / infos en avant : Space Grotesk */
+  --font-display: 'Contrail One', system-ui, Georgia, serif;
+  --font-accent: 'Space Grotesk', system-ui, sans-serif;
+  --font-heading-accent: var(--font-accent);
+  /* Corps de texte, liens : Satoshi */
+  --font-sans: 'Satoshi', system-ui, -apple-system, sans-serif;
   --font-script: 'Caveat', cursive;
 }
 
 @layer base {
+  html {
+    font-size: 18px;
+  }
   body {
     font-family: var(--font-sans);
+    letter-spacing: -0.03em;
     background-color: var(--color-bg);
     color: var(--color-text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     position: relative;
+  }
+  a {
+    font-family: var(--font-sans);
+    letter-spacing: -0.03em;
+  }
+  /* Infos en avant dans les titres : Space Grotesk pour le contraste */
+  .font-heading-accent,
+  .font-accent {
+    font-family: var(--font-heading-accent);
+    letter-spacing: normal;
   }
   /* Légère texture papier (carnet de recettes) */
   body::before {
@@ -38,9 +65,9 @@
   }
 }
 
-/* Titre de section style carnet (la vague est en dessous via .deco-wave) */
+/* Titre de section style carnet : Space Grotesk pour contraste avec les titres Contrail */
 .recipe-section-title {
-  font-family: var(--font-display);
+  font-family: var(--font-accent);
   font-size: 0.75rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;

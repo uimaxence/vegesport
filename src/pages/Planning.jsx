@@ -56,6 +56,7 @@ export default function Planning({ user, savePlanning }) {
   const [mealNotes, setMealNotes] = useState({});
   const [editingNote, setEditingNote] = useState(null);
   const [actionFeedback, setActionFeedback] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [hasSavedPlanning, setHasSavedPlanning] = useState(false);
   const [editingPlanningId, setEditingPlanningId] = useState(null);
   const [editWeekStart, setEditWeekStart] = useState(null);
@@ -97,22 +98,71 @@ export default function Planning({ user, savePlanning }) {
   };
 
   const generatePlanning = () => {
-    const base = defaultPlannings[objective]?.meals || defaultPlannings.masse.meals;
-    const newPlanning = {};
+    setIsGenerating(true);
 
-    days.forEach(day => {
-      newPlanning[day] = {};
-      mealTypes.forEach(mt => {
-        if (pinnedMeals[`${day}-${mt.id}`]) {
-          newPlanning[day][mt.id] = planning[day]?.[mt.id];
-        } else {
-          newPlanning[day][mt.id] = base[day]?.[mt.id];
-        }
+    // Petit délai pour le spinner + éviter le freeze UI
+    setTimeout(() => {
+      // Pool de recettes déjà choisies sur cette génération pour limiter les doublons
+      const usedIds = new Set(
+        Object.values(pinnedMeals).length > 0
+          ? Object.entries(pinnedMeals)
+              .filter(([, pinned]) => pinned)
+              .map(([key]) => {
+                const [day, mt] = key.split('-');
+                return planning[day]?.[mt];
+              })
+              .filter(Boolean)
+          : []
+      );
+
+      const newPlanning = {};
+
+      days.forEach(day => {
+        newPlanning[day] = {};
+        mealTypes.forEach(mt => {
+          const key = `${day}-${mt.id}`;
+
+          // Repas verrouillé → on le conserve tel quel
+          if (pinnedMeals[key]) {
+            newPlanning[day][mt.id] = planning[day]?.[mt.id];
+            return;
+          }
+
+          // Filtrage par catégorie + objectif + régime
+          let pool = recipes.filter(r => {
+            if (r.category !== mt.id) return false;
+            if (!r.objective.includes(objective)) return false;
+            if (regime !== 'vegetarien' && !r.regime.includes(regime)) return false;
+            return true;
+          });
+
+          // Fallback : catégorie + objectif (ignore régime)
+          if (pool.length === 0) {
+            pool = recipes.filter(r => r.category === mt.id && r.objective.includes(objective));
+          }
+          // Fallback ultime : catégorie seule
+          if (pool.length === 0) {
+            pool = recipes.filter(r => r.category === mt.id);
+          }
+
+          if (pool.length === 0) {
+            newPlanning[day][mt.id] = null;
+            return;
+          }
+
+          // Préférer les recettes pas encore utilisées dans ce planning
+          const fresh = pool.filter(r => !usedIds.has(r.id));
+          const candidates = fresh.length > 0 ? fresh : pool;
+          const picked = candidates[Math.floor(Math.random() * candidates.length)];
+          newPlanning[day][mt.id] = picked.id;
+          usedIds.add(picked.id);
+        });
       });
-    });
 
-    setPlanning(newPlanning);
-    setGenerated(true);
+      setPlanning(newPlanning);
+      setGenerated(true);
+      setIsGenerating(false);
+    }, 500);
   };
 
   const replaceRecipe = (day, mealType) => {
@@ -678,10 +728,14 @@ export default function Planning({ user, savePlanning }) {
 
         <button
           onClick={generatePlanning}
-          className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-white text-base font-medium rounded-sm hover:bg-primary-dark transition-colors mb-10"
+          disabled={isGenerating}
+          className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-white text-base font-medium rounded-sm hover:bg-primary-dark transition-colors mb-10 disabled:opacity-75 disabled:cursor-not-allowed"
         >
-          <RefreshCw size={18} />
-          {generated ? 'Regénérer' : 'Générer mon planning'}
+          {isGenerating
+            ? <Loader2 size={18} className="animate-spin" />
+            : <RefreshCw size={18} />
+          }
+          {isGenerating ? 'Génération…' : generated ? 'Regénérer' : 'Générer mon planning'}
         </button>
 
         {/* Moyennes nutritionnelles vs besoins sportif */}
@@ -796,6 +850,14 @@ export default function Planning({ user, savePlanning }) {
                     >
                       {recipe && !isDragSource ? (
                         <>
+                          {/* Photo recette — format horizontal, saigne jusqu'aux bords */}
+                          <div className="-mx-3 -mt-3 mb-2 overflow-hidden rounded-t-xl flex-shrink-0">
+                            <img
+                              src={recipe.image}
+                              alt={recipe.title}
+                              className="w-full aspect-[16/9] object-cover"
+                            />
+                          </div>
                           {!isPast && (
                             <div className="flex items-center justify-end gap-0.5 mb-1">
                               <button
@@ -872,7 +934,7 @@ export default function Planning({ user, savePlanning }) {
                               {dupPanel.day === day && dupPanel.mealType === mt.id && (
                                 <>
                                   <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-sm shadow-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
-                                    <p className="px-3 pt-2.5 pb-1 text-[10px] font-medium uppercase tracking-wider text-text-light">
+                                    <p className="px-3 pt-2.5 pb-1 text-[13px] font-medium uppercase tracking-wider text-text-light">
                                       Dupliquer vers
                                     </p>
                                     <div className="px-2 py-1 space-y-0.5">
@@ -895,7 +957,7 @@ export default function Planning({ user, savePlanning }) {
                                       <button
                                         type="button"
                                         onClick={() => setDupPanel(prev => ({ ...prev, selectedDays: days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))) }))}
-                                        className="flex-1 text-[10px] py-1.5 text-text-light hover:text-text border border-border rounded-sm transition-colors"
+                                        className="flex-1 text-[13px] py-1.5 text-text-light hover:text-text border border-border rounded-sm transition-colors"
                                       >
                                         Tous
                                       </button>
@@ -903,7 +965,7 @@ export default function Planning({ user, savePlanning }) {
                                         type="button"
                                         onClick={confirmDuplicate}
                                         disabled={dupPanel.selectedDays.length === 0}
-                                        className="flex-1 text-[10px] py-1.5 font-medium bg-primary text-white rounded-sm hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                        className="flex-1 text-[13px] py-1.5 font-medium bg-primary text-white rounded-sm hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                       >
                                         Valider
                                       </button>
@@ -1024,7 +1086,16 @@ export default function Planning({ user, savePlanning }) {
                         </div>
                       );
                       return (
-                        <div key={mt.id} className={`rounded-lg bg-black/[0.02] border border-black/8 p-3.5 ${isPinned ? 'ring-1 ring-black/20' : ''} ${dayIsPast ? 'opacity-90' : ''}`}>
+                        <div key={mt.id} className={`rounded-lg bg-black/[0.02] border border-black/8 overflow-hidden ${isPinned ? 'ring-1 ring-black/20' : ''} ${dayIsPast ? 'opacity-90' : ''}`}>
+                          {/* Photo recette mobile — format horizontal */}
+                          <div className="overflow-hidden">
+                            <img
+                              src={recipe.image}
+                              alt={recipe.title}
+                              className="w-full aspect-[16/9] object-cover"
+                            />
+                          </div>
+                          <div className="p-3.5">
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-xs font-medium text-text-light uppercase tracking-wider">{mt.label}</span>
                             {!dayIsPast && (
@@ -1102,7 +1173,7 @@ export default function Planning({ user, savePlanning }) {
                                 {dupPanel.day === day && dupPanel.mealType === mt.id && (
                                   <>
                                     <div className="absolute right-0 top-full mt-1 z-30 w-52 bg-white border border-border rounded-lg shadow-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
-                                      <p className="px-3 pt-2.5 pb-1 text-[10px] font-medium uppercase tracking-wider text-text-light">
+                                      <p className="px-3 pt-2.5 pb-1 text-[13px] font-medium uppercase tracking-wider text-text-light">
                                         Dupliquer vers
                                       </p>
                                       <div className="px-2 py-1 space-y-0.5">
@@ -1125,7 +1196,7 @@ export default function Planning({ user, savePlanning }) {
                                         <button
                                           type="button"
                                           onClick={() => setDupPanel(prev => ({ ...prev, selectedDays: days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))) }))}
-                                          className="flex-1 text-[10px] py-1.5 text-text-light hover:text-text border border-border rounded transition-colors"
+                                          className="flex-1 text-[13px] py-1.5 text-text-light hover:text-text border border-border rounded transition-colors"
                                         >
                                           Tous
                                         </button>
@@ -1133,7 +1204,7 @@ export default function Planning({ user, savePlanning }) {
                                           type="button"
                                           onClick={confirmDuplicate}
                                           disabled={dupPanel.selectedDays.length === 0}
-                                          className="flex-1 text-[10px] py-1.5 font-medium bg-primary text-white rounded hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                          className="flex-1 text-[13px] py-1.5 font-medium bg-primary text-white rounded hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                         >
                                           Valider
                                         </button>
@@ -1165,6 +1236,7 @@ export default function Planning({ user, savePlanning }) {
                             </p>
                           </button>
                           )}
+                          </div>{/* /p-3.5 */}
                         </div>
                       );
                     })}
@@ -1254,7 +1326,7 @@ export default function Planning({ user, savePlanning }) {
                 {previewRecipe.tags?.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {previewRecipe.tags.slice(0, 4).map(tag => (
-                      <span key={tag} className="text-[10px] px-2 py-0.5 rounded-sm bg-black/5 text-text border border-border">
+                      <span key={tag} className="text-[13px] px-2 py-0.5 rounded-sm bg-black/5 text-text border border-border">
                         {tag.replace('#', '')}
                       </span>
                     ))}

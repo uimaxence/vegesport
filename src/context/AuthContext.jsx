@@ -3,11 +3,44 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const AuthContext = createContext(null);
 
+// ─── localStorage helpers ────────────────────────────────────────────────────
+const LS_PLANNINGS_PREFIX = 'vegeprot_plannings_';
+
+function lsKey(userId) {
+  return `${LS_PLANNINGS_PREFIX}${userId || 'guest'}`;
+}
+
+function loadPlanningsFromLS(userId) {
+  try {
+    const raw = localStorage.getItem(lsKey(userId));
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function savePlanningsToLS(userId, plannings) {
+  try {
+    localStorage.setItem(lsKey(userId), JSON.stringify(plannings));
+  } catch {}
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [favorites, setFavorites] = useState([]);
-  const [savedPlannings, setSavedPlannings] = useState([]);
+  // Initialise depuis localStorage guest pour affichage immédiat
+  const [savedPlannings, setSavedPlannings] = useState(() => loadPlanningsFromLS('guest'));
   const [loading, setLoading] = useState(!!isSupabaseConfigured());
+
+  // Wrapper : met à jour le state ET localStorage en même temps
+  const setPlannings = useCallback((updaterOrValue, userId) => {
+    setSavedPlannings((prev) => {
+      const next = typeof updaterOrValue === 'function' ? updaterOrValue(prev) : updaterOrValue;
+      savePlanningsToLS(userId || 'guest', next);
+      return next;
+    });
+  }, []);
 
   const loadFavorites = useCallback(async (userId) => {
     if (!supabase || !userId) return [];
@@ -43,36 +76,57 @@ export function AuthProvider({ children }) {
 
     supabase.auth
       .getSession()
-      .then(({ data: { session } }) => {
-        setUser(session?.user ?? null);
-        if (session?.user?.id) {
-          loadFavorites(session.user.id).then(setFavorites);
-          loadPlannings(session.user.id).then(setSavedPlannings);
+      .then(async ({ data: { session } }) => {
+        const u = session?.user ?? null;
+        setUser(u);
+        if (u?.id) {
+          // Pré-charge depuis localStorage pour affichage immédiat
+          const cached = loadPlanningsFromLS(u.id);
+          if (cached.length > 0) setSavedPlannings(cached);
+          // Puis synchronise avec Supabase
+          const [favs, plans] = await Promise.all([
+            loadFavorites(u.id),
+            loadPlannings(u.id),
+          ]);
+          setFavorites(favs);
+          // Supabase fait autorité : on écrase le cache et le LS
+          if (plans.length > 0) {
+            savePlanningsToLS(u.id, plans);
+            setSavedPlannings(plans);
+          }
         }
         setLoading(false);
       })
       .catch(() => {
-        // Réseau inaccessible (ex. Failed to fetch auth.supabase.io) : on laisse l'app utilisable sans auth
         setLoading(false);
       });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user?.id) {
+      const u = session?.user ?? null;
+      setUser(u);
+      if (u?.id) {
         try {
-          const favs = await loadFavorites(session.user.id);
-          const plans = await loadPlannings(session.user.id);
+          // Pré-charge depuis localStorage
+          const cached = loadPlanningsFromLS(u.id);
+          if (cached.length > 0) setSavedPlannings(cached);
+          const [favs, plans] = await Promise.all([
+            loadFavorites(u.id),
+            loadPlannings(u.id),
+          ]);
           setFavorites(favs);
-          setSavedPlannings(plans);
+          if (plans.length > 0) {
+            savePlanningsToLS(u.id, plans);
+            setSavedPlannings(plans);
+          }
         } catch {
           setFavorites([]);
-          setSavedPlannings([]);
         }
       } else {
         setFavorites([]);
-        setSavedPlannings([]);
+        // Garde les plannings guest depuis LS
+        setSavedPlannings(loadPlanningsFromLS('guest'));
       }
     });
 
@@ -89,12 +143,26 @@ export function AuthProvider({ children }) {
       }
       if (!supabase) return;
       const isFav = favorites.includes(recipeId);
-      if (isFav) {
-        await supabase.from('favorites').delete().eq('user_id', user.id).eq('recipe_id', recipeId);
-        setFavorites((prev) => prev.filter((id) => id !== recipeId));
-      } else {
-        await supabase.from('favorites').insert({ user_id: user.id, recipe_id: recipeId });
-        setFavorites((prev) => [...prev, recipeId]);
+
+      // Mise à jour optimiste : réponse immédiate de l'UI
+      setFavorites((prev) =>
+        isFav ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]
+      );
+
+      try {
+        if (isFav) {
+          const { error } = await supabase.from('favorites').delete().eq('user_id', user.id).eq('recipe_id', recipeId);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.from('favorites').insert({ user_id: user.id, recipe_id: recipeId });
+          if (error) throw error;
+        }
+      } catch (e) {
+        console.error('toggleFavorite error:', e?.message);
+        // Annule la mise à jour optimiste en cas d'échec
+        setFavorites((prev) =>
+          isFav ? [...prev, recipeId] : prev.filter((id) => id !== recipeId)
+        );
       }
     },
     [user?.id, favorites]
@@ -112,28 +180,58 @@ export function AuthProvider({ children }) {
   const savePlanning = useCallback(
     async (planning) => {
       const weekStart = planning.weekStart || getWeekStart(new Date());
-      const entry = {
-        label: planning.date,
+      const newEntry = {
+        id: null,
+        date: planning.date,
         objective: planning.objective,
         meals: planning.meals || {},
-        week_start: weekStart,
+        weekStart,
       };
-      setSavedPlannings((prev) => [
-        { id: null, date: planning.date, objective: planning.objective, meals: planning.meals, weekStart },
-        ...prev,
-      ]);
+      // Remplace le planning de la même semaine s'il existe déjà, sinon prepend
+      setPlannings((prev) => {
+        const filtered = prev.filter((p) => p.weekStart !== weekStart);
+        return [newEntry, ...filtered];
+      }, user?.id);
+
       if (user?.id && supabase) {
-        const { data } = await supabase.from('plannings').insert({ ...entry, user_id: user.id }).select('id, created_at').single();
-        if (data) {
-          setSavedPlannings((prev) =>
-            prev.map((p) =>
-              !p.id && p.date === planning.date ? { ...p, id: data.id } : p
-            )
+        // Vérifie s'il existe déjà un planning pour cette semaine en BDD
+        const { data: existing } = await supabase
+          .from('plannings')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('week_start', weekStart)
+          .maybeSingle();
+
+        if (existing?.id) {
+          // Mise à jour
+          await supabase.from('plannings').update({
+            label: planning.date,
+            objective: planning.objective,
+            meals: planning.meals || {},
+          }).eq('id', existing.id).eq('user_id', user.id);
+          setPlannings((prev) =>
+            prev.map((p) => p.weekStart === weekStart ? { ...p, id: existing.id } : p),
+            user.id
           );
+        } else {
+          // Création
+          const { data } = await supabase.from('plannings').insert({
+            user_id: user.id,
+            label: planning.date,
+            objective: planning.objective,
+            meals: planning.meals || {},
+            week_start: weekStart,
+          }).select('id').single();
+          if (data?.id) {
+            setPlannings((prev) =>
+              prev.map((p) => p.weekStart === weekStart && !p.id ? { ...p, id: data.id } : p),
+              user.id
+            );
+          }
         }
       }
     },
-    [user?.id, getWeekStart]
+    [user?.id, getWeekStart, setPlannings]
   );
 
   const updatePlanning = useCallback(
@@ -145,23 +243,27 @@ export function AuthProvider({ children }) {
       if (objective !== undefined) updates.objective = objective;
       if (week_start !== undefined) updates.week_start = week_start;
       if (Object.keys(updates).length === 0) return;
-      setSavedPlannings((prev) =>
+      setPlannings((prev) =>
         prev.map((p) =>
-          p.id === planningId ? { ...p, ...updates, date: updates.label ?? p.date, weekStart: updates.week_start ?? p.weekStart } : p
-        )
+          p.id === planningId
+            ? { ...p, ...updates, date: updates.label ?? p.date, weekStart: updates.week_start ?? p.weekStart }
+            : p
+        ),
+        user?.id
       );
       if (user?.id && supabase) {
         await supabase.from('plannings').update(updates).eq('id', planningId).eq('user_id', user.id);
       }
     },
-    [user?.id]
+    [user?.id, setPlannings]
   );
 
   const signOut = useCallback(async () => {
     if (supabase) await supabase.auth.signOut();
     setUser(null);
     setFavorites([]);
-    setSavedPlannings([]);
+    // Conserve les plannings guest depuis LS
+    setSavedPlannings(loadPlanningsFromLS('guest'));
   }, []);
 
   const setUserLocal = useCallback((u) => {
