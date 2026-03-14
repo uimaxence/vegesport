@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Download, Lock, LockOpen, RefreshCw, ShoppingCart, ChevronDown, ChevronRight, Check, Copy, MoreVertical, X, Clock, Flame, Beef, Users, ExternalLink, Trash2, RotateCcw, Pencil, Plus, Loader2 } from 'lucide-react';
+import { Download, Lock, LockOpen, RefreshCw, ShoppingCart, ChevronDown, ChevronRight, Check, Copy, MoreVertical, X, Clock, Flame, Beef, Users, ExternalLink, Trash2, RotateCcw, Pencil, Plus, Loader2, Calendar } from 'lucide-react';
 import { usePageMeta } from '../hooks/usePageMeta';
 import Toast from '../components/Toast';
 import { getSlug } from '../lib/slug';
@@ -9,6 +9,8 @@ import { defaultPlannings, days, mealTypes } from '../data/plannings';
 import { objectives, regimes } from '../data/recipes';
 import { useAuth } from '../context/AuthContext';
 import { getCarrefourDriveUrl, getCoursesUDriveUrl, hasCarrefourAffiliate } from '../lib/driveLinks';
+import { buildPlanningIcs, downloadPlanningIcs } from '../lib/calendarExport';
+import { addToGoogleCalendar, hasGoogleCalendarConfig } from '../lib/googleCalendar';
 
 function getTodayStr() {
   const d = new Date();
@@ -47,10 +49,14 @@ export default function Planning({ user, savePlanning }) {
   const [showGroceryList, setShowGroceryList] = useState(false);
   const [groceryListStep, setGroceryListStep] = useState('loading');
   const [pantryChecked, setPantryChecked] = useState(() => new Set());
+  const [groceryChecked, setGroceryChecked] = useState(() => new Set());
   const [pinnedMeals, setPinnedMeals] = useState({});
   const [generated, setGenerated] = useState(false);
   const [previewRecipe, setPreviewRecipe] = useState(null);
   const [contextMenu, setContextMenu] = useState({ day: null, mealType: null });
+  const [addingToGoogle, setAddingToGoogle] = useState(false);
+  const [googleCalendarCount, setGoogleCalendarCount] = useState(0);
+  const [googleCalendarError, setGoogleCalendarError] = useState('');
   const [dupPanel, setDupPanel] = useState({ day: null, mealType: null, selectedDays: [] });
   const [skippedDays, setSkippedDays] = useState({});
   const [expandedDay, setExpandedDay] = useState(null);
@@ -325,6 +331,7 @@ export default function Planning({ user, savePlanning }) {
     }
     setGroceryListStep('loading');
     setPantryChecked(new Set());
+    setGroceryChecked(new Set());
     const t = setTimeout(() => setGroceryListStep('pantry'), 550);
     return () => clearTimeout(t);
   }, [showGroceryList]);
@@ -363,6 +370,16 @@ export default function Planning({ user, savePlanning }) {
     });
   };
 
+  const toggleGroceryItem = (category, item) => {
+    const key = `${category}-${item}`;
+    setGroceryChecked(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
   const toBuyByCategory = useMemo(() => {
     const toBuy = [
       ...pantryItems.filter(({ name }) => !pantryChecked.has(name)),
@@ -376,6 +393,18 @@ export default function Planning({ user, savePlanning }) {
     return byCat;
   }, [pantryItems, restItems, pantryChecked]);
 
+  const toBuyByCategoryOrdered = useMemo(() => {
+    const entries = Object.entries(toBuyByCategory);
+    return entries.sort(([a], [b]) => {
+      const ia = RAYON_ORDER.indexOf(a);
+      const ib = RAYON_ORDER.indexOf(b);
+      if (ia === -1 && ib === -1) return a.localeCompare(b, 'fr');
+      if (ia === -1) return 1;
+      if (ib === -1) return -1;
+      return ia - ib;
+    });
+  }, [toBuyByCategory]);
+
   const activeMealTypes = mealTypes.slice(0, mealsPerDay);
 
   const handleGroceryClick = () => {
@@ -388,6 +417,41 @@ export default function Planning({ user, savePlanning }) {
     if (requireAuthForAction('download')) return;
     exportGroceryList(groceryList);
     setActionFeedback('download');
+  };
+
+  /** Lundi de la semaine courante (YYYY-MM-DD) si pas de semaine en édition. */
+  const weekStartForCalendar = editWeekStart || (() => {
+    const today = new Date();
+    const day = today.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diff);
+    return monday.toISOString().slice(0, 10);
+  })();
+
+  const handleAddToCalendar = () => {
+    const ics = buildPlanningIcs(planning, weekStartForCalendar, getRecipe, mealTypes, days, mealsPerDay);
+    downloadPlanningIcs(ics);
+    setActionFeedback('calendar');
+  };
+
+  const handleAddToGoogleCalendar = async () => {
+    setAddingToGoogle(true);
+    try {
+      const result = await addToGoogleCalendar(planning, weekStartForCalendar, getRecipe, mealTypes, days, mealsPerDay);
+      if (result.success) {
+        setActionFeedback(result.count > 0 ? 'google_calendar' : 'google_calendar_empty');
+        setGoogleCalendarCount(result.count);
+      } else {
+        setActionFeedback('google_calendar_error');
+        setGoogleCalendarError(result.error || 'Erreur inconnue');
+      }
+    } catch (e) {
+      setActionFeedback('google_calendar_error');
+      setGoogleCalendarError(e?.message || 'Erreur');
+    } finally {
+      setAddingToGoogle(false);
+    }
   };
 
   const doSavePlanning = () => {
@@ -598,6 +662,18 @@ export default function Planning({ user, savePlanning }) {
           )}
           {actionFeedback === 'copy' && (
             <p>Liste copiée dans le presse-papier. Colle-la dans ton drive.</p>
+          )}
+          {actionFeedback === 'calendar' && (
+            <p>Planning exporté en .ics. Ouvre le fichier pour l’ajouter à Apple Calendar ou Outlook.</p>
+          )}
+          {actionFeedback === 'google_calendar' && (
+            <p>{googleCalendarCount} repas ajoutés à ton Google Calendar.</p>
+          )}
+          {actionFeedback === 'google_calendar_empty' && (
+            <p>Aucun repas à ajouter (planning vide pour cette semaine).</p>
+          )}
+          {actionFeedback === 'google_calendar_error' && (
+            <p>Erreur : {googleCalendarError}</p>
           )}
           {actionFeedback === 'updated' && (
             <p>
@@ -1274,6 +1350,33 @@ export default function Planning({ user, savePlanning }) {
             <Download size={18} />
             Télécharger la liste
           </button>
+          {hasGoogleCalendarConfig() ? (
+            <>
+              <button
+                onClick={handleAddToGoogleCalendar}
+                disabled={addingToGoogle}
+                className="inline-flex items-center gap-2 px-5 py-3 bg-black/[0.04] text-text text-base font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent disabled:opacity-60"
+              >
+                {addingToGoogle ? <Loader2 size={18} className="animate-spin" /> : <Calendar size={18} />}
+                {addingToGoogle ? 'Connexion…' : 'Ajouter à Google Calendar'}
+              </button>
+              <button
+                onClick={handleAddToCalendar}
+                className="inline-flex items-center gap-2 px-5 py-3 bg-black/[0.04] text-text text-base font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
+              >
+                <Download size={18} />
+                Fichier .ics (Apple, Outlook)
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={handleAddToCalendar}
+              className="inline-flex items-center gap-2 px-5 py-3 bg-black/[0.04] text-text text-base font-medium rounded-[10px] hover:bg-black/[0.08] transition-colors border border-transparent"
+            >
+              <Calendar size={18} />
+              Ajouter à mon calendrier
+            </button>
+          )}
 
         </div>
 
@@ -1349,10 +1452,15 @@ export default function Planning({ user, savePlanning }) {
         )}
 
         {showGroceryList && (
-          <div className="mt-8 bg-white border border-black/[0.08] rounded-xl p-6 sm:p-8 shadow-sm">
-            <h3 className="text-xs uppercase tracking-[0.2em] text-text-light mb-6">
-              Liste de courses {portions > 1 ? `(pour ${portions} portions)` : ''}
-            </h3>
+          <div className="mt-8 bg-white border border-black/[0.08] rounded-2xl p-6 sm:p-8 shadow-sm">
+            <div className="flex flex-wrap items-baseline justify-between gap-4 mb-6">
+              <h3 className="text-lg font-semibold text-text">
+                Liste de courses {portions > 1 ? `(pour ${portions} portions)` : ''}
+              </h3>
+              <p className="text-sm text-text-light max-w-xl">
+                Organisée par rayon pour faciliter vos achats.
+              </p>
+            </div>
 
             {groceryListStep === 'loading' && (
               <div className="flex flex-col items-center justify-center py-16 sm:py-20">
@@ -1388,9 +1496,9 @@ export default function Planning({ user, savePlanning }) {
                 <button
                   type="button"
                   onClick={() => setGroceryListStep('rest')}
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-primary text-white text-base font-medium rounded-lg hover:bg-primary-dark transition-colors"
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-primary text-white text-base font-medium rounded-xl hover:bg-primary-dark transition-colors shadow-sm"
                 >
-                  Voir le reste des ingrédients
+                  Voir les ingrédients à acheter (par rayon)
                   <ChevronRight size={18} />
                 </button>
               </>
@@ -1415,17 +1523,33 @@ export default function Planning({ user, savePlanning }) {
                 <p className="text-sm text-text-light mb-6">
                   À acheter pour la semaine. Cochez au fur et à mesure de vos courses.
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {Object.entries(toBuyByCategory).map(([category, items]) => (
-                    <div key={category}>
-                      <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-2">{category}</p>
-                      <ul className="space-y-1.5">
-                        {items.map((item, i) => (
-                          <li key={`${category}-${item}-${i}`} className="flex items-start gap-2 text-sm text-text-light">
-                            <span className="w-3.5 h-3.5 rounded border border-border flex-shrink-0 mt-0.5" />
-                            {item}
-                          </li>
-                        ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+                  {toBuyByCategoryOrdered.map(([category, items]) => (
+                    <div key={category} className="rounded-xl border border-black/[0.08] bg-black/[0.02] p-4">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-text-light mb-3 pb-2 border-b border-black/[0.08]">
+                        {category}
+                      </p>
+                      <ul className="space-y-1">
+                        {items.map((item) => {
+                          const key = `${category}-${item}`;
+                          const checked = groceryChecked.has(key);
+                          return (
+                            <li key={key}>
+                              <button
+                                type="button"
+                                onClick={() => toggleGroceryItem(category, item)}
+                                className="flex items-center gap-3 w-full text-left py-2 px-2 -mx-2 rounded-lg hover:bg-white transition-colors min-w-0"
+                              >
+                                <span className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${checked ? 'bg-primary border-primary' : 'border-border'}`}>
+                                  {checked && <Check size={12} className="text-white" strokeWidth={3} />}
+                                </span>
+                                <span className={`text-sm truncate min-w-0 ${checked ? 'text-text-light line-through' : 'text-text'}`}>
+                                  {item}
+                                </span>
+                              </button>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   ))}
@@ -1442,7 +1566,7 @@ export default function Planning({ user, savePlanning }) {
                     type="button"
                     onClick={() => {
                       const lines = [];
-                      Object.entries(toBuyByCategory).forEach(([category, items]) => {
+                      toBuyByCategoryOrdered.forEach(([category, items]) => {
                         lines.push(`${category.toUpperCase()}`);
                         items.forEach(item => lines.push(`☐ ${item}`));
                         lines.push('');
@@ -1452,7 +1576,7 @@ export default function Planning({ user, savePlanning }) {
                         navigator.clipboard.writeText(text).then(() => setActionFeedback('copy'));
                       }
                     }}
-                    className="inline-flex items-center gap-2 px-4 py-3 rounded-lg border border-border text-text hover:bg-black/[0.03] transition-colors text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-border text-text hover:bg-black/[0.03] transition-colors text-sm font-medium"
                   >
                     <Copy size={16} /> Copier la liste
                   </button>
@@ -1539,16 +1663,29 @@ function EmptyMealSlot({ cellKey, day, mealType, mealNotes, editingNote, startEd
   );
 }
 
+/** Rayons supermarché : ordre d’affichage (parcours type en magasin). */
+const RAYON_ORDER = [
+  'Fruits et légumes',
+  'Épicerie',
+  'Pâtes, riz et céréales',
+  'Boissons',
+  'Frais et protéines végétales',
+  'Surgelés',
+  'Condiments et épices',
+  'Graines et oléagineux',
+];
+
 function categorizeIngredient(ingredient) {
   const lower = ingredient.toLowerCase();
-  if (/tofu|tempeh|seitan|protéine|edamame/.test(lower)) return 'Protéines végétales';
-  if (/lentille|pois chiche|haricot|quinoa|pois/.test(lower)) return 'Légumineuses et céréales';
-  if (/avoine|farine|sarrasin|riz|pâte|tortilla|pain/.test(lower)) return 'Épicerie';
-  if (/lait|crème|yaourt|coco/.test(lower)) return 'Boissons végétales';
-  if (/beurre de|tahini|huile|soja|sauce|miel|sirop|cacao|chocolat|levure|spiruline|curry|cumin|curcuma|paprika|garam|chili|origan|piment|sel|poivre/.test(lower)) return 'Condiments et épices';
-  if (/graine|noix|amande|cacahuète|sésame|pin|tournesol|chia|lin|chanvre/.test(lower)) return 'Graines et oléagineux';
-  if (/banane|mangue|myrtille|fruit|açaï|datte|citron|passion|olive/.test(lower)) return 'Fruits';
-  return 'Légumes et herbes';
+  if (/tofu|tempeh|seitan|protéine|edamame/.test(lower)) return 'Frais et protéines végétales';
+  if (/lentille|pois chiche|haricot|quinoa|pois\s+(cassé|sec)/.test(lower)) return 'Pâtes, riz et céréales';
+  if (/avoine|farine|sarrasin|riz|pâte|tortilla|pain|flocon|granola/.test(lower)) return 'Épicerie';
+  if (/\blait\s+(d'|de\s+)|crème\s+(végétale|de\s+coco)|yaourt\s+végétal|boisson\s+végétale/.test(lower)) return 'Boissons';
+  if (/surgelé|congelé/.test(lower)) return 'Surgelés';
+  if (/beurre de|tahini|huile|sauce\s+soja|sauce|miel|sirop|cacao|chocolat\s+noir|levure|spiruline|curry|cumin|curcuma|paprika|garam|chili|origan|piment|sel|poivre|confiture|moutarde|vinaigre/.test(lower)) return 'Condiments et épices';
+  if (/graine|noix|amande|cacahuète|sésame|pin|tournesol|chia|lin|chanvre|noix de coco râpée/.test(lower)) return 'Graines et oléagineux';
+  if (/banane|mangue|myrtille|fruit|açaï|datte|citron|passion|olive|pomme|poire|pêche|abricot|kiwi|ananas/.test(lower)) return 'Fruits et légumes';
+  return 'Fruits et légumes';
 }
 
 const UNIT_REG = /^(\d+(?:[.,]\d+)?)\s*(g|kg|ml|L|cl|cm|c\.à\.s|c\.à\.c|c\.à\.s\.|c\.à\.c\.|pincée|pincées|sachet|sachets|tranche|tranches)?\s+(.+)$/i;
@@ -1664,8 +1801,16 @@ function aggregateIngredientsByCategory(rawByCategory) {
 }
 
 function exportGroceryList(groceryList) {
+  const entries = Object.entries(groceryList).sort(([a], [b]) => {
+    const ia = RAYON_ORDER.indexOf(a);
+    const ib = RAYON_ORDER.indexOf(b);
+    if (ia === -1 && ib === -1) return a.localeCompare(b, 'fr');
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
   let text = "=== LISTE DE COURSES — et si mamie était végé ? ===\n\n";
-  Object.entries(groceryList).forEach(([category, items]) => {
+  entries.forEach(([category, items]) => {
     text += `--- ${category.toUpperCase()} ---\n`;
     items.forEach(item => {
       text += `☐ ${item}\n`;
