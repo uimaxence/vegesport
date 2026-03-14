@@ -7,5 +7,9 @@ export const isSupabaseConfigured = () =>
   Boolean(url && anonKey && url !== 'https://xxx.supabase.co');
 
 export const supabase = isSupabaseConfigured()
-  ? createClient(url, anonKey)
+  ? createClient(url, anonKey, {
+      auth: {
+        detectSessionInUrl: true,
+      },
+    })
   : null;

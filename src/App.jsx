@@ -12,6 +12,7 @@ import Planning from './pages/Planning';
 import Blog from './pages/Blog';
 import BlogArticle from './pages/BlogArticle';
 import Login from './pages/Login';
+import AuthCallback from './pages/AuthCallback';
 import Profile from './pages/Profile';
 
 function AppRoutes() {
@@ -36,6 +37,7 @@ function AppRoutes() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:id" element={<BlogArticle />} />
           <Route path="/connexion" element={<Login />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/profil" element={
             <Profile
               user={user}
