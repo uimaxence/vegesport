@@ -49,9 +49,11 @@ export default function Footer() {
           <p className="text-xs text-text-light">
             &copy; {new Date().getFullYear()} et si mamie était végé ? — Recettes végétariennes.
           </p>
-          <p className="text-xs text-text-light">
-            by M+&copy;
-          </p>
+          <div className="flex items-center gap-4 text-xs text-text-light">
+            <Link to="/mentions-legales" className="hover:text-text transition-colors">Mentions légales</Link>
+            <Link to="/donnees-personnelles" className="hover:text-text transition-colors">Données personnelles</Link>
+            <span>by M+&copy;</span>
+          </div>
         </div>
       </div>
     </footer>

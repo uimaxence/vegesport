@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { DataProvider } from './context/DataContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
@@ -14,6 +15,8 @@ import BlogArticle from './pages/BlogArticle';
 import Login from './pages/Login';
 import AuthCallback from './pages/AuthCallback';
 import Profile from './pages/Profile';
+import PersonalData from './pages/PersonalData';
+import MentionsLegales from './pages/MentionsLegales';
 
 function AppRoutes() {
   const { user, favorites, savedPlannings, toggleFavorite, savePlanning } = useAuth();
@@ -35,7 +38,7 @@ function AppRoutes() {
             <Planning user={user} savePlanning={savePlanning} />
           } />
           <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:id" element={<BlogArticle />} />
+          <Route path="/blog/:id/:slug?" element={<BlogArticle />} />
           <Route path="/connexion" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/profil" element={
@@ -45,6 +48,8 @@ function AppRoutes() {
               savedPlannings={savedPlannings}
             />
           } />
+          <Route path="/donnees-personnelles" element={<PersonalData />} />
+          <Route path="/mentions-legales" element={<MentionsLegales />} />
         </Routes>
       </main>
       <Footer />
@@ -57,10 +62,12 @@ export default function App() {
     <Router>
       <AuthProvider>
         <DataProvider>
-          <div className="min-h-screen flex flex-col relative z-[1]">
-            <AppRoutes />
-            <Analytics />
-          </div>
+          <ErrorBoundary>
+            <div className="min-h-screen flex flex-col relative z-[1]">
+              <AppRoutes />
+              <Analytics />
+            </div>
+          </ErrorBoundary>
         </DataProvider>
       </AuthProvider>
     </Router>

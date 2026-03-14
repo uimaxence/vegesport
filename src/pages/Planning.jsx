@@ -8,6 +8,7 @@ import { recipes } from '../data/recipes';
 import { defaultPlannings, days, mealTypes } from '../data/plannings';
 import { objectives, regimes } from '../data/recipes';
 import { useAuth } from '../context/AuthContext';
+import { getCarrefourDriveUrl, getCoursesUDriveUrl, hasCarrefourAffiliate } from '../lib/driveLinks';
 
 function getTodayStr() {
   const d = new Date();
@@ -594,6 +595,9 @@ export default function Planning({ user, savePlanning }) {
           )}
           {actionFeedback === 'download' && (
             <p>Ta liste de courses a été téléchargée.</p>
+          )}
+          {actionFeedback === 'copy' && (
+            <p>Liste copiée dans le presse-papier. Colle-la dans ton drive.</p>
           )}
           {actionFeedback === 'updated' && (
             <p>
@@ -1362,18 +1366,19 @@ export default function Planning({ user, savePlanning }) {
                 <p className="text-sm text-text-light mb-4 max-w-xl">
                   Cochez ce que vous avez déjà dans vos placards pour ne pas le racheter.
                 </p>
-                <ul className="space-y-2 mb-8">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-8">
                   {pantryItems.map(({ name }) => (
                     <li key={name}>
                       <button
                         type="button"
                         onClick={() => togglePantryItem(name)}
-                        className="flex items-center gap-3 w-full text-left px-4 py-3 rounded-lg border border-border hover:bg-black/[0.02] transition-colors"
+                        title={name}
+                        className="flex items-center gap-3 w-full text-left px-4 py-3 rounded-lg border border-border hover:bg-black/[0.02] transition-colors min-w-0"
                       >
                         <span className={`flex-shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${pantryChecked.has(name) ? 'bg-primary border-primary' : 'border-border'}`}>
                           {pantryChecked.has(name) && <Check size={14} className="text-white" />}
                         </span>
-                        <span className={`text-base font-medium ${pantryChecked.has(name) ? 'text-text-light line-through' : 'text-text'}`}>
+                        <span className={`text-sm font-medium truncate min-w-0 ${pantryChecked.has(name) ? 'text-text-light line-through' : 'text-text'}`}>
                           {name}
                         </span>
                       </button>
@@ -1435,11 +1440,47 @@ export default function Planning({ user, savePlanning }) {
                   </button>
                   <button
                     type="button"
-                    className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-white text-base font-medium rounded-lg hover:bg-primary-dark transition-colors"
+                    onClick={() => {
+                      const lines = [];
+                      Object.entries(toBuyByCategory).forEach(([category, items]) => {
+                        lines.push(`${category.toUpperCase()}`);
+                        items.forEach(item => lines.push(`☐ ${item}`));
+                        lines.push('');
+                      });
+                      const text = lines.length ? lines.join('\n') : '';
+                      if (text) {
+                        navigator.clipboard.writeText(text).then(() => setActionFeedback('copy'));
+                      }
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-3 rounded-lg border border-border text-text hover:bg-black/[0.03] transition-colors text-sm font-medium"
                   >
-                    Passer commande
+                    <Copy size={16} /> Copier la liste
                   </button>
                 </div>
+                <p className="text-xs text-text-light mt-4 mb-2">Passer commande sur un drive</p>
+                <div className="flex flex-wrap gap-3">
+                  <a
+                    href={getCarrefourDriveUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-[#004E9A] text-white text-sm font-medium hover:bg-[#003d7a] transition-colors"
+                  >
+                    <ExternalLink size={16} /> Carrefour Drive
+                  </a>
+                  <a
+                    href={getCoursesUDriveUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-lg border border-border text-text text-sm font-medium hover:bg-black/[0.03] transition-colors"
+                  >
+                    <ExternalLink size={16} /> Courses U (Super U)
+                  </a>
+                </div>
+                {hasCarrefourAffiliate() && (
+                  <p className="text-[11px] text-text-light mt-2">
+                    Le lien Carrefour est un lien partenaire : on peut toucher une petite commission si tu commandes, sans changement de prix pour toi.
+                  </p>
+                )}
               </>
             )}
           </div>

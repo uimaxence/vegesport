@@ -44,6 +44,21 @@ function scaleIngredient(ing, ratio) {
   return (newQty + ' ' + parsed.name).trim();
 }
 
+/** Ingrédients qu'on a souvent dans le placard / frigo (sel, poivre, épices, huile…). */
+function isCommonPantry(ingredientName) {
+  const lower = (ingredientName || '').toLowerCase();
+  const common = [
+    'sel', 'poivre', 'pâtes', 'pates', 'riz', 'oignon', 'oignons', 'ail', 'huile', 'farine',
+    'sucre', 'vinaigre', 'moutarde', 'paprika', 'curry', 'cumin', 'curcuma', 'origan',
+    'basilic', 'persil', 'thym', 'laurier', 'piment', 'cannelle', 'muscade', 'levure',
+    'bicarbonate', 'maïzena', 'cornichon', 'câpres', 'olive', 'tomate séchée', 'confiture',
+    'miel', 'sirop', 'sauce soja', 'tahini', 'bouillon', 'lait', 'crème', 'beurre',
+    'œuf', 'oeuf', 'pain', 'tortilla', 'quinoa', 'avoine', 'lentille', 'pois chiche',
+    'haricot', 'noix', 'amande', 'cacahuète', 'cacao', 'chocolat', 'coriandre'
+  ];
+  return common.some(term => lower.includes(term));
+}
+
 function StepWithQuantities({ stepText, ingredients }) {
   const segments = useMemo(() => {
     const parsed = ingredients.map(ing => parseIngredient(ing)).filter(p => p.name.length > 0);
@@ -103,6 +118,8 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
   const [activeStep, setActiveStep] = useState(null);
   const [cookingMode, setCookingMode] = useState(false);
   const [checkedIngredients, setCheckedIngredients] = useState([]);
+  const [ingredientsStepPhase, setIngredientsStepPhase] = useState('pantry'); // 'pantry' | 'rest'
+  const [pantryChecked, setPantryChecked] = useState(() => new Set());
 
   if (loading) {
     return (
@@ -127,10 +144,15 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
     );
   }
 
-  usePageMeta(recipe.title, (recipe.steps && recipe.steps[0]) ? recipe.steps[0].slice(0, 155) + '…' : undefined);
+  const steps = recipe.steps ?? [];
+  const ingredients = recipe.ingredients ?? [];
+  const tags = recipe.tags ?? [];
+  const objective = recipe.objective ?? [];
 
-  const isFavorite = favorites.includes(recipe.id);
-  const ratio = servings / recipe.servings;
+  usePageMeta(recipe.title, steps[0] ? steps[0].slice(0, 155) + '…' : undefined);
+
+  const isFavorite = favorites?.includes(recipe.id) ?? false;
+  const ratio = servings / (recipe.servings || 1);
 
   const [shareStatus, setShareStatus] = useState(null); // null | 'copied' | 'shared'
 
@@ -150,35 +172,100 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
     setTimeout(() => setShareStatus(null), 2500);
   }, [recipe.title]);
 
-  const similar = recipes
-    .filter(r => r.id !== recipe.id && r.objective.some(o => recipe.objective.includes(o)))
-    .slice(0, 3);
+  const similar = (recipes ?? []).filter(
+    (r) => r.id !== recipe.id && (r.objective ?? []).some((o) => objective.includes(o))
+  ).slice(0, 3);
 
-  const totalSteps = 1 + recipe.steps.length;
+  const totalSteps = 1 + steps.length;
+
+  // Séparation placard (basiques) / reste (à préparer) pour le mode cuisine
+  const { pantryList, restList } = useMemo(() => {
+    const pantry = [];
+    const rest = [];
+    ingredients.forEach((ing, i) => {
+      const parsed = parseIngredient(ing);
+      const name = parsed.name || ing;
+      if (isCommonPantry(name)) {
+        pantry.push({ index: i, text: scaleIngredient(ing, ratio) });
+      } else {
+        rest.push({ index: i, text: scaleIngredient(ing, ratio) });
+      }
+    });
+    return { pantryList: pantry, restList: rest };
+  }, [ingredients, ratio]);
 
   if (cookingMode) {
     const stepIndex = typeof activeStep === 'number' ? activeStep : 0;
     const isIngredientsStep = stepIndex === 0;
+    const isPantryPhase = isIngredientsStep && ingredientsStepPhase === 'pantry' && pantryList.length > 0;
+    const isRestPhase = isIngredientsStep && (ingredientsStepPhase === 'rest' || pantryList.length === 0);
     const instructionIndex = stepIndex - 1;
-    const currentStepText = isIngredientsStep ? '' : (recipe.steps[instructionIndex] ?? recipe.steps[0]);
+    const currentStepText = isIngredientsStep ? '' : (steps[instructionIndex] ?? steps[0]);
 
-    const checked = checkedIngredients.length === recipe.ingredients.length
+    const checked = checkedIngredients.length === ingredients.length
       ? checkedIngredients
-      : recipe.ingredients.map(() => false);
+      : ingredients.map(() => false);
 
     const toggleCheck = (i) => {
       setCheckedIngredients(prev => {
-        const next = prev.length === recipe.ingredients.length ? [...prev] : recipe.ingredients.map(() => false);
+        const next = prev.length === ingredients.length ? [...prev] : ingredients.map(() => false);
         next[i] = !next[i];
         return next;
       });
     };
 
+    const togglePantry = (index) => {
+      setPantryChecked(prev => {
+        const next = new Set(prev);
+        if (next.has(index)) next.delete(index);
+        else next.add(index);
+        return next;
+      });
+    };
+
+    const handlePrev = () => {
+      if (isRestPhase && pantryList.length > 0) {
+        setIngredientsStepPhase('pantry');
+      } else if (stepIndex > 0) {
+        setActiveStep(stepIndex - 1);
+      }
+    };
+
+    const handleNext = () => {
+      if (isPantryPhase) {
+        setIngredientsStepPhase('rest');
+      } else if (isRestPhase) {
+        setActiveStep(1);
+      } else if (stepIndex >= totalSteps - 1) {
+        setCookingMode(false);
+        setActiveStep(null);
+        setCheckedIngredients([]);
+        setPantryChecked(new Set());
+      } else {
+        setActiveStep(stepIndex + 1);
+      }
+    };
+
+    const stepLabel = isPantryPhase
+      ? '1 — Placard'
+      : isRestPhase
+        ? '2 — À préparer'
+        : isIngredientsStep
+          ? 'Préparation'
+          : `Étape ${stepIndex + 1} sur ${totalSteps}`;
+    const bottomCaption = isPantryPhase
+      ? 'Cochez ce que vous avez déjà'
+      : isRestPhase
+        ? 'Préparez et cochez au fur et à mesure'
+        : isIngredientsStep
+          ? 'Préparez les ingrédients'
+          : currentStepText;
+
     return (
       <div className="fixed inset-0 z-50 flex flex-col bg-[#1a1a1a]">
         <div className="flex justify-end p-4">
           <button
-            onClick={() => { setCookingMode(false); setActiveStep(null); setCheckedIngredients([]); }}
+            onClick={() => { setCookingMode(false); setActiveStep(null); setCheckedIngredients([]); setPantryChecked(new Set()); }}
             className="text-white/70 hover:text-white text-base flex items-center gap-2 py-2"
           >
             <X size={20} /> Quitter le mode cuisine
@@ -187,40 +274,86 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
 
         <div className="flex-1 overflow-y-auto px-6 pb-6 flex flex-col items-center justify-center">
           <p className="text-sm uppercase tracking-[0.2em] text-primary-light mb-6">
-            {isIngredientsStep ? 'Préparation' : `Étape ${stepIndex} sur ${totalSteps}`}
+            {stepLabel}
           </p>
 
-          {isIngredientsStep ? (
+          {isPantryPhase && (
             <>
-              <p className="font-display text-2xl sm:text-3xl text-center text-white max-w-xl leading-relaxed mb-8">
-                Vérifiez que vous avez tous les ingrédients
+              <p className="font-display text-2xl sm:text-3xl text-center text-white max-w-xl leading-relaxed mb-2">
+                Vous avez déjà ces basiques ?
               </p>
-              <div className="w-full max-w-lg rounded-lg bg-white/10 border border-white/20 p-5 sm:p-6">
-                <p className="text-sm uppercase tracking-wider text-white/60 mb-4">Ingrédients</p>
-                <ul className="space-y-3">
-                  {recipe.ingredients.map((ing, i) => (
-                    <li key={i} className="flex items-center gap-4">
+              <p className="text-white/70 text-center text-sm mb-8 max-w-md">
+                Sel, poivre, épices, huile… Cochez ce que vous avez dans vos placards.
+              </p>
+              <div className="w-full max-w-md rounded-xl bg-white/10 border border-white/20 p-5 sm:p-6">
+                <ul className="space-y-2">
+                  {pantryList.map(({ index, text }) => (
+                    <li key={index}>
                       <button
                         type="button"
-                        onClick={() => toggleCheck(i)}
-                        className={`flex-shrink-0 w-8 h-8 rounded-md border-2 flex items-center justify-center transition-colors ${
-                          checked[i]
-                            ? 'bg-primary border-primary'
-                            : 'border-white/40 hover:border-white/60'
-                        }`}
+                        onClick={() => togglePantry(index)}
+                        className="flex items-center gap-4 w-full text-left px-4 py-3 rounded-lg border border-white/20 hover:bg-white/10 transition-colors"
                       >
-                        {checked[i] && <Check size={18} className="text-white" />}
+                        <span className={`flex-shrink-0 w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-colors ${
+                          pantryChecked.has(index) ? 'bg-primary border-primary' : 'border-white/40'
+                        }`}>
+                          {pantryChecked.has(index) && <Check size={18} className="text-white" />}
+                        </span>
+                        <span className={`text-base font-medium leading-snug ${pantryChecked.has(index) ? 'text-white/50 line-through' : 'text-white'}`}>
+                          {text}
+                        </span>
                       </button>
-                      <span className={`text-base sm:text-lg font-medium leading-snug ${checked[i] ? 'text-white/50 line-through' : 'text-white'}`}>
-                        {scaleIngredient(ing, ratio)}
-                      </span>
                     </li>
                   ))}
                 </ul>
+                <p className="mt-4 text-xs text-white/50 text-center">
+                  Pas besoin de tout cocher — on vous redemandera seulement ce qu’il faut acheter.
+                </p>
               </div>
             </>
-          ) : (
-            <StepWithQuantities stepText={currentStepText} ingredients={recipe.ingredients.map((ing) => scaleIngredient(ing, ratio))} />
+          )}
+
+          {isRestPhase && (
+            <>
+              <p className="font-display text-2xl sm:text-3xl text-center text-white max-w-xl leading-relaxed mb-2">
+                Ingrédients à préparer
+              </p>
+              <p className="text-white/70 text-center text-sm mb-8 max-w-md">
+                {restList.length === 0
+                  ? 'Vous avez tout dans vos basiques — on peut commencer.'
+                  : 'Sortez-les, pesez, préparez et cochez au fur et à mesure.'}
+              </p>
+              <div className="w-full max-w-md rounded-xl bg-white/10 border border-white/20 p-5 sm:p-6">
+                {restList.length === 0 ? (
+                  <p className="text-center text-white/60 text-sm py-4">Aucun autre ingrédient à lister.</p>
+                ) : (
+                  <ul className="space-y-2">
+                    {restList.map(({ index, text }) => (
+                      <li key={index}>
+                        <button
+                          type="button"
+                          onClick={() => toggleCheck(index)}
+                          className="flex items-center gap-4 w-full text-left px-4 py-3 rounded-lg border border-white/20 hover:bg-white/10 transition-colors"
+                        >
+                          <span className={`flex-shrink-0 w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-colors ${
+                            checked[index] ? 'bg-primary border-primary' : 'border-white/40'
+                          }`}>
+                            {checked[index] && <Check size={18} className="text-white" />}
+                          </span>
+                          <span className={`text-base font-medium leading-snug ${checked[index] ? 'text-white/50 line-through' : 'text-white'}`}>
+                            {text}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </>
+          )}
+
+          {!isIngredientsStep && (
+            <StepWithQuantities stepText={currentStepText} ingredients={ingredients.map((ing) => scaleIngredient(ing, ratio))} />
           )}
         </div>
 
@@ -228,29 +361,21 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
             <button
               type="button"
-              onClick={() => setActiveStep(Math.max(0, stepIndex - 1))}
-              disabled={stepIndex === 0}
+              onClick={handlePrev}
+              disabled={stepIndex === 0 && !(isRestPhase && pantryList.length > 0)}
               className="flex-shrink-0 px-5 py-3.5 rounded-lg text-base font-medium text-white/90 hover:text-white disabled:opacity-30 disabled:pointer-events-none border border-white/20 hover:border-white/40 transition-colors"
             >
               ← Précédent
             </button>
             <p className="flex-1 text-center text-base sm:text-lg text-white/95 line-clamp-3 min-w-0 px-3 leading-snug">
-              {isIngredientsStep ? 'Préparez les ingrédients' : currentStepText}
+              {bottomCaption}
             </p>
             <button
               type="button"
-              onClick={() => {
-                if (stepIndex >= totalSteps - 1) {
-                  setCookingMode(false);
-                  setActiveStep(null);
-                  setCheckedIngredients([]);
-                } else {
-                  setActiveStep(stepIndex + 1);
-                }
-              }}
+              onClick={handleNext}
               className="flex-shrink-0 px-6 py-3.5 rounded-lg text-base font-medium bg-primary text-white hover:bg-primary-light transition-colors"
             >
-              {stepIndex >= totalSteps - 1 ? 'Terminer' : 'Suivant →'}
+              {isPantryPhase ? 'J\'ai tout, continuer →' : isRestPhase ? 'Commencer la recette →' : stepIndex >= totalSteps - 1 ? 'Terminer' : 'Suivant →'}
             </button>
           </div>
         </div>
@@ -279,7 +404,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
 
           <div className="lg:w-1/2">
             <div className="flex items-center gap-2 mb-3 flex-wrap">
-              {recipe.tags.slice(0, 3).map(tag => (
+              {tags.slice(0, 3).map(tag => (
                 <span key={tag} className="text-[13px] font-medium px-2.5 py-0.5 rounded-sm border border-border text-text-light">
                   {tag.replace('#', '')}
                 </span>
@@ -349,7 +474,14 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                 {isFavorite ? 'Favori' : 'Ajouter'}
               </button>
               <button
-                onClick={() => { setCookingMode(true); setActiveStep(0); setCheckedIngredients(recipe.ingredients.map(() => false)); }}
+                onClick={() => {
+                setCookingMode(true);
+                setActiveStep(0);
+                setCheckedIngredients(ingredients.map(() => false));
+                const hasPantry = ingredients.some(ing => isCommonPantry(parseIngredient(ing).name || ing));
+                setIngredientsStepPhase(hasPantry ? 'pantry' : 'rest');
+                setPantryChecked(new Set());
+              }}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-sm text-sm bg-primary text-white hover:bg-primary-dark transition-colors"
               >
                 <ChefHat size={14} />
@@ -378,7 +510,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
             <h2 className="recipe-section-title">Ingrédients</h2>
             <div className="deco-wave mb-4" />
             <ul className="space-y-2.5">
-              {recipe.ingredients.map((ingredient, i) => (
+              {ingredients.map((ingredient, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-text-light">
                   <span className="w-1.5 h-1.5 rounded-sm bg-primary/40 mt-1.5 flex-shrink-0" />
                   {scaleIngredient(ingredient, ratio)}
@@ -391,7 +523,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
             <h2 className="recipe-section-title">Préparation</h2>
             <div className="deco-wave mb-4" />
             <ol className="space-y-4">
-              {recipe.steps.map((step, i) => (
+              {steps.map((step, i) => (
                 <li key={i} className="flex gap-4">
                   <span className="flex-shrink-0 w-6 h-6 rounded-sm bg-bg-warm text-xs flex items-center justify-center text-text-light font-medium">
                     {i + 1}

@@ -26,9 +26,12 @@ function savePlanningsToLS(userId, plannings) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+const DEFAULT_CONSENTS = { newsletter: false, ads_personnalisation: false, partage_partenaires: false };
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [consents, setConsents] = useState(DEFAULT_CONSENTS);
   // Initialise depuis localStorage guest pour affichage immédiat
   const [savedPlannings, setSavedPlannings] = useState(() => loadPlanningsFromLS('guest'));
   const [loading, setLoading] = useState(!!isSupabaseConfigured());
@@ -68,6 +71,54 @@ export function AuthProvider({ children }) {
     }));
   }, []);
 
+  const loadConsents = useCallback(async (userId, rawUser) => {
+    if (!supabase || !userId) return DEFAULT_CONSENTS;
+    try {
+      const meta = rawUser?.user_metadata || {};
+      const fromMeta = {
+        newsletter: !!meta.consent_newsletter,
+        ads_personnalisation: !!meta.consent_ads_personnalisation,
+        partage_partenaires: !!meta.consent_partage_partenaires,
+      };
+      const hasMeta = fromMeta.newsletter || fromMeta.ads_personnalisation || fromMeta.partage_partenaires;
+      if (hasMeta) {
+        await supabase.from('user_consents').upsert(
+          {
+            user_id: userId,
+            newsletter: fromMeta.newsletter,
+            ads_personnalisation: fromMeta.ads_personnalisation,
+            partage_partenaires: fromMeta.partage_partenaires,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id' }
+        );
+      }
+      const { data } = await supabase.from('user_consents').select('newsletter, ads_personnalisation, partage_partenaires').eq('user_id', userId).maybeSingle();
+      if (data) return data;
+      return hasMeta ? fromMeta : DEFAULT_CONSENTS;
+    } catch {
+      return DEFAULT_CONSENTS;
+    }
+  }, []);
+
+  const updateConsents = useCallback(async (userId, updates) => {
+    if (!supabase || !userId) return;
+    setConsents((prev) => {
+      const next = { ...prev, ...updates };
+      supabase.from('user_consents').upsert(
+        {
+          user_id: userId,
+          newsletter: next.newsletter,
+          ads_personnalisation: next.ads_personnalisation,
+          partage_partenaires: next.partage_partenaires,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      ).then(({ error }) => { if (error) setConsents(prev); });
+      return next;
+    });
+  }, []);
+
   useEffect(() => {
     if (!isSupabaseConfigured()) {
       setLoading(false);
@@ -84,11 +135,13 @@ export function AuthProvider({ children }) {
           const cached = loadPlanningsFromLS(u.id);
           if (cached.length > 0) setSavedPlannings(cached);
           // Puis synchronise avec Supabase
-          const [favs, plans] = await Promise.all([
+          const [favs, plans, userConsents] = await Promise.all([
             loadFavorites(u.id),
             loadPlannings(u.id),
+            loadConsents(u.id, u),
           ]);
           setFavorites(favs);
+          setConsents(userConsents);
           // Supabase fait autorité : on écrase le cache et le LS
           if (plans.length > 0) {
             savePlanningsToLS(u.id, plans);
@@ -111,11 +164,13 @@ export function AuthProvider({ children }) {
           // Pré-charge depuis localStorage
           const cached = loadPlanningsFromLS(u.id);
           if (cached.length > 0) setSavedPlannings(cached);
-          const [favs, plans] = await Promise.all([
+          const [favs, plans, userConsents] = await Promise.all([
             loadFavorites(u.id),
             loadPlannings(u.id),
+            loadConsents(u.id, u),
           ]);
           setFavorites(favs);
+          setConsents(userConsents);
           if (plans.length > 0) {
             savePlanningsToLS(u.id, plans);
             setSavedPlannings(plans);
@@ -125,13 +180,14 @@ export function AuthProvider({ children }) {
         }
       } else {
         setFavorites([]);
+        setConsents(DEFAULT_CONSENTS);
         // Garde les plannings guest depuis LS
         setSavedPlannings(loadPlanningsFromLS('guest'));
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [loadFavorites, loadPlannings]);
+  }, [loadFavorites, loadPlannings, loadConsents]);
 
   const toggleFavorite = useCallback(
     async (recipeId) => {
@@ -282,10 +338,12 @@ export function AuthProvider({ children }) {
       : null,
     favorites,
     savedPlannings,
+    consents,
     loading,
     toggleFavorite,
     savePlanning,
     updatePlanning,
+    updateConsents: user?.id ? (updates) => updateConsents(user.id, updates) : undefined,
     signOut,
     setUserLocal: isSupabaseConfigured() ? undefined : setUserLocal,
   };

@@ -11,6 +11,10 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [acceptCgu, setAcceptCgu] = useState(false);
+  const [consentNewsletter, setConsentNewsletter] = useState(false);
+  const [consentAds, setConsentAds] = useState(false);
+  const [consentPartenaires, setConsentPartenaires] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -45,10 +49,22 @@ export default function Login() {
             return;
           }
         } else {
+          if (!acceptCgu) {
+            setError('Tu dois accepter les conditions d\'utilisation et la politique de confidentialité pour t\'inscrire.');
+            setLoading(false);
+            return;
+          }
           const { data, error: err } = await supabase.auth.signUp({
             email,
             password,
-            options: { data: { name: name || email.split('@')[0] } },
+            options: {
+              data: {
+                name: name || email.split('@')[0],
+                consent_newsletter: consentNewsletter,
+                consent_ads_personnalisation: consentAds,
+                consent_partage_partenaires: consentPartenaires,
+              },
+            },
           });
           if (err) throw err;
           if (data?.session) {
@@ -162,6 +178,52 @@ export default function Login() {
               placeholder="••••••••"
             />
           </div>
+
+          {!isLogin && (
+            <div className="space-y-3 text-sm">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={acceptCgu}
+                  onChange={(e) => setAcceptCgu(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-border text-primary focus:ring-primary/20"
+                />
+                <span className="text-text-light">
+                  J&apos;accepte les{' '}
+                  <Link to="/mentions-legales" className="text-primary hover:underline">conditions d&apos;utilisation</Link>
+                  {' '}et la{' '}
+                  <Link to="/donnees-personnelles" className="text-primary hover:underline">politique de confidentialité</Link>.
+                </span>
+              </label>
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consentNewsletter}
+                  onChange={(e) => setConsentNewsletter(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-border text-primary focus:ring-primary/20"
+                />
+                <span className="text-text-light">Newsletter : recevoir les actualités du site (recettes, articles).</span>
+              </label>
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consentAds}
+                  onChange={(e) => setConsentAds(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-border text-primary focus:ring-primary/20"
+                />
+                <span className="text-text-light">Publicité personnalisée (ex. Google Ads) selon mes centres d&apos;intérêt.</span>
+              </label>
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consentPartenaires}
+                  onChange={(e) => setConsentPartenaires(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-border text-primary focus:ring-primary/20"
+                />
+                <span className="text-text-light">Partage de mon email avec des partenaires pour offres et mailing ciblés (nutrition, sport, etc.).</span>
+              </label>
+            </div>
+          )}
 
           <button
             type="submit"

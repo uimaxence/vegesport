@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Navigate, Link } from 'react-router-dom';
-import { Heart, Calendar, Award, LogOut, ChevronDown, ChevronUp, Check, Pencil, Flame, Beef } from 'lucide-react';
+import { Heart, Calendar, Award, LogOut, ChevronDown, ChevronUp, Check, Pencil, Flame, Beef, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -108,13 +108,22 @@ export default function Profile({ user, favorites, savedPlannings }) {
               <p className="text-sm text-text-light mt-1">{user.email}</p>
             </div>
           </div>
-          <button
-            onClick={signOut}
-            className="flex items-center gap-1.5 text-sm text-text-light hover:text-primary transition-colors"
-          >
-            <LogOut size={16} />
-            Déconnexion
-          </button>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/donnees-personnelles"
+              className="flex items-center gap-1.5 text-sm text-text-light hover:text-primary transition-colors"
+            >
+              <Shield size={16} />
+              Données personnelles
+            </Link>
+            <button
+              onClick={signOut}
+              className="flex items-center gap-1.5 text-sm text-text-light hover:text-primary transition-colors"
+            >
+              <LogOut size={16} />
+              Déconnexion
+            </button>
+          </div>
         </div>
 
         {/* Dashboard semaine en cours */}

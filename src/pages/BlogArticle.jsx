@@ -1,13 +1,25 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ArrowLeft, Clock, Share2 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { getSlug } from '../lib/slug';
 import ArticleBlocks from '../components/article/ArticleBlocks';
 
 export default function BlogArticle() {
-  const { id } = useParams();
+  const { id, slug } = useParams();
+  const navigate = useNavigate();
   const { articles, recipes, loading, error } = useData();
   const article = articles.find((a) => a.id === parseInt(id, 10));
+  const canonicalSlug = article ? getSlug(article.title) : '';
+
+  // Rediriger vers l'URL canonique avec le slug si absent ou incorrect
+  useEffect(() => {
+    if (!article || !canonicalSlug) return;
+    if (slug !== canonicalSlug) {
+      navigate(`/blog/${id}/${canonicalSlug}`, { replace: true });
+    }
+  }, [article, id, slug, canonicalSlug, navigate]);
 
   if (loading) {
     return (
@@ -96,7 +108,7 @@ export default function BlogArticle() {
             <h3 className="font-display text-2xl text-text mb-8">À lire aussi</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {otherArticles.map(a => (
-                <Link key={a.id} to={`/blog/${a.id}`} className="group">
+                <Link key={a.id} to={`/blog/${a.id}/${getSlug(a.title)}`} className="group">
                   <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
                     <img
                       src={a.image}

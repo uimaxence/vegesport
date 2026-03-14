@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Clock } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { getSlug } from '../lib/slug';
 import { blogCategories } from '../data/blog';
 import BlogSkeleton from '../components/skeleton/BlogSkeleton';
 
@@ -54,7 +55,7 @@ export default function Blog() {
 
         {/* Featured */}
         {activeCategory === 'tous' && featured && (
-          <Link to={`/blog/${featured.id}`} className="block group mb-12">
+          <Link to={`/blog/${featured.id}/${getSlug(featured.title)}`} className="block group mb-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
               <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
                 <img
@@ -83,7 +84,7 @@ export default function Blog() {
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {rest.map(article => (
-            <Link key={article.id} to={`/blog/${article.id}`} className="group">
+            <Link key={article.id} to={`/blog/${article.id}/${getSlug(article.title)}`} className="group">
               <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
                 <img
                   src={article.image}

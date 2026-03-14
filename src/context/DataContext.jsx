@@ -16,12 +16,16 @@ export function DataProvider({ children }) {
     Promise.all([fetchRecipes(), fetchArticles()])
       .then(([r, a]) => {
         if (!cancelled) {
-          setRecipes(r);
-          setArticles(a);
+          setRecipes(Array.isArray(r) ? r : []);
+          setArticles(Array.isArray(a) ? a : []);
         }
       })
       .catch((e) => {
-        if (!cancelled) setError(e?.message || 'Erreur chargement données');
+        if (!cancelled) {
+          setError(e?.message || 'Erreur chargement données');
+          setRecipes((prev) => (Array.isArray(prev) ? prev : []));
+          setArticles((prev) => (Array.isArray(prev) ? prev : []));
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -30,8 +34,8 @@ export function DataProvider({ children }) {
   }, []);
 
   const value = {
-    recipes,
-    articles,
+    recipes: recipes ?? [],
+    articles: articles ?? [],
     loading,
     error,
   };
