@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Search, User } from 'lucide-react';
+import { Menu, X, Search, User, Shield } from 'lucide-react';
+import { isAdminUser } from '../lib/admin';
 
 export default function Navbar({ user }) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const showAdmin = isAdminUser(user);
 
   const links = [
     { path: '/', label: 'Accueil' },
@@ -40,6 +42,15 @@ export default function Navbar({ user }) {
           </div>
 
           <div className="hidden md:flex items-center gap-4">
+            {showAdmin && (
+              <Link
+                to="/admin"
+                className="flex items-center gap-1.5 text-sm text-text-light hover:text-primary transition-colors px-2 py-1 rounded-lg hover:bg-primary/5"
+              >
+                <Shield size={18} />
+                Admin
+              </Link>
+            )}
             <Link to="/recettes" className="p-2 text-text-light hover:text-text transition-colors">
               <Search size={18} />
             </Link>
@@ -80,6 +91,15 @@ export default function Navbar({ user }) {
                 {link.label}
               </Link>
             ))}
+            {showAdmin && (
+              <Link
+                to="/admin"
+                onClick={() => setIsOpen(false)}
+                className="block py-2 text-sm text-text-light"
+              >
+                Admin
+              </Link>
+            )}
             <Link
               to={user ? '/profil' : '/connexion'}
               onClick={() => setIsOpen(false)}

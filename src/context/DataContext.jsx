@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { fetchRecipes, fetchArticles } from '../lib/data';
 
 const DataContext = createContext(null);
@@ -33,11 +33,16 @@ export function DataProvider({ children }) {
     return () => { cancelled = true; };
   }, []);
 
+  const refetchRecipes = useCallback(() => {
+    fetchRecipes().then((r) => setRecipes(Array.isArray(r) ? r : [])).catch(() => {});
+  }, []);
+
   const value = {
     recipes: recipes ?? [],
     articles: articles ?? [],
     loading,
     error,
+    refetchRecipes,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

@@ -17,6 +17,10 @@ import AuthCallback from './pages/AuthCallback';
 import Profile from './pages/Profile';
 import PersonalData from './pages/PersonalData';
 import MentionsLegales from './pages/MentionsLegales';
+import AdminGuard from './components/admin/AdminGuard';
+import AdminRecipes from './pages/admin/AdminRecipes';
+import AdminRecipeForm from './pages/admin/AdminRecipeForm';
+import AdminIngredients from './pages/admin/AdminIngredients';
 
 function AppRoutes() {
   const { user, favorites, savedPlannings, toggleFavorite, savePlanning } = useAuth();
@@ -50,6 +54,12 @@ function AppRoutes() {
           } />
           <Route path="/donnees-personnelles" element={<PersonalData />} />
           <Route path="/mentions-legales" element={<MentionsLegales />} />
+          <Route element={<AdminGuard />}>
+            <Route path="/admin" element={<AdminRecipes />} />
+            <Route path="/admin/recettes/nouvelle" element={<AdminRecipeForm />} />
+            <Route path="/admin/recettes/:id/edit" element={<AdminRecipeForm />} />
+            <Route path="/admin/ingredients" element={<AdminIngredients />} />
+          </Route>
         </Routes>
       </main>
       <Footer />
