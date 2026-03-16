@@ -35,6 +35,11 @@ function saveMealsDoneToStorage(userId, data) {
 export default function Profile({ user, favorites, savedPlannings }) {
   usePageMeta('Mon profil', 'Tes recettes favorites, plannings sauvegardés et badges et si mamie était végé ?.');
   const { signOut } = useAuth();
+
+  const handleSignOut = () => {
+    signOut(); // nettoyage synchrone (localStorage + state), pas d’await pour ne pas bloquer
+    window.location.href = '/';
+  };
   const { recipes } = useData();
   const [expandedPlanningId, setExpandedPlanningId] = useState(null);
   const [mealsDone, setMealsDone] = useState(() => loadMealsDoneFromStorage(user?.id));
@@ -117,8 +122,9 @@ export default function Profile({ user, favorites, savedPlannings }) {
               Données personnelles
             </Link>
             <button
-              onClick={signOut}
-              className="flex items-center gap-1.5 text-sm text-text-light hover:text-primary transition-colors"
+              type="button"
+              onClick={handleSignOut}
+              className="flex items-center gap-1.5 text-sm text-text-light hover:text-primary transition-colors cursor-pointer"
             >
               <LogOut size={16} />
               Déconnexion

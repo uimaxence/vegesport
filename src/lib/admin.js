@@ -1,18 +1,44 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 
 const ADMIN_EMAIL = 'maxencecailleau.pro@gmail.com';
+// Délai plus large pour éviter les erreurs "timeout" trop agressives sur /admin
+const FETCH_TIMEOUT_MS = 15000;
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+  ]);
+}
 
 export function isAdminUser(user) {
   return !!user?.email && user.email === ADMIN_EMAIL;
 }
 
+/** Liste des recettes pour l'admin (toujours depuis la BDD). */
+export async function fetchAdminRecipes() {
+  if (!isSupabaseConfigured() || !supabase) return [];
+  const { data, error } = await withTimeout(
+    supabase
+      .from('recipes')
+      .select('id, title, category, time')
+      .order('id', { ascending: true }),
+    FETCH_TIMEOUT_MS
+  );
+  if (error) throw error;
+  return data || [];
+}
+
 /** Liste tous les ingrédients (admin ou lecture publique). */
 export async function fetchIngredients() {
   if (!isSupabaseConfigured() || !supabase) return [];
-  const { data, error } = await supabase
-    .from('ingredients')
-    .select('id, name, rayon, created_at')
-    .order('name', { ascending: true });
+  const { data, error } = await withTimeout(
+    supabase
+      .from('ingredients')
+      .select('id, name, rayon, created_at')
+      .order('name', { ascending: true }),
+    FETCH_TIMEOUT_MS
+  );
   if (error) throw error;
   return data || [];
 }
@@ -203,17 +229,23 @@ export async function deleteRecipe(id) {
 /** Récupère une recette avec ses recipe_ingredients (pour édition). */
 export async function fetchRecipeForEdit(id) {
   if (!isSupabaseConfigured() || !supabase) return null;
-  const { data: recipe, error: e1 } = await supabase
-    .from('recipes')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const { data: recipe, error: e1 } = await withTimeout(
+    supabase
+      .from('recipes')
+      .select('*')
+      .eq('id', id)
+      .single(),
+    FETCH_TIMEOUT_MS
+  );
   if (e1 || !recipe) return null;
 
-  const { data: ri } = await supabase
-    .from('recipe_ingredients')
-    .select('ingredient_id, quantity_text, ingredients(id, name, rayon)')
-    .eq('recipe_id', id);
+  const { data: ri } = await withTimeout(
+    supabase
+      .from('recipe_ingredients')
+      .select('ingredient_id, quantity_text, ingredients(id, name, rayon)')
+      .eq('recipe_id', id),
+    FETCH_TIMEOUT_MS
+  );
 
   const recipeIngredients = (ri || []).map((r) => ({
     ingredientId: r.ingredient_id,

@@ -30,6 +30,88 @@ const SEASONS = [
 
 const DIFFICULTIES = ['Facile', 'Moyen'];
 
+function IngredientAutocomplete({ ingredients, value, onChange, onAdd }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState(value?.mode === 'new' ? (value?.name || '') : '');
+
+  useEffect(() => {
+    if (value?.mode === 'new') setQuery(value?.name || '');
+    if (value?.mode === 'existing') setQuery('');
+  }, [value?.mode, value?.name]);
+
+  const normalized = (query || '').trim().toLowerCase();
+  const filtered = normalized
+    ? (ingredients || []).filter((i) => (i.name || '').toLowerCase().includes(normalized)).slice(0, 8)
+    : (ingredients || []).slice(0, 8);
+
+  const hasExact = normalized && (ingredients || []).some((i) => (i.name || '').toLowerCase() === normalized);
+
+  return (
+    <div className="relative">
+      <input
+        type="text"
+        value={value?.mode === 'existing' ? '' : query}
+        onChange={(e) => {
+          const v = e.target.value;
+          setQuery(v);
+          onChange?.({ mode: 'new', name: v });
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        placeholder="Tape pour rechercher (ou créer)…"
+        className="w-full px-2 py-1.5 border border-black/10 rounded text-sm"
+      />
+
+      {open && (
+        <div className="absolute z-20 mt-1 w-full rounded-lg border border-black/10 bg-white shadow-lg overflow-hidden">
+          {filtered.map((ing) => (
+            <button
+              key={ing.id}
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setOpen(false);
+                onChange?.({ mode: 'existing', ingredientId: ing.id });
+              }}
+              className="w-full text-left px-3 py-2 text-sm hover:bg-black/[0.04] flex items-center justify-between gap-2"
+            >
+              <span className="truncate">{ing.name}</span>
+              <span className="text-xs text-text-light flex-shrink-0">{ing.rayon}</span>
+            </button>
+          ))}
+
+          {normalized && !hasExact && (
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setOpen(false);
+                onAdd?.(query.trim());
+              }}
+              className="w-full text-left px-3 py-2 text-sm hover:bg-primary/5 text-primary border-t border-black/5"
+            >
+              Ajouter « {query.trim()} »
+            </button>
+          )}
+
+          {!normalized && filtered.length === 0 && (
+            <div className="px-3 py-2 text-sm text-text-light">Aucun ingrédient.</div>
+          )}
+        </div>
+      )}
+
+      {open && (
+        <button
+          type="button"
+          className="fixed inset-0 z-10 cursor-default"
+          onClick={() => setOpen(false)}
+          aria-label="Fermer"
+        />
+      )}
+    </div>
+  );
+}
+
 export default function AdminRecipeForm() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -38,6 +120,7 @@ export default function AdminRecipeForm() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [notFound, setNotFound] = useState(false);
   const [ingredientsList, setIngredientsList] = useState([]);
 
   const [title, setTitle] = useState('');
@@ -66,10 +149,12 @@ export default function AdminRecipeForm() {
   useEffect(() => {
     if (!isNew && id) {
       setLoading(true);
+      setNotFound(false);
       fetchRecipeForEdit(id)
         .then((r) => {
           if (!r) {
             setError('Recette introuvable');
+            setNotFound(true);
             return;
           }
           setTitle(r.title || '');
@@ -197,6 +282,34 @@ export default function AdminRecipeForm() {
     return (
       <div className="px-6 py-12 flex justify-center">
         <p className="text-text-light">Chargement…</p>
+      </div>
+    );
+  }
+
+  if (!isNew && notFound) {
+    return (
+      <div className="px-6 lg:px-8 py-12">
+        <div className="max-w-xl mx-auto">
+          <div className="flex items-center gap-4 mb-6">
+            <Link
+              to="/admin"
+              className="p-2 text-text-light hover:text-text rounded-lg hover:bg-black/5"
+              aria-label="Retour"
+            >
+              <ArrowLeft size={20} />
+            </Link>
+            <h1 className="font-display text-2xl text-text">Recette introuvable</h1>
+          </div>
+          <p className="text-text-light mb-4">
+            Cette recette n’existe pas dans la base. (En dev, la liste publique peut venir des données locales.)
+          </p>
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark"
+          >
+            Retour à la liste
+          </Link>
+        </div>
       </div>
     );
   }
@@ -474,51 +587,64 @@ export default function AdminRecipeForm() {
             <div className="space-y-3">
               {recipeIngredients.map((row, i) => (
                 <div key={i} className="flex flex-wrap items-start gap-2 p-3 rounded-lg bg-black/[0.04] border border-black/5">
-                  <select
-                    value={row.ingredientId}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      const ing = v ? ingredientsList.find((x) => String(x.id) === v) : null;
-                      setRecipeIngredients((prev) =>
-                        prev.map((r, idx) =>
-                          idx === i
-                            ? {
-                                ...r,
-                                ingredientId: v,
-                                name: ing?.name ?? '',
-                                rayon: ing?.rayon ?? RAYONS[0],
-                              }
-                            : r
-                        )
-                      );
-                    }}
-                    className="flex-1 min-w-[140px] px-2 py-1.5 border border-black/10 rounded text-sm"
-                  >
-                    <option value="">— Nouveau —</option>
-                    {ingredientsList.map((ing) => (
-                      <option key={ing.id} value={ing.id}>{ing.name}</option>
-                    ))}
-                  </select>
-                  {!row.ingredientId && (
-                    <>
-                      <input
-                        type="text"
-                        value={row.name}
-                        onChange={(e) => setIngredientRow(i, 'name', e.target.value)}
-                        placeholder="Nom ingrédient"
-                        className="min-w-[120px] px-2 py-1.5 border border-black/10 rounded text-sm flex-1"
-                      />
-                      <select
-                        value={row.rayon}
-                        onChange={(e) => setIngredientRow(i, 'rayon', e.target.value)}
-                        className="px-2 py-1.5 border border-black/10 rounded text-sm"
-                      >
-                        {RAYONS.map((r) => (
-                          <option key={r} value={r}>{r}</option>
-                        ))}
-                      </select>
-                    </>
-                  )}
+                  <div className="flex-1 min-w-[220px]">
+                    <IngredientAutocomplete
+                      ingredients={ingredientsList}
+                      value={row.ingredientId ? { mode: 'existing', ingredientId: row.ingredientId } : { mode: 'new', name: row.name }}
+                      onChange={(next) => {
+                        if (next.mode === 'existing') {
+                          const ing = ingredientsList.find((x) => String(x.id) === String(next.ingredientId));
+                          setRecipeIngredients((prev) =>
+                            prev.map((r, idx) =>
+                              idx === i
+                                ? {
+                                    ...r,
+                                    ingredientId: String(next.ingredientId),
+                                    name: ing?.name ?? '',
+                                    rayon: ing?.rayon ?? RAYONS[0],
+                                  }
+                                : r
+                            )
+                          );
+                          return;
+                        }
+                        setRecipeIngredients((prev) =>
+                          prev.map((r, idx) =>
+                            idx === i
+                              ? {
+                                  ...r,
+                                  ingredientId: '',
+                                  name: next.name,
+                                }
+                              : r
+                          )
+                        );
+                      }}
+                      onAdd={(name) => {
+                        setRecipeIngredients((prev) =>
+                          prev.map((r, idx) =>
+                            idx === i
+                              ? { ...r, ingredientId: '', name, rayon: RAYONS[0] }
+                              : r
+                          )
+                        );
+                      }}
+                    />
+                    {!row.ingredientId && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="text-xs text-text-light">Rayon</span>
+                        <select
+                          value={row.rayon}
+                          onChange={(e) => setIngredientRow(i, 'rayon', e.target.value)}
+                          className="px-2 py-1.5 border border-black/10 rounded text-sm"
+                        >
+                          {RAYONS.map((r) => (
+                            <option key={r} value={r}>{r}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
                   <input
                     type="text"
                     value={row.quantityText}

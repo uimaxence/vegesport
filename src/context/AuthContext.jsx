@@ -125,6 +125,17 @@ export function AuthProvider({ children }) {
       return;
     }
 
+    let settled = false;
+    const done = () => {
+      if (!settled) {
+        settled = true;
+        setLoading(false);
+      }
+    };
+
+    // Timeout de sécurité : ne pas bloquer indéfiniment si getSession ne répond pas
+    const timeoutId = setTimeout(done, 5000);
+
     supabase.auth
       .getSession()
       .then(async ({ data: { session } }) => {
@@ -135,24 +146,28 @@ export function AuthProvider({ children }) {
           const cached = loadPlanningsFromLS(u.id);
           if (cached.length > 0) setSavedPlannings(cached);
           // Puis synchronise avec Supabase
-          const [favs, plans, userConsents] = await Promise.all([
-            loadFavorites(u.id),
-            loadPlannings(u.id),
-            loadConsents(u.id, u),
-          ]);
-          setFavorites(favs);
-          setConsents(userConsents);
-          // Supabase fait autorité : on écrase le cache et le LS
-          if (plans.length > 0) {
-            savePlanningsToLS(u.id, plans);
-            setSavedPlannings(plans);
+          try {
+            const [favs, plans, userConsents] = await Promise.all([
+              loadFavorites(u.id),
+              loadPlannings(u.id),
+              loadConsents(u.id, u),
+            ]);
+            setFavorites(favs);
+            setConsents(userConsents);
+            if (plans.length > 0) {
+              savePlanningsToLS(u.id, plans);
+              setSavedPlannings(plans);
+            }
+          } catch {
+            // favs/plans/consents en erreur : on garde user, on arrête le chargement
           }
         }
-        setLoading(false);
+        done();
       })
       .catch(() => {
-        setLoading(false);
-      });
+        done();
+      })
+      .finally(() => clearTimeout(timeoutId));
 
     const {
       data: { subscription },
@@ -315,11 +330,29 @@ export function AuthProvider({ children }) {
   );
 
   const signOut = useCallback(async () => {
-    if (supabase) await supabase.auth.signOut();
+    // 1. Nettoyer le localStorage EN PREMIER (synchrone) pour que le reload ne retrouve pas de session
+    Object.keys(localStorage).forEach((k) => {
+      if (
+        k === 'supabase.auth.token' ||
+        k.startsWith('supabase.auth.token') ||
+        (k.startsWith('sb-') && k.includes('-auth-token'))
+      ) {
+        localStorage.removeItem(k);
+      }
+    });
+
     setUser(null);
     setFavorites([]);
-    // Conserve les plannings guest depuis LS
+    setConsents(DEFAULT_CONSENTS);
     setSavedPlannings(loadPlanningsFromLS('guest'));
+
+    if (supabase) {
+      try {
+        await supabase.auth.signOut();
+      } catch {
+        // Déjà déconnecté côté storage, on ignore
+      }
+    }
   }, []);
 
   const setUserLocal = useCallback((u) => {

@@ -1,17 +1,32 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Pencil, Trash2, Package } from 'lucide-react';
-import { useData } from '../../context/DataContext';
-import { deleteRecipe } from '../../lib/admin';
+import { deleteRecipe, fetchAdminRecipes } from '../../lib/admin';
 
 export default function AdminRecipes() {
-  const { recipes, loading, error, refetchRecipes } = useData();
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [listError, setListError] = useState(null);
 
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchAdminRecipes();
+      setRecipes(data);
+    } catch (e) {
+      setError(e?.message || 'Erreur chargement');
+      setRecipes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    refetchRecipes();
-  }, [refetchRecipes]);
+    load();
+  }, []);
 
   const handleDelete = async (id, title) => {
     if (!window.confirm(`Supprimer la recette « ${title} » ?`)) return;
@@ -19,7 +34,7 @@ export default function AdminRecipes() {
     setListError(null);
     try {
       await deleteRecipe(id);
-      refetchRecipes();
+      await load();
     } catch (e) {
       setListError(e?.message || 'Erreur suppression');
     } finally {
