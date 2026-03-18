@@ -59,6 +59,168 @@ function isCommonPantry(ingredientName) {
   return common.some(term => lower.includes(term));
 }
 
+// ─── Timer ───────────────────────────────────────────────────────────────────
+
+function detectTimerFromStep(text) {
+  if (!text) return null;
+  const m = text.match(/(\d+)\s*(?:[-\u2013\u00e0]\s*\d+\s*)?(secondes?|sec\b|minutes?|mins?\b|mn\b|heures?|h\b)/i);
+  if (!m) return null;
+  const value = parseInt(m[1], 10);
+  const unit = m[2].toLowerCase().trim();
+  let seconds;
+  if (/^sec|^s/.test(unit)) seconds = value;
+  else if (/^(min|mn)/.test(unit)) seconds = value * 60;
+  else if (/^h/.test(unit)) seconds = value * 3600;
+  else return null;
+  if (seconds < 10 || seconds > 10800) return null;
+  const unitLabel = /^h/.test(unit) ? 'h' : /^sec|^s/.test(unit) ? 's' : 'min';
+  return { seconds, label: `${value}\u202f${unitLabel}` };
+}
+
+function formatTimer(s) {
+  if (s <= 0) return '0:00';
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  return `${m}:${String(sec).padStart(2, '0')}`;
+}
+
+function CookingTimerIsland({ timer, expanded, setExpanded, onStop, onAdd, onRemove }) {
+  useEffect(() => {
+    if (timer?.done) setExpanded(true);
+  }, [timer?.done, setExpanded]);
+
+  if (!timer) return null;
+
+  const timeStr = formatTimer(timer.remainingSeconds);
+  const progress = timer.totalSeconds > 0 ? timer.remainingSeconds / timer.totalSeconds : 0;
+  const rSm = 12;
+  const circSm = 2 * Math.PI * rSm;
+  const offSm = circSm * (1 - progress);
+  const rLg = 46;
+  const circLg = 2 * Math.PI * rLg;
+  const offLg = circLg * (1 - progress);
+  const startedAtStr = timer.startedAt
+    ? timer.startedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    : '';
+  const accentColor = timer.done ? '#ef4444' : '#f97316';
+
+  return (
+    <div
+      className={`bg-[#111] border shadow-2xl transition-all duration-300 ease-in-out overflow-hidden select-none ${
+        expanded
+          ? 'rounded-2xl border-white/25 w-72 sm:w-80'
+          : 'rounded-full border-white/20 cursor-pointer'
+      }`}
+      onClick={() => !expanded && setExpanded(true)}
+    >
+      {!expanded ? (
+        /* ── Compact pill ── */
+        <div className="flex items-center gap-2 px-3 py-1.5">
+          <svg width="30" height="30" className="-rotate-90 flex-shrink-0">
+            <circle cx="15" cy="15" r={rSm} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="2.5" />
+            <circle
+              cx="15" cy="15" r={rSm} fill="none"
+              stroke={accentColor}
+              strokeWidth="2.5"
+              strokeDasharray={circSm}
+              strokeDashoffset={offSm}
+              strokeLinecap="round"
+              style={{ transition: 'stroke-dashoffset 1s linear' }}
+            />
+          </svg>
+          <span className={`text-sm font-mono font-semibold tabular-nums pr-1 ${timer.done ? 'text-red-400 animate-pulse' : 'text-white'}`}>
+            {timer.done ? 'Pret !' : timeStr}
+          </span>
+        </div>
+      ) : (
+        /* ── Expanded island ── */
+        <div className="p-4">
+          <div className="flex items-start justify-between mb-1">
+            <div>
+              <p className="text-[10px] font-semibold text-white/40 uppercase tracking-widest">Minuteur</p>
+              {timer.label && (
+                <p className="text-xs text-white/55 mt-0.5 max-w-[180px] line-clamp-2 leading-tight">{timer.label}</p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
+              className="text-white/30 hover:text-white/70 transition-colors w-7 h-7 flex items-center justify-center text-lg leading-none -mt-1 -mr-1"
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Ring */}
+          <div className="flex items-center justify-center my-3">
+            <div className="relative" style={{ width: 108, height: 108 }}>
+              <svg width="108" height="108" className="-rotate-90">
+                <circle cx="54" cy="54" r={rLg} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="6" />
+                <circle
+                  cx="54" cy="54" r={rLg} fill="none"
+                  stroke={accentColor}
+                  strokeWidth="6"
+                  strokeDasharray={circLg}
+                  strokeDashoffset={offLg}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke-dashoffset 1s linear' }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
+                <span className={`text-[1.75rem] font-mono font-bold tabular-nums leading-none ${timer.done ? 'text-red-400 animate-pulse' : 'text-white'}`}>
+                  {timer.done ? '0:00' : timeStr}
+                </span>
+                {startedAtStr && (
+                  <span className="text-[10px] text-white/35 tabular-nums">depuis {startedAtStr}</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Controls */}
+          {!timer.done ? (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onRemove(60); }}
+                className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white/70 text-sm font-medium transition-colors"
+              >
+                −1 min
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onStop(); setExpanded(false); }}
+                className="flex-1 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 text-sm font-semibold transition-colors"
+              >
+                Arreter
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onAdd(60); }}
+                className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white/70 text-sm font-medium transition-colors"
+              >
+                +1 min
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onStop(); setExpanded(false); }}
+              className="w-full py-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 text-sm font-semibold transition-colors"
+            >
+              Fermer le minuteur
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function StepWithQuantities({ stepText, ingredients }) {
   const segments = useMemo(() => {
     const parsed = ingredients.map(ing => parseIngredient(ing)).filter(p => p.name.length > 0);
@@ -122,6 +284,44 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
   const [checkedIngredients, setCheckedIngredients] = useState([]);
   const [ingredientsStepPhase, setIngredientsStepPhase] = useState('pantry'); // 'pantry' | 'rest'
   const [pantryChecked, setPantryChecked] = useState(() => new Set());
+
+  // Timer state (hooks avant tout early return)
+  const [timer, setTimer] = useState(null);
+  const [timerIslandExpanded, setTimerIslandExpanded] = useState(false);
+
+  const startTimer = useCallback((seconds, label) => {
+    setTimer({ totalSeconds: seconds, remainingSeconds: seconds, startedAt: new Date(), label, running: true, done: false });
+    setTimerIslandExpanded(false);
+  }, []);
+
+  const stopTimer = useCallback(() => {
+    setTimer(null);
+    setTimerIslandExpanded(false);
+  }, []);
+
+  const addTimerTime = useCallback((secs) => {
+    setTimer((prev) => prev ? { ...prev, remainingSeconds: prev.remainingSeconds + secs, totalSeconds: prev.totalSeconds + secs } : prev);
+  }, []);
+
+  const removeTimerTime = useCallback((secs) => {
+    setTimer((prev) => prev ? { ...prev, remainingSeconds: Math.max(0, prev.remainingSeconds - secs) } : prev);
+  }, []);
+
+  useEffect(() => {
+    if (!timer?.running) return;
+    const id = setInterval(() => {
+      setTimer((prev) => {
+        if (!prev?.running) return prev;
+        const remaining = prev.remainingSeconds - 1;
+        if (remaining <= 0) {
+          try { window.navigator?.vibrate?.([300, 100, 300, 100, 300]); } catch {}
+          return { ...prev, remainingSeconds: 0, running: false, done: true };
+        }
+        return { ...prev, remainingSeconds: remaining };
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [timer?.running]);
 
   if (loading) {
     return (
@@ -287,14 +487,29 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           ? 'Préparez les ingrédients'
           : currentStepText;
 
+    const timerInfo = detectTimerFromStep(currentStepText);
+
     return (
       <div className="fixed inset-0 z-50 flex flex-col bg-[#1a1a1a]">
-        <div className="flex justify-end p-4">
+        {/* Top bar: exit + timer island */}
+        <div className="flex-shrink-0 flex items-center justify-between px-4 pt-3 pb-2 gap-3">
+          <div className="w-8 flex-shrink-0" />
+          {/* Dynamic Island (centre) */}
+          <div className="flex-1 flex justify-center">
+            <CookingTimerIsland
+              timer={timer}
+              expanded={timerIslandExpanded}
+              setExpanded={setTimerIslandExpanded}
+              onStop={stopTimer}
+              onAdd={addTimerTime}
+              onRemove={removeTimerTime}
+            />
+          </div>
           <button
             onClick={() => { setCookingMode(false); setActiveStep(null); setCheckedIngredients([]); setPantryChecked(new Set()); }}
-            className="text-white/70 hover:text-white text-base flex items-center gap-2 py-2"
+            className="flex-shrink-0 text-white/60 hover:text-white text-sm flex items-center gap-1.5 py-1.5"
           >
-            <X size={20} /> Quitter le mode cuisine
+            <X size={16} /> <span className="hidden sm:inline">Quitter</span>
           </button>
         </div>
 
@@ -311,28 +526,28 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
               <p className="text-white/70 text-center text-sm mb-8 max-w-md">
                 Sel, poivre, épices, huile… Cochez ce que vous avez dans vos placards.
               </p>
-              <div className="w-full max-w-md rounded-xl bg-white/10 border border-white/20 p-5 sm:p-6">
-                <ul className="space-y-2">
+              <div className="w-full max-w-md rounded-xl bg-white/10 border border-white/20 p-3 sm:p-4">
+                <ul className="space-y-1.5">
                   {pantryList.map(({ index, text }) => (
                     <li key={index}>
                       <button
                         type="button"
                         onClick={() => togglePantry(index)}
-                        className="flex items-center gap-4 w-full text-left px-4 py-3 rounded-lg border border-white/20 hover:bg-white/10 transition-colors"
+                        className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg border border-white/20 hover:bg-white/10 transition-colors"
                       >
-                        <span className={`flex-shrink-0 w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-colors ${
+                        <span className={`flex-shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${
                           pantryChecked.has(index) ? 'bg-primary border-primary' : 'border-white/40'
                         }`}>
-                          {pantryChecked.has(index) && <Check size={18} className="text-white" />}
+                          {pantryChecked.has(index) && <Check size={13} className="text-white" />}
                         </span>
-                        <span className={`text-base font-medium leading-snug ${pantryChecked.has(index) ? 'text-white/50 line-through' : 'text-white'}`}>
+                        <span className={`text-sm font-medium leading-snug ${pantryChecked.has(index) ? 'text-white/50 line-through' : 'text-white'}`}>
                           {text}
                         </span>
                       </button>
                     </li>
                   ))}
                 </ul>
-                <p className="mt-4 text-xs text-white/50 text-center">
+                <p className="mt-3 text-xs text-white/50 text-center">
                   Pas besoin de tout cocher — on vous redemandera seulement ce qu’il faut acheter.
                 </p>
               </div>
@@ -349,24 +564,24 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                   ? 'Vous avez tout dans vos basiques — on peut commencer.'
                   : 'Sortez-les, pesez, préparez et cochez au fur et à mesure.'}
               </p>
-              <div className="w-full max-w-md rounded-xl bg-white/10 border border-white/20 p-5 sm:p-6">
+              <div className="w-full max-w-md rounded-xl bg-white/10 border border-white/20 p-3 sm:p-4">
                 {restList.length === 0 ? (
                   <p className="text-center text-white/60 text-sm py-4">Aucun autre ingrédient à lister.</p>
                 ) : (
-                  <ul className="space-y-2">
+                  <ul className="space-y-1.5">
                     {restList.map(({ index, text }) => (
                       <li key={index}>
                         <button
                           type="button"
                           onClick={() => toggleCheck(index)}
-                          className="flex items-center gap-4 w-full text-left px-4 py-3 rounded-lg border border-white/20 hover:bg-white/10 transition-colors"
+                          className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg border border-white/20 hover:bg-white/10 transition-colors"
                         >
-                          <span className={`flex-shrink-0 w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-colors ${
+                          <span className={`flex-shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${
                             checked[index] ? 'bg-primary border-primary' : 'border-white/40'
                           }`}>
-                            {checked[index] && <Check size={18} className="text-white" />}
+                            {checked[index] && <Check size={13} className="text-white" />}
                           </span>
-                          <span className={`text-base font-medium leading-snug ${checked[index] ? 'text-white/50 line-through' : 'text-white'}`}>
+                          <span className={`text-sm font-medium leading-snug ${checked[index] ? 'text-white/50 line-through' : 'text-white'}`}>
                             {text}
                           </span>
                         </button>
@@ -379,30 +594,59 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           )}
 
           {!isIngredientsStep && (
-            <StepWithQuantities stepText={currentStepText} ingredients={ingredients.map((ing) => scaleIngredient(ing, ratio))} />
+            <>
+              <StepWithQuantities stepText={currentStepText} ingredients={ingredients.map((ing) => scaleIngredient(ing, ratio))} />
+              {timerInfo && (
+                <button
+                  type="button"
+                  onClick={() => !timer && startTimer(timerInfo.seconds, currentStepText.slice(0, 60) + (currentStepText.length > 60 ? '…' : ''))}
+                  className={`mt-6 flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all ${
+                    timer && !timer.done
+                      ? 'border-white/15 text-white/35 cursor-default'
+                      : 'border-primary/50 text-primary hover:bg-primary/10 hover:border-primary active:scale-95'
+                  }`}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  {timer && !timer.done ? 'Minuteur actif' : `Lancer ${timerInfo.label}`}
+                </button>
+              )}
+            </>
           )}
         </div>
 
-        <div className="flex-shrink-0 border-t border-white/10 bg-[#252525] px-4 py-5 sm:py-6">
-          <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
-            <button
-              type="button"
-              onClick={handlePrev}
-              disabled={stepIndex === 0 && !(isRestPhase && pantryList.length > 0)}
-              className="flex-shrink-0 px-5 py-3.5 rounded-lg text-base font-medium text-white/90 hover:text-white disabled:opacity-30 disabled:pointer-events-none border border-white/20 hover:border-white/40 transition-colors"
-            >
-              ← Précédent
-            </button>
-            <p className="flex-1 text-center text-base sm:text-lg text-white/95 line-clamp-3 min-w-0 px-3 leading-snug">
-              {bottomCaption}
-            </p>
-            <button
-              type="button"
-              onClick={handleNext}
-              className="flex-shrink-0 px-6 py-3.5 rounded-lg text-base font-medium bg-primary text-white hover:bg-primary-light transition-colors"
-            >
-              {isPantryPhase ? 'J\'ai tout, continuer →' : isRestPhase ? 'Commencer la recette →' : stepIndex >= totalSteps - 1 ? 'Terminer' : 'Suivant →'}
-            </button>
+        <div className="flex-shrink-0 border-t border-white/10 bg-[#252525] px-4 py-3 sm:py-4">
+          <div className="max-w-3xl mx-auto">
+            {bottomCaption && !isIngredientsStep && (
+              <p className="text-center text-xs sm:text-sm text-white/60 line-clamp-2 mb-2.5 leading-snug px-2">
+                {bottomCaption}
+              </p>
+            )}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handlePrev}
+                disabled={stepIndex === 0 && !(isRestPhase && pantryList.length > 0)}
+                className="flex-shrink-0 px-4 py-2.5 sm:px-5 sm:py-3 rounded-lg text-sm sm:text-base font-medium text-white/80 hover:text-white disabled:opacity-25 disabled:pointer-events-none border border-white/20 hover:border-white/40 transition-colors whitespace-nowrap"
+              >
+                ← <span className="hidden sm:inline">Précédent</span><span className="sm:hidden">Préc.</span>
+              </button>
+              <div className="flex-1" />
+              <button
+                type="button"
+                onClick={handleNext}
+                className="flex-shrink-0 px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-base font-semibold bg-primary text-white hover:bg-primary-light transition-colors whitespace-nowrap"
+              >
+                {isPantryPhase
+                  ? <><span className="hidden sm:inline">J&apos;ai tout, continuer</span><span className="sm:hidden">J&apos;ai tout</span> →</>
+                  : isRestPhase
+                    ? <><span className="hidden sm:inline">Commencer la recette</span><span className="sm:hidden">Commencer</span> →</>
+                    : stepIndex >= totalSteps - 1
+                      ? 'Terminer ✓'
+                      : 'Suivant →'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
