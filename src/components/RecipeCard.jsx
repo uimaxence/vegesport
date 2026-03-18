@@ -11,6 +11,10 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
             src={recipe.image}
             alt={recipe.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+            decoding="async"
+            width="64"
+            height="64"
           />
         </div>
         <div className="flex-1 min-w-0">
@@ -33,6 +37,10 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
             src={recipe.image}
             alt={recipe.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+            decoding="async"
+            width="800"
+            height="600"
           />
           {toggleFavorite && (
             <button

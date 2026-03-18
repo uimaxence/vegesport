@@ -2,7 +2,7 @@ import { supabase, isSupabaseConfigured } from './supabase';
 import { recipes as localRecipes } from '../data/recipes';
 import { articles as localArticles } from '../data/blog';
 
-const FETCH_TIMEOUT_MS = 4000;
+const FETCH_TIMEOUT_MS = 10000;
 
 /** En développement (localhost), on utilise les données locales pour un chargement instantané. */
 const useLocalDataOnly = () =>
@@ -41,6 +41,31 @@ function mapRecipeRow(row) {
   };
 }
 
+function mapRecipeSummaryRow(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    title: row.title,
+    category: row.category,
+    time: row.time,
+    calories: row.calories,
+    protein: row.protein,
+    carbs: row.carbs,
+    fat: row.fat,
+    servings: row.servings,
+    difficulty: row.difficulty,
+    tags: row.tags || [],
+    objective: row.objective || [],
+    regime: row.regime || [],
+    season: row.season || [],
+    mainIngredient: row.main_ingredient,
+    image: row.image,
+    ingredients: row.ingredients || [],
+    // steps non chargées ici (payload trop lourd pour une liste)
+    steps: null,
+  };
+}
+
 function mapArticleRow(row) {
   if (!row) return null;
   return {
@@ -64,17 +89,41 @@ export async function fetchRecipes() {
   if (isSupabaseConfigured() && supabase) {
     try {
       const { data, error } = await withTimeout(
-        supabase.from('recipes').select('*').order('id', { ascending: true }),
+        supabase
+          .from('recipes')
+          .select('id, title, category, time, calories, protein, carbs, fat, servings, difficulty, tags, objective, regime, season, main_ingredient, image, ingredients')
+          .order('id', { ascending: true }),
         FETCH_TIMEOUT_MS
       );
       if (error) throw error;
-      return (data || []).map(mapRecipeRow).filter(Boolean);
+      return (data || []).map(mapRecipeSummaryRow).filter(Boolean);
     } catch (e) {
       console.warn('fetchRecipes: fallback local', e?.message);
       return [...localRecipes];
     }
   }
   return [...localRecipes];
+}
+
+export async function fetchRecipeById(id) {
+  if (useLocalDataOnly()) {
+    const found = (localRecipes || []).find((r) => String(r.id) === String(id));
+    return found ? { ...found } : null;
+  }
+  if (isSupabaseConfigured() && supabase) {
+    const { data, error } = await withTimeout(
+      supabase
+        .from('recipes')
+        .select('*')
+        .eq('id', id)
+        .single(),
+      FETCH_TIMEOUT_MS
+    );
+    if (error) throw error;
+    return mapRecipeRow(data);
+  }
+  const found = (localRecipes || []).find((r) => String(r.id) === String(id));
+  return found ? { ...found } : null;
 }
 
 export async function fetchArticles() {

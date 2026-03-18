@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Clock, Flame, Heart, Users, ChefHat, X, Check, Share2, Copy } from 'lucide-react';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -109,12 +109,14 @@ function StepWithQuantities({ stepText, ingredients }) {
 
 export default function RecipeDetail({ favorites, toggleFavorite }) {
   const { slug } = useParams();
-  const { recipes, loading, error } = useData();
+  const { recipes, loading, error, getRecipe } = useData();
   const { user } = useAuth();
   const recipe = recipes.find(
     (r) => getSlug(r.title) === slug || String(r.id) === slug
   );
-  const [servings, setServings] = useState(recipe?.servings || 1);
+  const [fullRecipe, setFullRecipe] = useState(null);
+  const effectiveRecipe = fullRecipe || recipe;
+  const [servings, setServings] = useState(effectiveRecipe?.servings || 1);
   const [activeStep, setActiveStep] = useState(null);
   const [cookingMode, setCookingMode] = useState(false);
   const [checkedIngredients, setCheckedIngredients] = useState([]);
@@ -144,21 +146,45 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
     );
   }
 
-  const steps = recipe.steps ?? [];
-  const ingredients = recipe.ingredients ?? [];
-  const tags = recipe.tags ?? [];
-  const objective = recipe.objective ?? [];
+  useEffect(() => {
+    let cancelled = false;
+    async function loadFull() {
+      if (!recipe?.id) return;
+      // En prod, la liste charge un "summary" (steps = null) → on charge le détail ici.
+      if (recipe.steps == null) {
+        try {
+          const full = await getRecipe?.(recipe.id);
+          if (!cancelled && full) {
+            setFullRecipe(full);
+            setServings(full.servings || 1);
+          }
+        } catch {
+          // on garde le summary; l'UI reste fonctionnelle
+        }
+      } else {
+        // Si on a déjà un full (ex. dev/local), on synchronise les servings.
+        setServings(recipe.servings || 1);
+      }
+    }
+    loadFull();
+    return () => { cancelled = true; };
+  }, [recipe?.id, recipe?.steps, recipe?.servings, getRecipe]);
 
-  usePageMeta(recipe.title, steps[0] ? steps[0].slice(0, 155) + '…' : undefined);
+  const steps = effectiveRecipe?.steps ?? [];
+  const ingredients = effectiveRecipe?.ingredients ?? [];
+  const tags = effectiveRecipe?.tags ?? [];
+  const objective = effectiveRecipe?.objective ?? [];
 
-  const isFavorite = favorites?.includes(recipe.id) ?? false;
-  const ratio = servings / (recipe.servings || 1);
+  usePageMeta(effectiveRecipe?.title || recipe.title, steps[0] ? steps[0].slice(0, 155) + '…' : undefined);
+
+  const isFavorite = favorites?.includes(effectiveRecipe?.id ?? recipe.id) ?? false;
+  const ratio = servings / ((effectiveRecipe?.servings || recipe.servings) || 1);
 
   const [shareStatus, setShareStatus] = useState(null); // null | 'copied' | 'shared'
 
   const handleShare = useCallback(async () => {
     const url = window.location.href;
-    const title = recipe.title;
+    const title = effectiveRecipe?.title || recipe.title;
     const text = `${title} — recette végétarienne protéinée sur et si mamie était végé ?`;
     if (navigator.share) {
       try {
@@ -170,10 +196,10 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
       setShareStatus('copied');
     }
     setTimeout(() => setShareStatus(null), 2500);
-  }, [recipe.title]);
+  }, [effectiveRecipe?.title, recipe.title]);
 
   const similar = (recipes ?? []).filter(
-    (r) => r.id !== recipe.id && (r.objective ?? []).some((o) => objective.includes(o))
+    (r) => r.id !== (effectiveRecipe?.id ?? recipe.id) && (r.objective ?? []).some((o) => objective.includes(o))
   ).slice(0, 3);
 
   const totalSteps = 1 + steps.length;
@@ -398,7 +424,13 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
         <div className="flex flex-col lg:flex-row gap-10">
           <div className="lg:w-1/2">
             <div className="aspect-[4/3] rounded-sm overflow-hidden bg-bg-warm">
-              <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover" />
+              <img
+                src={effectiveRecipe?.image || recipe.image}
+                alt={effectiveRecipe?.title || recipe.title}
+                className="w-full h-full object-cover"
+                decoding="async"
+                fetchPriority="high"
+              />
             </div>
           </div>
 
@@ -411,30 +443,30 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
               ))}
             </div>
             <h1 className="font-display text-3xl sm:text-4xl text-text leading-tight">
-              {recipe.title}
+              {effectiveRecipe?.title || recipe.title}
             </h1>
             <p className="recipe-script-note mt-2 text-base">
-              {recipe.time <= 15 ? 'Rapide à faire !' : recipe.time <= 30 ? 'Parfait pour le soir' : 'À prévoir à l\'avance'}
+              {(effectiveRecipe?.time ?? recipe.time) <= 15 ? 'Rapide à faire !' : (effectiveRecipe?.time ?? recipe.time) <= 30 ? 'Parfait pour le soir' : 'À prévoir à l\'avance'}
             </p>
 
             <div className="flex items-center gap-4 mt-4 text-sm text-text-light">
-              <span className="flex items-center gap-1.5"><Clock size={15} /> {recipe.time} min</span>
-              <span className="flex items-center gap-1.5"><Flame size={15} /> {Math.round(recipe.calories * ratio)} kcal</span>
-              <span className="flex items-center gap-1.5"><ChefHat size={15} /> {recipe.difficulty}</span>
+              <span className="flex items-center gap-1.5"><Clock size={15} /> {effectiveRecipe?.time ?? recipe.time} min</span>
+              <span className="flex items-center gap-1.5"><Flame size={15} /> {Math.round((effectiveRecipe?.calories ?? recipe.calories) * ratio)} kcal</span>
+              <span className="flex items-center gap-1.5"><ChefHat size={15} /> {effectiveRecipe?.difficulty ?? recipe.difficulty}</span>
             </div>
 
             {/* Macros */}
             <div className="mt-6 grid grid-cols-3 gap-3">
               <div className="bg-bg-warm rounded-sm p-3 text-center">
-                <p className="text-lg font-medium text-primary">{Math.round(recipe.protein * ratio)}g</p>
+                <p className="text-lg font-medium text-primary">{Math.round((effectiveRecipe?.protein ?? recipe.protein) * ratio)}g</p>
                 <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Protéines</p>
               </div>
               <div className="bg-bg-warm rounded-sm p-3 text-center">
-                <p className="text-lg font-medium text-text">{Math.round(recipe.carbs * ratio)}g</p>
+                <p className="text-lg font-medium text-text">{Math.round((effectiveRecipe?.carbs ?? recipe.carbs) * ratio)}g</p>
                 <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Glucides</p>
               </div>
               <div className="bg-bg-warm rounded-sm p-3 text-center">
-                <p className="text-lg font-medium text-text">{Math.round(recipe.fat * ratio)}g</p>
+                <p className="text-lg font-medium text-text">{Math.round((effectiveRecipe?.fat ?? recipe.fat) * ratio)}g</p>
                 <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Lipides</p>
               </div>
             </div>
