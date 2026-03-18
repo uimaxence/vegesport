@@ -94,10 +94,26 @@ export default function AdminRecipes() {
         )}
 
         {loading && (
-          <p className="text-text-light">Chargement des recettes…</p>
+          <div className="flex items-center gap-3 text-text-light">
+            <svg className="animate-spin h-4 w-4 text-primary flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+            </svg>
+            <span>Chargement des recettes…</span>
+          </div>
         )}
         {error && (
-          <p className="text-red-600">Erreur : {error}</p>
+          <div className="rounded-xl bg-red-50 border border-red-200 p-4">
+            <p className="text-red-700 text-sm font-medium mb-1">Impossible de charger les recettes</p>
+            <p className="text-red-600 text-sm mb-3">{error}</p>
+            <button
+              type="button"
+              onClick={loadFirstPage}
+              className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+            >
+              Réessayer
+            </button>
+          </div>
         )}
         {!loading && !error && recipes.length === 0 && (
           <p className="text-text-light">Aucune recette.</p>

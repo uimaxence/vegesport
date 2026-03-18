@@ -1,22 +1,69 @@
-import { supabase, isSupabaseConfigured } from './supabase';
-import { recipes as localRecipes } from '../data/recipes';
-import { articles as localArticles } from '../data/blog';
+import { isSupabaseConfigured } from './supabase';
 
 const FETCH_TIMEOUT_MS = 10000;
 
-/** En développement (localhost), on utilise les données locales pour un chargement instantané. */
+/** En dev, on utilise les données locales (chargement instantané, pas de réseau). */
 const useLocalDataOnly = () =>
   typeof import.meta !== 'undefined' && import.meta.env?.DEV === true;
 
-function withTimeout(promise, ms) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('timeout')), ms)
-    ),
-  ]);
+// ─── Données locales en import dynamique ─────────────────────────────────────
+// Pas d'import statique : ces modules (~110KB) n'entrent plus dans le bundle prod.
+// Ils sont chargés à la demande (dev ou fallback en cas de panne Supabase).
+let _localRecipes = null;
+let _localArticles = null;
+
+async function getLocalRecipes() {
+  if (_localRecipes) return _localRecipes;
+  const mod = await import('../data/recipes');
+  _localRecipes = mod.recipes || [];
+  return _localRecipes;
 }
 
+async function getLocalArticles() {
+  if (_localArticles) return _localArticles;
+  const mod = await import('../data/blog');
+  _localArticles = mod.articles || [];
+  return _localArticles;
+}
+
+// ─── Appel REST direct (contourne supabase-js + son init auth) ───────────────
+function getRestBase() {
+  return String(import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
+}
+
+function getAnonKey() {
+  return String(import.meta.env.VITE_SUPABASE_ANON_KEY || '');
+}
+
+async function restGet(path, timeoutMs = FETCH_TIMEOUT_MS) {
+  const base = getRestBase();
+  const key = getAnonKey();
+  if (!base || !key) return null;
+
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(`${base}/rest/v1/${path}`, {
+      signal: controller.signal,
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      throw new Error(`HTTP ${res.status}: ${body || res.statusText}`);
+    }
+    return await res.json();
+  } catch (e) {
+    if (e?.name === 'AbortError') throw new Error('timeout');
+    throw e;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+// ─── Mappers ─────────────────────────────────────────────────────────────────
 function mapRecipeRow(row) {
   if (!row) return null;
   return {
@@ -61,7 +108,6 @@ function mapRecipeSummaryRow(row) {
     mainIngredient: row.main_ingredient,
     image: row.image,
     ingredients: row.ingredients || [],
-    // steps non chargées ici (payload trop lourd pour une liste)
     steps: null,
   };
 }
@@ -84,62 +130,49 @@ function mapArticleRow(row) {
   };
 }
 
+// ─── Exports ─────────────────────────────────────────────────────────────────
 export async function fetchRecipes() {
-  if (useLocalDataOnly()) return [...localRecipes];
-  if (isSupabaseConfigured() && supabase) {
+  if (useLocalDataOnly()) return [...(await getLocalRecipes())];
+  if (isSupabaseConfigured()) {
     try {
-      const { data, error } = await withTimeout(
-        supabase
-          .from('recipes')
-          .select('id, title, category, time, calories, protein, carbs, fat, servings, difficulty, tags, objective, regime, season, main_ingredient, image, ingredients')
-          .order('id', { ascending: true }),
-        FETCH_TIMEOUT_MS
-      );
-      if (error) throw error;
-      return (data || []).map(mapRecipeSummaryRow).filter(Boolean);
+      const cols = 'id,title,category,time,calories,protein,carbs,fat,servings,difficulty,tags,objective,regime,season,main_ingredient,image,ingredients';
+      const data = await restGet(`recipes?select=${cols}&order=id.asc`);
+      if (Array.isArray(data)) return data.map(mapRecipeSummaryRow).filter(Boolean);
     } catch (e) {
       console.warn('fetchRecipes: fallback local', e?.message);
-      return [...localRecipes];
     }
   }
-  return [...localRecipes];
+  return [...(await getLocalRecipes())];
 }
 
 export async function fetchRecipeById(id) {
   if (useLocalDataOnly()) {
-    const found = (localRecipes || []).find((r) => String(r.id) === String(id));
+    const list = await getLocalRecipes();
+    const found = list.find((r) => String(r.id) === String(id));
     return found ? { ...found } : null;
   }
-  if (isSupabaseConfigured() && supabase) {
-    const { data, error } = await withTimeout(
-      supabase
-        .from('recipes')
-        .select('*')
-        .eq('id', id)
-        .single(),
-      FETCH_TIMEOUT_MS
-    );
-    if (error) throw error;
-    return mapRecipeRow(data);
+  if (isSupabaseConfigured()) {
+    try {
+      const data = await restGet(`recipes?id=eq.${id}&select=*&limit=1`);
+      if (Array.isArray(data) && data[0]) return mapRecipeRow(data[0]);
+    } catch (e) {
+      console.warn('fetchRecipeById: fallback local', e?.message);
+    }
   }
-  const found = (localRecipes || []).find((r) => String(r.id) === String(id));
+  const list = await getLocalRecipes();
+  const found = list.find((r) => String(r.id) === String(id));
   return found ? { ...found } : null;
 }
 
 export async function fetchArticles() {
-  if (useLocalDataOnly()) return [...localArticles];
-  if (isSupabaseConfigured() && supabase) {
+  if (useLocalDataOnly()) return [...(await getLocalArticles())];
+  if (isSupabaseConfigured()) {
     try {
-      const { data, error } = await withTimeout(
-        supabase.from('blog_articles').select('*').order('date', { ascending: false }),
-        FETCH_TIMEOUT_MS
-      );
-      if (error) throw error;
-      return (data || []).map(mapArticleRow).filter(Boolean);
+      const data = await restGet('blog_articles?select=*&order=date.desc');
+      if (Array.isArray(data)) return data.map(mapArticleRow).filter(Boolean);
     } catch (e) {
       console.warn('fetchArticles: fallback local', e?.message);
-      return [...localArticles];
     }
   }
-  return [...localArticles];
+  return [...(await getLocalArticles())];
 }

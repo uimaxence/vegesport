@@ -1,180 +1,81 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 
 const ADMIN_EMAIL = 'maxencecailleau.pro@gmail.com';
-// Délai plus large pour éviter les erreurs "timeout" trop agressives sur /admin
-// En dev local, on laisse plus de marge (réseau, cold start Supabase, etc.)
-const FETCH_TIMEOUT_MS = (typeof import.meta !== 'undefined' && import.meta.env?.DEV) ? 45000 : 15000;
 
-function formatTimeoutHelp() {
-  const url = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ? String(import.meta.env.VITE_SUPABASE_URL) : '';
-  const host = url ? (() => { try { return new URL(url).host; } catch { return url; } })() : '';
-  const target = host ? ` (${host})` : '';
-  const hasKey = Boolean(typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY);
-  const keyHint = hasKey ? 'OK' : 'MANQUANT';
-  return `Supabase ne répond pas${target}. Vérifie VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY (clé: ${keyHint}). En local, mets-les dans un fichier ".env.local" (préfixe VITE_ obligatoire). Si tu es sur un réseau d’entreprise/VPN/proxy, autorise *.supabase.co.`;
+// ─── REST direct (contourne supabase-js + son init auth) ─────────────────────
+// supabase-js attend que la session auth soit initialisée avant d'envoyer les
+// requêtes REST. En attendant, les appels peuvent geler plusieurs secondes.
+// fetch() direct avec apikey + Authorization: Bearer anonKey ne passe pas par
+// ce mécanisme et répond immédiatement.
+
+const REST_TIMEOUT_MS = 10000;
+
+function getRestBase() {
+  return String(import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
 }
 
-function withTimeout(promise, ms) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
-  ]);
+function getAnonKey() {
+  return String(import.meta.env.VITE_SUPABASE_ANON_KEY || '');
 }
 
-let reachabilityCheckedAt = 0;
-let lastReachabilityError = null;
-async function probeSupabaseReachability() {
-  // En prod: inutile, on laisse la requête Supabase remonter ses erreurs.
-  if (!(typeof import.meta !== 'undefined' && import.meta.env?.DEV)) return;
-
-  // Throttle (évite de spammer en dev si on refresh souvent)
-  const now = Date.now();
-  if (now - reachabilityCheckedAt < 15000) {
-    if (lastReachabilityError) throw lastReachabilityError;
-    return;
-  }
-  reachabilityCheckedAt = now;
-  lastReachabilityError = null;
-
-  const base = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL)
-    ? String(import.meta.env.VITE_SUPABASE_URL)
-    : '';
-  const anonKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY)
-    ? String(import.meta.env.VITE_SUPABASE_ANON_KEY)
-    : '';
-  if (!base) return;
-  if (!anonKey) {
-    lastReachabilityError = new Error('VITE_SUPABASE_ANON_KEY manquant. Ajoute-le dans ".env.local" puis relance `npm run dev`.');
-    throw lastReachabilityError;
-  }
+async function restGet(path) {
+  const base = getRestBase();
+  const key = getAnonKey();
+  if (!base || !key) throw new Error('Supabase non configure (variables VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY manquantes)');
 
   const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), 3000);
+  const t = setTimeout(() => controller.abort(), REST_TIMEOUT_MS);
   try {
-    // Endpoint léger, public, utile pour détecter proxy/DNS/connexion
-    const res = await fetch(`${base.replace(/\/$/, '')}/auth/v1/settings`, {
-      method: 'GET',
+    const res = await fetch(`${base}/rest/v1/${path}`, {
       signal: controller.signal,
       headers: {
-        apikey: anonKey,
+        apikey: key,
+        Authorization: `Bearer ${key}`,
       },
     });
     if (!res.ok) {
-      // Si on a une réponse HTTP, la connectivité est OK, mais on peut aider sur la config.
-      // 401/403 ici indique généralement une clé invalide.
-      if (res.status === 401 || res.status === 403) {
-        lastReachabilityError = new Error(`Clé Supabase invalide ou refusée (HTTP ${res.status}). Vérifie VITE_SUPABASE_ANON_KEY pour ce projet.`);
-        throw lastReachabilityError;
-      }
-      return;
+      const body = await res.text().catch(() => '');
+      throw new Error(`Supabase HTTP ${res.status}: ${body || res.statusText}`);
     }
-  } catch (e) {
-    const msg = e?.name === 'AbortError'
-      ? `Supabase injoignable (test réseau > 3s). ${formatTimeoutHelp()}`
-      : `Supabase injoignable (test réseau). ${formatTimeoutHelp()}`;
-    lastReachabilityError = new Error(msg);
-    throw lastReachabilityError;
-  } finally {
-    clearTimeout(t);
-  }
-}
-
-async function fetchAdminRecipesViaRest({ page = 0, pageSize = 50 } = {}) {
-  const base = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL)
-    ? String(import.meta.env.VITE_SUPABASE_URL).replace(/\/$/, '')
-    : '';
-  const anonKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY)
-    ? String(import.meta.env.VITE_SUPABASE_ANON_KEY)
-    : '';
-  if (!base || !anonKey) throw new Error(formatTimeoutHelp());
-
-  const offset = Math.max(0, page) * Math.max(1, pageSize);
-  const limit = Math.max(1, pageSize);
-  const url = `${base}/rest/v1/recipes?select=id,title,category,time&order=id.desc&offset=${offset}&limit=${limit}`;
-
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), 6000);
-  try {
-    const res = await fetch(url, {
-      method: 'GET',
-      signal: controller.signal,
-      headers: {
-        apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`,
-      },
-    });
-    const text = await res.text();
-    if (!res.ok) {
-      throw new Error(`Supabase REST error (HTTP ${res.status}): ${text || res.statusText}`);
-    }
-    try {
-      return JSON.parse(text);
-    } catch {
-      throw new Error(`Supabase REST JSON invalide: ${text.slice(0, 200)}`);
-    }
+    return await res.json();
   } catch (e) {
     if (e?.name === 'AbortError') {
-      throw new Error(`Supabase REST injoignable (>6s). ${formatTimeoutHelp()}`);
+      throw new Error(
+        `Supabase ne répond pas après ${REST_TIMEOUT_MS / 1000}s. ` +
+        `Le projet est peut-être en veille (plan gratuit) — réessaie dans quelques secondes.`
+      );
     }
     throw e;
   } finally {
     clearTimeout(t);
   }
 }
+
+// ─── Exports ──────────────────────────────────────────────────────────────────
 
 export function isAdminUser(user) {
   return !!user?.email && user.email === ADMIN_EMAIL;
 }
 
-/** Liste des recettes pour l'admin (toujours depuis la BDD). */
+/** Liste des recettes pour l'admin (lecture directe REST, pas de supabase-js). */
 export async function fetchAdminRecipes({ page = 0, pageSize = 50 } = {}) {
-  if (!isSupabaseConfigured() || !supabase) return [];
-  const from = Math.max(0, page) * Math.max(1, pageSize);
-  const to = from + Math.max(1, pageSize) - 1;
-  try {
-    await probeSupabaseReachability();
-    const { data, error } = await withTimeout(
-      supabase
-        .from('recipes')
-        .select('id, title, category, time')
-        .order('id', { ascending: false })
-        .range(from, to),
-      FETCH_TIMEOUT_MS
-    );
-    if (error) throw error;
-    return data || [];
-  } catch (e) {
-    if (e?.message === 'timeout') {
-      // En dev, tente un appel REST direct pour obtenir un diagnostic HTTP clair.
-      if (typeof import.meta !== 'undefined' && import.meta.env?.DEV) {
-        try {
-          const restData = await fetchAdminRecipesViaRest({ page, pageSize });
-          return Array.isArray(restData) ? restData : [];
-        } catch (restErr) {
-          throw new Error(`timeout — ${formatTimeoutHelp()}\nDétail (REST): ${restErr?.message || restErr}`);
-        }
-      }
-      throw new Error(`timeout — ${formatTimeoutHelp()}`);
-    }
-    throw e;
-  }
-}
-
-/** Liste tous les ingrédients (admin ou lecture publique). */
-export async function fetchIngredients() {
-  if (!isSupabaseConfigured() || !supabase) return [];
-  const { data, error } = await withTimeout(
-    supabase
-      .from('ingredients')
-      .select('id, name, rayon, created_at')
-      .order('name', { ascending: true }),
-    FETCH_TIMEOUT_MS
+  if (!isSupabaseConfigured()) return [];
+  const offset = Math.max(0, page) * Math.max(1, pageSize);
+  const limit = Math.max(1, pageSize);
+  const data = await restGet(
+    `recipes?select=id,title,category,time&order=id.desc&offset=${offset}&limit=${limit}`
   );
-  if (error) throw error;
-  return data || [];
+  return Array.isArray(data) ? data : [];
 }
 
-/** Crée un ingrédient s'il n'existe pas. Retourne { id, created } (created = true si insert). */
+/** Liste tous les ingrédients (lecture directe REST). */
+export async function fetchIngredients() {
+  if (!isSupabaseConfigured()) return [];
+  const data = await restGet('ingredients?select=id,name,rayon,created_at&order=name.asc');
+  return Array.isArray(data) ? data : [];
+}
+
+/** Crée un ingrédient s'il n'existe pas. Retourne { id, created }. */
 export async function createIngredient(name, rayon = 'Fruits et légumes') {
   if (!isSupabaseConfigured() || !supabase) throw new Error('Supabase non configuré');
   const trimmed = (name || '').trim();
@@ -227,7 +128,6 @@ export async function uploadRecipeImage(recipeId, file) {
   return urlData?.publicUrl ?? null;
 }
 
-/** Construit le payload recipes pour insert/update (colonnes snake_case). */
 function recipeToRow(payload) {
   return {
     title: payload.title,
@@ -245,12 +145,11 @@ function recipeToRow(payload) {
     season: Array.isArray(payload.season) ? payload.season : [],
     main_ingredient: payload.mainIngredient ?? payload.main_ingredient ?? null,
     image: payload.image ?? null,
-    ingredients: payload.ingredients ?? [], // sera recalculé après recipe_ingredients
+    ingredients: payload.ingredients ?? [],
     steps: Array.isArray(payload.steps) ? payload.steps : [],
   };
 }
 
-/** Résout chaque entrée en ingredient_id (création si besoin) et retourne [{ ingredient_id, quantity_text }]. */
 async function resolveRecipeIngredients(entries) {
   const resolved = [];
   for (const entry of entries || []) {
@@ -269,7 +168,6 @@ async function resolveRecipeIngredients(entries) {
   return resolved;
 }
 
-/** Met à jour recipes.ingredients (jsonb) à partir de recipe_ingredients pour une recette. */
 async function syncRecipeIngredientsJsonb(recipeId) {
   if (!supabase) return;
   const { data: rows } = await supabase
@@ -283,22 +181,14 @@ async function syncRecipeIngredientsJsonb(recipeId) {
     return qty ? `${qty} ${name}`.trim() : name;
   }).filter(Boolean);
 
-  await supabase
-    .from('recipes')
-    .update({ ingredients: arr })
-    .eq('id', recipeId);
+  await supabase.from('recipes').update({ ingredients: arr }).eq('id', recipeId);
 }
 
-/**
- * Crée une recette + ses recipe_ingredients et synchronise ingredients (jsonb).
- * payload: title, category, time, calories, protein, carbs, fat, servings, difficulty,
- * tags, objective, regime, season, mainIngredient, image, steps, recipeIngredients: [{ ingredientId?, name?, rayon?, quantityText }]
- */
 export async function createRecipe(payload) {
   if (!isSupabaseConfigured() || !supabase) throw new Error('Supabase non configuré');
 
   const row = recipeToRow(payload);
-  row.ingredients = []; // sera mis à jour après
+  row.ingredients = [];
 
   const { data: recipe, error: errRecipe } = await supabase
     .from('recipes')
@@ -320,14 +210,11 @@ export async function createRecipe(payload) {
   return recipeId;
 }
 
-/**
- * Met à jour une recette, remplace les recipe_ingredients et synchronise ingredients (jsonb).
- */
 export async function updateRecipe(id, payload) {
   if (!isSupabaseConfigured() || !supabase) throw new Error('Supabase non configuré');
 
   const row = recipeToRow(payload);
-  delete row.ingredients; // on le recalcule
+  delete row.ingredients;
 
   const { error: errRecipe } = await supabase
     .from('recipes')
@@ -348,37 +235,25 @@ export async function updateRecipe(id, payload) {
   await syncRecipeIngredientsJsonb(id);
 }
 
-/**
- * Supprime une recette (cascade supprime recipe_ingredients).
- */
 export async function deleteRecipe(id) {
   if (!isSupabaseConfigured() || !supabase) throw new Error('Supabase non configuré');
   const { error } = await supabase.from('recipes').delete().eq('id', id);
   if (error) throw error;
 }
 
-/** Récupère une recette avec ses recipe_ingredients (pour édition). */
+/** Récupère une recette complète avec ses recipe_ingredients (pour édition). */
 export async function fetchRecipeForEdit(id) {
-  if (!isSupabaseConfigured() || !supabase) return null;
-  const { data: recipe, error: e1 } = await withTimeout(
-    supabase
-      .from('recipes')
-      .select('*')
-      .eq('id', id)
-      .single(),
-    FETCH_TIMEOUT_MS
-  );
-  if (e1 || !recipe) return null;
+  if (!isSupabaseConfigured()) return null;
 
-  const { data: ri } = await withTimeout(
-    supabase
-      .from('recipe_ingredients')
-      .select('ingredient_id, quantity_text, ingredients(id, name, rayon)')
-      .eq('recipe_id', id),
-    FETCH_TIMEOUT_MS
-  );
+  const [recipeArr, riArr] = await Promise.all([
+    restGet(`recipes?id=eq.${id}&select=*&limit=1`),
+    restGet(`recipe_ingredients?recipe_id=eq.${id}&select=ingredient_id,quantity_text,ingredients(id,name,rayon)`),
+  ]);
 
-  const recipeIngredients = (ri || []).map((r) => ({
+  const recipe = Array.isArray(recipeArr) ? recipeArr[0] : null;
+  if (!recipe) return null;
+
+  const recipeIngredients = (Array.isArray(riArr) ? riArr : []).map((r) => ({
     ingredientId: r.ingredient_id,
     ingredient_id: r.ingredient_id,
     quantityText: r.quantity_text,
