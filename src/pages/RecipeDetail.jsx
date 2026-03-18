@@ -94,127 +94,152 @@ function CookingTimerIsland({ timer, expanded, setExpanded, onStop, onAdd, onRem
   if (!timer) return null;
 
   const timeStr = formatTimer(timer.remainingSeconds);
-  const progress = timer.totalSeconds > 0 ? timer.remainingSeconds / timer.totalSeconds : 0;
-  const rSm = 12;
-  const circSm = 2 * Math.PI * rSm;
-  const offSm = circSm * (1 - progress);
-  const rLg = 46;
-  const circLg = 2 * Math.PI * rLg;
-  const offLg = circLg * (1 - progress);
+  const totalStr = formatTimer(timer.totalSeconds);
+  const halfStr = formatTimer(Math.round(timer.totalSeconds / 2));
+  // elapsed fraction 0→1 as timer counts down (bar fills left to right)
+  const elapsed = timer.totalSeconds > 0
+    ? Math.max(0, Math.min(1, 1 - timer.remainingSeconds / timer.totalSeconds))
+    : 1;
+  const elapsedPct = elapsed * 100;
+  const isDone = timer.done;
   const startedAtStr = timer.startedAt
     ? timer.startedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     : '';
-  const accentColor = timer.done ? '#ef4444' : '#f97316';
 
   return (
     <div
-      className={`bg-[#111] border shadow-2xl transition-all duration-300 ease-in-out overflow-hidden select-none ${
-        expanded
-          ? 'rounded-2xl border-white/25 w-72 sm:w-80'
-          : 'rounded-full border-white/20 cursor-pointer'
-      }`}
-      onClick={() => !expanded && setExpanded(true)}
+      className="bg-[#0f0f0f] border border-white/[0.1] shadow-2xl overflow-hidden select-none"
+      style={{
+        width: expanded ? '280px' : '120px',
+        borderRadius: expanded ? '20px' : '100px',
+        transition: 'width 400ms cubic-bezier(0.4,0,0.2,1), border-radius 400ms cubic-bezier(0.4,0,0.2,1)',
+      }}
     >
-      {!expanded ? (
-        /* ── Compact pill ── */
-        <div className="flex items-center gap-2 px-3 py-1.5">
-          <svg width="30" height="30" className="-rotate-90 flex-shrink-0">
-            <circle cx="15" cy="15" r={rSm} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="2.5" />
-            <circle
-              cx="15" cy="15" r={rSm} fill="none"
-              stroke={accentColor}
-              strokeWidth="2.5"
-              strokeDasharray={circSm}
-              strokeDashoffset={offSm}
-              strokeLinecap="round"
-              style={{ transition: 'stroke-dashoffset 1s linear' }}
-            />
-          </svg>
-          <span className={`text-sm font-mono font-semibold tabular-nums pr-1 ${timer.done ? 'text-red-400 animate-pulse' : 'text-white'}`}>
-            {timer.done ? 'Pret !' : timeStr}
+      {/* ── Compact pill (visible when collapsed) ── */}
+      <div
+        className="cursor-pointer"
+        style={{
+          opacity: expanded ? 0 : 1,
+          maxHeight: expanded ? 0 : '48px',
+          overflow: 'hidden',
+          transition: 'opacity 180ms, max-height 400ms cubic-bezier(0.4,0,0.2,1)',
+          pointerEvents: expanded ? 'none' : 'auto',
+        }}
+        onClick={() => setExpanded(true)}
+      >
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 whitespace-nowrap">
+          <div className="flex-shrink-0 w-12 h-[3px] rounded-full bg-white/10 overflow-hidden">
+            <div style={{
+              width: `${elapsedPct}%`,
+              height: '100%',
+              background: isDone ? '#ef4444' : '#f97316',
+              transition: 'width 1s linear',
+              borderRadius: 'inherit',
+            }} />
+          </div>
+          <span className={`text-sm font-mono font-semibold tabular-nums ${isDone ? 'text-red-400' : 'text-white'}`}>
+            {isDone ? 'Prêt !' : timeStr}
           </span>
         </div>
-      ) : (
-        /* ── Expanded island ── */
-        <div className="p-4">
-          <div className="flex items-start justify-between mb-1">
-            <div>
-              <p className="text-[10px] font-semibold text-white/40 uppercase tracking-widest">Minuteur</p>
-              {timer.label && (
-                <p className="text-xs text-white/55 mt-0.5 max-w-[180px] line-clamp-2 leading-tight">{timer.label}</p>
-              )}
-            </div>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
-              className="text-white/30 hover:text-white/70 transition-colors w-7 h-7 flex items-center justify-center text-lg leading-none -mt-1 -mr-1"
-            >
-              ×
-            </button>
+      </div>
+
+      {/* ── Expanded card (click card body to close) ── */}
+      <div
+        style={{
+          opacity: expanded ? 1 : 0,
+          maxHeight: expanded ? '420px' : 0,
+          overflow: 'hidden',
+          transition: 'opacity 250ms 60ms, max-height 400ms cubic-bezier(0.4,0,0.2,1)',
+          pointerEvents: expanded ? 'auto' : 'none',
+        }}
+      >
+        {/* Body: click to close */}
+        <div className="p-5 cursor-pointer" onClick={() => setExpanded(false)}>
+          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.16em] mb-3">
+            ⏱ En cuisson…
+          </p>
+
+          {/* Time */}
+          <div className="flex items-baseline gap-2 mb-1">
+            <span className={`text-[2.5rem] leading-none font-mono font-bold tabular-nums ${isDone ? 'text-red-400 animate-pulse' : 'text-white'}`}>
+              {isDone ? '0:00' : timeStr}
+            </span>
+            <span className="text-white/22 text-sm tabular-nums">• {totalStr}</span>
           </div>
 
-          {/* Ring */}
-          <div className="flex items-center justify-center my-3">
-            <div className="relative" style={{ width: 108, height: 108 }}>
-              <svg width="108" height="108" className="-rotate-90">
-                <circle cx="54" cy="54" r={rLg} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="6" />
-                <circle
-                  cx="54" cy="54" r={rLg} fill="none"
-                  stroke={accentColor}
-                  strokeWidth="6"
-                  strokeDasharray={circLg}
-                  strokeDashoffset={offLg}
-                  strokeLinecap="round"
-                  style={{ transition: 'stroke-dashoffset 1s linear' }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
-                <span className={`text-[1.75rem] font-mono font-bold tabular-nums leading-none ${timer.done ? 'text-red-400 animate-pulse' : 'text-white'}`}>
-                  {timer.done ? '0:00' : timeStr}
-                </span>
-                {startedAtStr && (
-                  <span className="text-[10px] text-white/35 tabular-nums">depuis {startedAtStr}</span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Controls */}
-          {!timer.done ? (
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); onRemove(60); }}
-                className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white/70 text-sm font-medium transition-colors"
-              >
-                −1 min
-              </button>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); onStop(); setExpanded(false); }}
-                className="flex-1 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 text-sm font-semibold transition-colors"
-              >
-                Arreter
-              </button>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); onAdd(60); }}
-                className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white/70 text-sm font-medium transition-colors"
-              >
-                +1 min
-              </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onStop(); setExpanded(false); }}
-              className="w-full py-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 text-sm font-semibold transition-colors"
-            >
-              Fermer le minuteur
-            </button>
+          {startedAtStr && (
+            <p className="text-white/28 text-[11px] mb-5 tabular-nums">depuis {startedAtStr}</p>
           )}
+          {!startedAtStr && <div className="mb-5" />}
+
+          {/* Scale labels */}
+          <div className="flex justify-between text-[10px] text-white/22 mb-1.5 tabular-nums px-0.5">
+            <span>0:00</span>
+            <span>{halfStr}</span>
+            <span>{totalStr}</span>
+          </div>
+
+          {/* Progress bar — glow style */}
+          <div
+            className="h-9 rounded-2xl overflow-hidden mb-5"
+            style={{ background: 'rgba(255,255,255,0.045)' }}
+          >
+            <div style={{
+              width: `${elapsedPct}%`,
+              height: '100%',
+              borderRadius: 'inherit',
+              background: isDone
+                ? 'linear-gradient(90deg, #dc2626 0%, #ef4444 100%)'
+                : 'linear-gradient(90deg, rgba(234,88,12,0.5) 0%, rgba(255,255,255,0.90) 100%)',
+              boxShadow: isDone
+                ? '0 0 28px 10px rgba(239,68,68,0.4)'
+                : '0 0 32px 12px rgba(255,185,80,0.48)',
+              transition: 'width 1s linear',
+            }} />
+          </div>
+
+          {/* Controls — stop propagation so they don't close the card */}
+          <div onClick={(e) => e.stopPropagation()}>
+            {!isDone ? (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onRemove(60)}
+                  className="flex-1 py-2.5 rounded-xl text-white/55 text-sm font-medium transition-colors hover:text-white/80"
+                  style={{ background: 'rgba(255,255,255,0.07)' }}
+                >
+                  −1 min
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { onStop(); setExpanded(false); }}
+                  className="flex-1 py-2.5 rounded-xl text-red-400 text-sm font-semibold transition-colors hover:text-red-300"
+                  style={{ background: 'rgba(239,68,68,0.12)' }}
+                >
+                  Arrêter
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onAdd(60)}
+                  className="flex-1 py-2.5 rounded-xl text-white/55 text-sm font-medium transition-colors hover:text-white/80"
+                  style={{ background: 'rgba(255,255,255,0.07)' }}
+                >
+                  +1 min
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => { onStop(); setExpanded(false); }}
+                className="w-full py-2.5 rounded-xl text-red-400 text-sm font-semibold transition-colors hover:text-red-300"
+                style={{ background: 'rgba(239,68,68,0.12)' }}
+              >
+                Fermer le minuteur
+              </button>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
