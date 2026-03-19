@@ -1,9 +1,14 @@
 import { Link } from 'react-router-dom';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { canonicalUrl } from '../lib/seo';
 import { FileText } from 'lucide-react';
 
 export default function MentionsLegales() {
-  usePageMeta('Mentions légales', 'Conditions d\'utilisation et mentions légales — et si mamie était végé ?');
+  usePageMeta({
+    title: 'Mentions légales',
+    description: 'Conditions d\'utilisation et mentions légales du site et si mamie était végé ?',
+    canonical: canonicalUrl('/mentions-legales'),
+  });
 
   return (
     <div className="px-6 lg:px-8 py-12">

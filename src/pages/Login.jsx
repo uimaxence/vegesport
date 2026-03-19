@@ -5,7 +5,11 @@ import { usePageMeta } from '../hooks/usePageMeta';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export default function Login() {
-  usePageMeta('Connexion', 'Connecte-toi à ton compte et si mamie était végé ? pour sauvegarder tes favoris et tes plannings.');
+  usePageMeta({
+    title: 'Connexion',
+    description: 'Connecte-toi à ton compte et si mamie était végé ? pour sauvegarder tes favoris et tes plannings.',
+    noindex: true,
+  });
   const { user, setUserLocal } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');

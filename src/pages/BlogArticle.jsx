@@ -3,7 +3,9 @@ import { useEffect } from 'react';
 import { ArrowLeft, Clock, Share2 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { useJsonLd } from '../hooks/useJsonLd';
 import { getSlug } from '../lib/slug';
+import { canonicalUrl, buildArticleJsonLd, buildBreadcrumbJsonLd } from '../lib/seo';
 import ArticleBlocks from '../components/article/ArticleBlocks';
 
 export default function BlogArticle() {
@@ -44,23 +46,39 @@ export default function BlogArticle() {
     );
   }
 
-  usePageMeta(
-    article.metaTitle || article.title,
-    article.metaDescription || article.excerpt || (article.content ? article.content.slice(0, 155) + '…' : undefined),
-    Boolean(article.metaTitle)
-  );
+  const articleUrl = canonicalUrl(`/blog/${article.id}/${canonicalSlug}`);
+
+  usePageMeta({
+    title: article.metaTitle || article.title,
+    description: article.metaDescription || article.excerpt || (article.content ? article.content.slice(0, 155) + '…' : undefined),
+    fullTitle: Boolean(article.metaTitle),
+    canonical: articleUrl,
+    image: article.image,
+    type: 'article',
+  });
+
+  useJsonLd([
+    buildArticleJsonLd(article, articleUrl),
+    buildBreadcrumbJsonLd([
+      { name: 'Accueil', url: canonicalUrl('/') },
+      { name: 'Blog', url: canonicalUrl('/blog') },
+      { name: article.title, url: articleUrl },
+    ]),
+  ]);
 
   const otherArticles = articles.filter(a => a.id !== article.id).slice(0, 3);
 
   return (
     <div className="px-6 lg:px-8 py-12">
       <div className="max-w-3xl mx-auto">
-        <Link
-          to="/blog"
-          className="inline-flex items-center gap-1.5 text-sm text-text-light hover:text-text transition-colors mb-8"
-        >
-          <ArrowLeft size={16} /> Blog
-        </Link>
+        {/* Breadcrumb */}
+        <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-sm text-text-light mb-8 flex-wrap">
+          <Link to="/" className="hover:text-text transition-colors">Accueil</Link>
+          <span className="text-text-light/40">/</span>
+          <Link to="/blog" className="hover:text-text transition-colors">Blog</Link>
+          <span className="text-text-light/40">/</span>
+          <span className="text-text truncate max-w-[250px]">{article.title}</span>
+        </nav>
 
         <p className="text-xs text-primary font-medium mb-3">{article.category}</p>
         <h1 className="font-display text-3xl sm:text-4xl text-text leading-tight">
@@ -91,7 +109,7 @@ export default function BlogArticle() {
 
         {/* Comments placeholder */}
         <div className="mt-16 pt-8 border-t border-border">
-          <h3 className="text-xs uppercase tracking-[0.2em] text-primary mb-6">Commentaires</h3>
+          <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-6">Commentaires</h2>
           <div className="bg-bg-warm rounded-sm p-6 text-center">
             <p className="text-sm text-text-light">
               Les commentaires seront disponibles prochainement.
@@ -105,7 +123,7 @@ export default function BlogArticle() {
         {/* More articles */}
         {otherArticles.length > 0 && (
           <div className="mt-16">
-            <h3 className="font-display text-2xl text-text mb-8">À lire aussi</h3>
+            <h2 className="font-display text-2xl text-text mb-8">À lire aussi</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {otherArticles.map(a => (
                 <Link key={a.id} to={`/blog/${a.id}/${getSlug(a.title)}`} className="group">
@@ -116,9 +134,9 @@ export default function BlogArticle() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  <h4 className="mt-2 text-sm font-medium text-text group-hover:text-primary transition-colors">
+                  <h3 className="mt-2 text-sm font-medium text-text group-hover:text-primary transition-colors">
                     {a.title}
-                  </h4>
+                  </h3>
                 </Link>
               ))}
             </div>

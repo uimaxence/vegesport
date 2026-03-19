@@ -531,7 +531,7 @@ export default function AdminRecipeForm() {
             <label className="block text-sm font-medium text-text mb-1">Photo</label>
             {imagePreview && (
               <div className="mb-2">
-                <img src={imagePreview} alt="" className="h-24 object-cover rounded-lg border border-black/10" />
+                <img src={imagePreview} alt="" className="h-24 w-24 object-contain bg-bg-warm rounded-lg border border-black/10" />
               </div>
             )}
             <input

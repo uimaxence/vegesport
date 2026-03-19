@@ -135,11 +135,12 @@ export default function RepasDuMoment({ planning, getRecipe, mealsDoneMap, onTog
                     to={`/recettes/${getSlug(recipe.title)}`}
                     className="flex items-center gap-3 flex-1 min-w-0 group"
                   >
-                    <div className="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-bg-warm">
+                    <div className="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-bg-warm flex items-center justify-center">
                       <img
                         src={recipe.image}
                         alt=""
-                        className={`w-full h-full object-cover group-hover:scale-105 transition-transform ${isDone ? 'opacity-60' : ''}`}
+                        className={`w-full h-full object-cover scale-100 group-hover:scale-105 transition-transform ${isDone ? 'opacity-60' : ''}`}
+                        style={{ objectPosition: 'center' }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">

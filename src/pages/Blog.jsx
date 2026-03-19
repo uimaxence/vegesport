@@ -3,12 +3,17 @@ import { Link } from 'react-router-dom';
 import { Clock } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { canonicalUrl } from '../lib/seo';
 import { getSlug } from '../lib/slug';
 import { blogCategories } from '../data/blog';
 import BlogSkeleton from '../components/skeleton/BlogSkeleton';
 
 export default function Blog() {
-  usePageMeta('Blog', 'Conseils nutrition sportive végétale, meal prep, témoignages et comparatifs pour sportifs végétariens et végétaliens.');
+  usePageMeta({
+    title: 'Blog nutrition végétale & performance sportive',
+    description: 'Conseils nutrition sportive végétale, guides meal prep végétarien, témoignages et comparatifs pour sportifs végétariens et végétaliens.',
+    canonical: canonicalUrl('/blog'),
+  });
   const { articles, loading, error } = useData();
   const [activeCategory, setActiveCategory] = useState('tous');
 

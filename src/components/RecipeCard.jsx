@@ -6,11 +6,11 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
   if (layout === 'compact') {
     return (
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="group flex items-center gap-4 py-3 rounded-xl hover:bg-black/[0.03] transition-colors -mx-1 px-1">
-        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-black/5">
+        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-black/5 flex items-center justify-center">
           <img
             src={recipe.image}
             alt={recipe.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-contain scale-60 group-hover:scale-60 transition-transform duration-500"
             loading="lazy"
             decoding="async"
             width="64"
@@ -32,11 +32,11 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
   return (
     <div className="group overflow-hidden recipe-card-frame relative rounded-xl">
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="block">
-        <div className="aspect-[4/3] relative bg-[rgb(0,0,0,0.04)] overflow-hidden rounded-t-xl">
+        <div className="aspect-[16/10] relative bg-[rgb(0,0,0,0.04)] overflow-hidden rounded-t-xl flex items-center justify-center">
           <img
             src={recipe.image}
             alt={recipe.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-contain scale-60 group-hover:scale-60 transition-transform duration-500"
             loading="lazy"
             decoding="async"
             width="800"

@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /profil
+Disallow: /donnees-personnelles
+Disallow: /auth/callback
+Disallow: /connexion
 
-Sitemap: https://example.com/sitemap.xml
+Sitemap: https://www.mamie-vege.fr/sitemap.xml

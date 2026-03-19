@@ -23,6 +23,7 @@ const MentionsLegales = lazy(() => import('./pages/MentionsLegales'));
 const AdminRecipes = lazy(() => import('./pages/admin/AdminRecipes'));
 const AdminRecipeForm = lazy(() => import('./pages/admin/AdminRecipeForm'));
 const AdminIngredients = lazy(() => import('./pages/admin/AdminIngredients'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageFallback() {
   return (
@@ -71,6 +72,7 @@ function AppRoutes() {
               <Route path="/admin/recettes/:id/edit" element={<AdminRecipeForm />} />
               <Route path="/admin/ingredients" element={<AdminIngredients />} />
             </Route>
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>

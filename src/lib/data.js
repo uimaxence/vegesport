@@ -2,9 +2,12 @@ import { isSupabaseConfigured } from './supabase';
 
 const FETCH_TIMEOUT_MS = 10000;
 
-/** En dev, on utilise les données locales (chargement instantané, pas de réseau). */
+/**
+ * Mode données locales (opt-in).
+ * Par défaut, même en dev, on préfère Supabase si configuré (sinon les URLs locales peuvent diverger, ex. .png vs .webp).
+ */
 const useLocalDataOnly = () =>
-  typeof import.meta !== 'undefined' && import.meta.env?.DEV === true;
+  String(import.meta.env?.VITE_USE_LOCAL_DATA || '').toLowerCase() === 'true';
 
 // ─── Données locales en import dynamique ─────────────────────────────────────
 // Pas d'import statique : ces modules (~110KB) n'entrent plus dans le bundle prod.

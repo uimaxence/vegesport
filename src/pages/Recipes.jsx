@@ -3,12 +3,17 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { canonicalUrl } from '../lib/seo';
 import { categories, objectives, regimes, tags } from '../data/recipes';
 import RecipeCard from '../components/RecipeCard';
 import RecipesSkeleton from '../components/skeleton/RecipesSkeleton';
 
 export default function Recipes({ favorites, toggleFavorite }) {
-  usePageMeta('Recettes', 'Toutes nos recettes végétariennes et végétaliennes pour sportifs. Filtres par objectif, régime et temps de préparation.');
+  usePageMeta({
+    title: 'Recettes végétariennes protéinées pour sportifs',
+    description: 'Découvrez toutes nos recettes végétariennes et végétaliennes riches en protéines. Filtrez par objectif sportif, régime alimentaire et temps de préparation.',
+    canonical: canonicalUrl('/recettes'),
+  });
   const { recipes, loading, error } = useData();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);

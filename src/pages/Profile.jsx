@@ -33,7 +33,11 @@ function saveMealsDoneToStorage(userId, data) {
 }
 
 export default function Profile({ user, favorites, savedPlannings }) {
-  usePageMeta('Mon profil', 'Tes recettes favorites, plannings sauvegardés et badges et si mamie était végé ?.');
+  usePageMeta({
+    title: 'Mon profil',
+    description: 'Tes recettes favorites, plannings sauvegardés et badges et si mamie était végé ?.',
+    noindex: true,
+  });
   const { signOut } = useAuth();
 
   const handleSignOut = () => {

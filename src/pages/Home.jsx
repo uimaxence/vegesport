@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Clock, Flame } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { useJsonLd } from '../hooks/useJsonLd';
+import { canonicalUrl, buildWebSiteJsonLd } from '../lib/seo';
 import RecipeCard from '../components/RecipeCard';
 import { getSlug } from '../lib/slug';
 import vuePlanning from '../assets/vue planning.png';
@@ -12,11 +14,11 @@ function HeroRecipeCard({ recipe }) {
       to={`/recettes/${getSlug(recipe.title)}`}
       className="group flex-shrink-0 w-[200px] snap-start block bg-white rounded-xl overflow-hidden shadow-sm border border-border hover:shadow-md transition-all duration-300 hover:-translate-y-1"
     >
-      <div className="aspect-[3/4] overflow-hidden bg-bg-warm">
+      <div className="aspect-[3/4] overflow-hidden bg-bg-warm flex items-center justify-center">
         <img
           src={recipe.image}
           alt={recipe.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-contain scale-60 group-hover:scale-60 transition-transform duration-500"
         />
       </div>
       <div className="p-2.5">
@@ -49,7 +51,14 @@ const categoryShowcase = [
 ];
 
 export default function Home() {
-  usePageMeta('et si mamie était végé ? — Recettes végétariennes', 'Recettes végétariennes et végétaliennes riches en protéines pour sportifs. Planning repas hebdomadaire, liste de courses et conseils nutrition sportive végétale.', true);
+  usePageMeta({
+    title: 'et si mamie était végé ? — Recettes végétariennes protéinées',
+    description: 'Recettes végétariennes et végétaliennes riches en protéines pour sportifs. Planning repas hebdomadaire personnalisé, liste de courses automatique et conseils nutrition sportive végétale.',
+    fullTitle: true,
+    canonical: canonicalUrl('/'),
+    type: 'website',
+  });
+  useJsonLd(buildWebSiteJsonLd());
   const { recipes, articles, loading, error } = useData();
 
   function getCategoryCount(cat) {

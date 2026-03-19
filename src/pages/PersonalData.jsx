@@ -6,7 +6,11 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { Shield, Download, Trash2, ChevronRight } from 'lucide-react';
 
 export default function PersonalData() {
-  usePageMeta('Données personnelles', 'Gestion de tes données personnelles, consentements et droits RGPD — et si mamie était végé ?');
+  usePageMeta({
+    title: 'Données personnelles',
+    description: 'Gestion de tes données personnelles, consentements et droits RGPD — et si mamie était végé ?',
+    noindex: true,
+  });
   const { user, consents, updateConsents } = useAuth();
   const [exportStatus, setExportStatus] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState('');

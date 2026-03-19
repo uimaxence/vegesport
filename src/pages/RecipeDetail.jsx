@@ -4,7 +4,9 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { useJsonLd } from '../hooks/useJsonLd';
 import { getSlug } from '../lib/slug';
+import { canonicalUrl, buildRecipeJsonLd, buildBreadcrumbJsonLd, categoryLabel } from '../lib/seo';
 import RecipeCard from '../components/RecipeCard';
 import RecipeComments from '../components/RecipeComments';
 
@@ -86,6 +88,24 @@ function formatTimer(s) {
   return `${m}:${String(sec).padStart(2, '0')}`;
 }
 
+/** Extrait un court libellé "cuisson X" depuis le texte de l'étape (ex. "Cuire le quinoa 8 min" → "quinoa"). */
+function getCookingSubject(stepText) {
+  if (!stepText || typeof stepText !== 'string') return null;
+  const t = stepText.trim();
+  const m = t.match(/(?:cuire|faire cuire|mijoter|faire revenir|laisser cuire)\s+(?:le |la |les |l')?([a-zàâäéèêëïîôùûüçA-Z0-9\s]+?)(?:\s+\d|\s+à|\s*$)/i)
+    || t.match(/(?:cuisson|cuire)\s+(?:du |de la |des )?([a-zàâäéèêëïîôùûüç]+)/i);
+  if (m) {
+    const word = m[1].trim().split(/\s+/)[0];
+    if (word.length >= 2) return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  }
+  const known = ['quinoa', 'riz', 'pâtes', 'lentilles', 'pois chiches', 'semoule', 'boulgour', 'oignons', 'ail', 'sauce', 'légumes'];
+  const lower = t.toLowerCase();
+  for (const w of known) {
+    if (lower.includes(w)) return w.charAt(0).toUpperCase() + w.slice(1);
+  }
+  return null;
+}
+
 function CookingTimerIsland({ timer, expanded, setExpanded, onStop, onAdd, onRemove }) {
   useEffect(() => {
     if (timer?.done) setExpanded(true);
@@ -105,6 +125,8 @@ function CookingTimerIsland({ timer, expanded, setExpanded, onStop, onAdd, onRem
   const startedAtStr = timer.startedAt
     ? timer.startedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     : '';
+  const subject = getCookingSubject(timer.label);
+  const cookingLabel = subject ? `Cuisson ${subject}` : 'En cuisson…';
 
   return (
     <div
@@ -127,19 +149,25 @@ function CookingTimerIsland({ timer, expanded, setExpanded, onStop, onAdd, onRem
         }}
         onClick={() => setExpanded(true)}
       >
-        <div className="flex items-center gap-2.5 px-3.5 py-2.5 whitespace-nowrap">
-          <div className="flex-shrink-0 w-12 h-[3px] rounded-full bg-white/10 overflow-hidden">
-            <div style={{
+        <div className="relative h-12 w-full">
+          {/* Base: fond sombre (pas orange) */}
+          <div className="absolute inset-0 rounded-full" style={{ background: '#1a1a1a' }} />
+          {/* Remplissage orange = temps écoulé */}
+          <div
+            className="absolute inset-y-0 left-0 rounded-full"
+            style={{
               width: `${elapsedPct}%`,
-              height: '100%',
               background: isDone ? '#ef4444' : '#f97316',
+              boxShadow: isDone ? '0 0 24px rgba(239,68,68,0.28)' : '0 0 28px rgba(249,115,22,0.38)',
               transition: 'width 1s linear',
-              borderRadius: 'inherit',
-            }} />
+            }}
+          />
+          {/* Chrono centré dans toute la pastille */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className={`text-sm font-mono font-semibold tabular-nums ${isDone ? 'text-red-200' : 'text-white'}`}>
+              {isDone ? 'Prêt !' : timeStr}
+            </span>
           </div>
-          <span className={`text-sm font-mono font-semibold tabular-nums ${isDone ? 'text-red-400' : 'text-white'}`}>
-            {isDone ? 'Prêt !' : timeStr}
-          </span>
         </div>
       </div>
 
@@ -156,11 +184,11 @@ function CookingTimerIsland({ timer, expanded, setExpanded, onStop, onAdd, onRem
         {/* Body: click to close */}
         <div className="p-5 cursor-pointer" onClick={() => setExpanded(false)}>
           <p className="text-[10px] font-semibold text-white/30 uppercase tracking-[0.16em] mb-3">
-            ⏱ En cuisson…
+            ⏱ {cookingLabel}
           </p>
 
           {/* Time */}
-          <div className="flex items-baseline gap-2 mb-1">
+          <div className="flex items-baseline gap-2 mb-2">
             <span className={`text-[2.5rem] leading-none font-mono font-bold tabular-nums ${isDone ? 'text-red-400 animate-pulse' : 'text-white'}`}>
               {isDone ? '0:00' : timeStr}
             </span>
@@ -179,21 +207,19 @@ function CookingTimerIsland({ timer, expanded, setExpanded, onStop, onAdd, onRem
             <span>{totalStr}</span>
           </div>
 
-          {/* Progress bar — glow style */}
+          {/* Progress bar — fond sombre, remplissage orange */}
           <div
             className="h-9 rounded-2xl overflow-hidden mb-5"
-            style={{ background: 'rgba(255,255,255,0.045)' }}
+            style={{ background: 'rgba(255,255,255,0.06)' }}
           >
             <div style={{
               width: `${elapsedPct}%`,
               height: '100%',
               borderRadius: 'inherit',
-              background: isDone
-                ? 'linear-gradient(90deg, #dc2626 0%, #ef4444 100%)'
-                : 'linear-gradient(90deg, rgba(234,88,12,0.5) 0%, rgba(255,255,255,0.90) 100%)',
+              background: isDone ? '#ef4444' : '#f97316',
               boxShadow: isDone
-                ? '0 0 28px 10px rgba(239,68,68,0.4)'
-                : '0 0 32px 12px rgba(255,185,80,0.48)',
+                ? '0 0 28px 10px rgba(239,68,68,0.35)'
+                : '0 0 32px 12px rgba(249,115,22,0.45)',
               transition: 'width 1s linear',
             }} />
           </div>
@@ -400,7 +426,29 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
   const tags = effectiveRecipe?.tags ?? [];
   const objective = effectiveRecipe?.objective ?? [];
 
-  usePageMeta(effectiveRecipe?.title || recipe.title, steps[0] ? steps[0].slice(0, 155) + '…' : undefined);
+  const recipeTitle = effectiveRecipe?.title || recipe.title;
+  const recipeSlug = getSlug(recipeTitle);
+  const recipeUrl = canonicalUrl(`/recettes/${recipeSlug}`);
+  const recipeDesc = steps[0]
+    ? `${recipeTitle} — ${steps[0].slice(0, 120)}…`
+    : `Recette végétarienne ${recipeTitle} : ${effectiveRecipe?.calories || recipe.calories} kcal, ${effectiveRecipe?.protein || recipe.protein}g de protéines. Facile et rapide.`;
+
+  usePageMeta({
+    title: `${recipeTitle} — Recette végétarienne protéinée`,
+    description: recipeDesc,
+    canonical: recipeUrl,
+    image: effectiveRecipe?.image || recipe.image,
+    type: 'article',
+  });
+
+  useJsonLd([
+    buildRecipeJsonLd(effectiveRecipe || recipe, recipeUrl),
+    buildBreadcrumbJsonLd([
+      { name: 'Accueil', url: canonicalUrl('/') },
+      { name: 'Recettes', url: canonicalUrl('/recettes') },
+      { name: recipeTitle, url: recipeUrl },
+    ]),
+  ]);
 
   const isFavorite = favorites?.includes(effectiveRecipe?.id ?? recipe.id) ?? false;
   const ratio = servings / ((effectiveRecipe?.servings || recipe.servings) || 1);
@@ -681,22 +729,35 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
   return (
     <div className="px-6 lg:px-8 py-12">
       <div className="max-w-4xl mx-auto">
-        {/* Back */}
-        <Link
-          to="/recettes"
-          className="inline-flex items-center gap-1.5 text-sm text-text-light hover:text-text transition-colors mb-8"
-        >
-          <ArrowLeft size={16} /> Retour
-        </Link>
+        {/* Breadcrumb */}
+        <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-sm text-text-light mb-8 flex-wrap">
+          <Link to="/" className="hover:text-text transition-colors">Accueil</Link>
+          <span className="text-text-light/40">/</span>
+          <Link to="/recettes" className="hover:text-text transition-colors">Recettes</Link>
+          {(effectiveRecipe?.category || recipe.category) && (
+            <>
+              <span className="text-text-light/40">/</span>
+              <Link
+                to={`/recettes?categorie=${effectiveRecipe?.category || recipe.category}`}
+                className="hover:text-text transition-colors"
+              >
+                {categoryLabel(effectiveRecipe?.category || recipe.category)}
+              </Link>
+            </>
+          )}
+          <span className="text-text-light/40">/</span>
+          <span className="text-text truncate max-w-[200px]">{effectiveRecipe?.title || recipe.title}</span>
+        </nav>
 
         {/* Header */}
         <div className="flex flex-col lg:flex-row gap-10">
           <div className="lg:w-1/2">
-            <div className="aspect-[4/3] rounded-sm overflow-hidden bg-bg-warm">
+            <div className="aspect-[16/10] rounded-sm overflow-hidden bg-bg-warm flex items-center justify-center">
               <img
                 src={effectiveRecipe?.image || recipe.image}
                 alt={effectiveRecipe?.title || recipe.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain scale-60"
+                style={{ objectPosition: 'center' }}
                 decoding="async"
                 fetchPriority="high"
               />
@@ -706,9 +767,9 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           <div className="lg:w-1/2">
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               {tags.slice(0, 3).map(tag => (
-                <span key={tag} className="text-[13px] font-medium px-2.5 py-0.5 rounded-sm border border-border text-text-light">
+                <Link key={tag} to={`/recettes?tag=${encodeURIComponent(tag)}`} className="text-[13px] font-medium px-2.5 py-0.5 rounded-sm border border-border text-text-light hover:border-primary hover:text-primary transition-colors">
                   {tag.replace('#', '')}
-                </span>
+                </Link>
               ))}
             </div>
             <h1 className="font-display text-3xl sm:text-4xl text-text leading-tight">
@@ -848,8 +909,28 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                 <RecipeCard key={r.id} recipe={r} isFavorite={favorites.includes(r.id)} toggleFavorite={toggleFavorite} />
               ))}
             </div>
+            <div className="mt-6 flex flex-wrap items-center gap-4 text-sm">
+              <Link
+                to={`/recettes?categorie=${effectiveRecipe?.category || recipe.category}`}
+                className="text-primary hover:underline font-medium"
+              >
+                Toutes les recettes {categoryLabel(effectiveRecipe?.category || recipe.category).toLowerCase()} →
+              </Link>
+              <Link to="/recettes" className="text-text-light hover:text-text transition-colors">
+                Voir toutes les recettes
+              </Link>
+            </div>
           </div>
         )}
+
+        {/* CTA Planning */}
+        <div className="mt-16 p-6 bg-bg-warm rounded-xl text-center">
+          <h2 className="font-display text-xl text-text mb-2">Envie d&apos;intégrer cette recette dans ton planning ?</h2>
+          <p className="text-sm text-text-light mb-4">Génère un planning personnalisé avec tes objectifs et ton régime.</p>
+          <Link to="/planning" className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-primary-light transition-colors">
+            Créer mon planning →
+          </Link>
+        </div>
       </div>
     </div>
   );

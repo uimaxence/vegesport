@@ -2,12 +2,13 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Download, Lock, LockOpen, RefreshCw, ShoppingCart, ChevronDown, ChevronRight, Check, Copy, MoreVertical, X, Clock, Flame, Beef, Users, ExternalLink, Trash2, RotateCcw, Pencil, Plus, Loader2, Calendar } from 'lucide-react';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { canonicalUrl } from '../lib/seo';
 import Toast from '../components/Toast';
 import { getSlug } from '../lib/slug';
-import { recipes } from '../data/recipes';
 import { defaultPlannings, days, mealTypes } from '../data/plannings';
 import { objectives, regimes } from '../data/recipes';
 import { useAuth } from '../context/AuthContext';
+import { useData } from '../context/DataContext';
 import { getCarrefourDriveUrl, getCoursesUDriveUrl, hasCarrefourAffiliate } from '../lib/driveLinks';
 import { buildPlanningIcs, downloadPlanningIcs } from '../lib/calendarExport';
 import { addToGoogleCalendar, hasGoogleCalendarConfig } from '../lib/googleCalendar';
@@ -30,11 +31,16 @@ function isDayPast(day, weekStart) {
 }
 
 export default function Planning({ user, savePlanning }) {
-  usePageMeta('Planning repas', 'Crée ton planning hebdomadaire de repas végétariens. Choisis ton objectif (prise de masse, sèche, endurance), génère et sauvegarde ton planning.');
+  usePageMeta({
+    title: 'Planning repas végétarien hebdomadaire',
+    description: 'Crée ton planning hebdomadaire de repas végétariens personnalisé. Choisis ton objectif sportif (prise de masse, sèche, endurance), génère ta liste de courses et sauvegarde ton planning.',
+    canonical: canonicalUrl('/planning'),
+  });
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { savedPlannings, updatePlanning, loading: authLoading } = useAuth();
+  const { recipes: recipesList } = useData();
 
   const editId = searchParams.get('edit');
   const loadFromState = location.state?.loadPlanning;
@@ -136,7 +142,7 @@ export default function Planning({ user, savePlanning }) {
           }
 
           // Filtrage par catégorie + objectif + régime
-          let pool = recipes.filter(r => {
+          let pool = (recipesList || []).filter(r => {
             if (r.category !== mt.id) return false;
             if (!r.objective.includes(objective)) return false;
             if (regime !== 'vegetarien' && !r.regime.includes(regime)) return false;
@@ -145,11 +151,11 @@ export default function Planning({ user, savePlanning }) {
 
           // Fallback : catégorie + objectif (ignore régime)
           if (pool.length === 0) {
-            pool = recipes.filter(r => r.category === mt.id && r.objective.includes(objective));
+            pool = (recipesList || []).filter(r => r.category === mt.id && r.objective.includes(objective));
           }
           // Fallback ultime : catégorie seule
           if (pool.length === 0) {
-            pool = recipes.filter(r => r.category === mt.id);
+            pool = (recipesList || []).filter(r => r.category === mt.id);
           }
 
           if (pool.length === 0) {
@@ -174,13 +180,13 @@ export default function Planning({ user, savePlanning }) {
 
   const replaceRecipe = (day, mealType) => {
     const currentId = planning[day]?.[mealType];
-    const eligible = recipes.filter(r =>
+    const eligible = (recipesList || []).filter(r =>
       r.category === mealType &&
       r.objective.includes(objective) &&
       r.id !== currentId
     );
     if (eligible.length === 0) {
-      const fallback = recipes.filter(r => r.category === mealType && r.id !== currentId);
+      const fallback = (recipesList || []).filter(r => r.category === mealType && r.id !== currentId);
       if (fallback.length > 0) {
         const random = fallback[Math.floor(Math.random() * fallback.length)];
         setPlanning(prev => ({
@@ -258,7 +264,7 @@ export default function Planning({ user, savePlanning }) {
     });
   };
 
-  const getRecipe = (id) => recipes.find(r => r.id === id);
+  const getRecipe = (id) => (recipesList || []).find(r => r.id === id);
 
   const [dragState, setDragState] = useState({ day: null, mealType: null });
   const [hoverDrop, setHoverDrop] = useState({ day: null, mealType: null });
@@ -986,11 +992,14 @@ export default function Planning({ user, savePlanning }) {
                         <>
                           {/* Photo recette — format horizontal, saigne jusqu'aux bords */}
                           <div className="-mx-3 -mt-3 mb-2 overflow-hidden rounded-t-xl flex-shrink-0">
-                            <img
-                              src={recipe.image}
-                              alt={recipe.title}
-                              className="w-full aspect-[16/9] object-cover"
-                            />
+                            <div className="w-full aspect-[16/9] bg-bg-warm flex items-center justify-center">
+                              <img
+                                src={recipe.image}
+                                alt={recipe.title}
+                                className="w-full h-full object-contain scale-60"
+                                style={{ objectPosition: 'center' }}
+                              />
+                            </div>
                           </div>
                           {!isPast && (
                             <div className="flex items-center justify-end gap-0.5 mb-1">
@@ -1223,11 +1232,14 @@ export default function Planning({ user, savePlanning }) {
                         <div key={mt.id} className={`rounded-lg bg-black/[0.02] border border-black/8 overflow-hidden ${isPinned ? 'ring-1 ring-black/20' : ''} ${dayIsPast ? 'opacity-90' : ''}`}>
                           {/* Photo recette mobile — format horizontal */}
                           <div className="overflow-hidden">
-                            <img
-                              src={recipe.image}
-                              alt={recipe.title}
-                              className="w-full aspect-[16/9] object-cover"
-                            />
+                            <div className="w-full aspect-[16/9] bg-bg-warm flex items-center justify-center">
+                              <img
+                                src={recipe.image}
+                                alt={recipe.title}
+                                className="w-full h-full object-contain scale-60"
+                                style={{ objectPosition: 'center' }}
+                              />
+                            </div>
                           </div>
                           <div className="p-3.5">
                           <div className="flex items-center justify-between mb-1.5">
@@ -1403,8 +1415,13 @@ export default function Planning({ user, savePlanning }) {
                 </button>
               </div>
               <div className="overflow-y-auto flex-1 p-4">
-                <div className="aspect-[4/3] rounded-lg overflow-hidden bg-black/[0.04] mb-4">
-                  <img src={previewRecipe.image} alt={previewRecipe.title} className="w-full h-full object-cover" />
+                <div className="aspect-[16/10] rounded-lg overflow-hidden bg-black/[0.04] mb-4 flex items-center justify-center">
+                  <img
+                    src={previewRecipe.image}
+                    alt={previewRecipe.title}
+                    className="w-full h-full object-cover scale-100"
+                    style={{ objectPosition: 'center' }}
+                  />
                 </div>
                 <h3 className="font-display text-2xl text-text">{previewRecipe.title}</h3>
                 <div className="grid grid-cols-2 gap-3 mt-4">

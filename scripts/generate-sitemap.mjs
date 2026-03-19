@@ -1,11 +1,12 @@
 /**
- * Génère public/sitemap.xml à partir des routes et des données locales.
- * À lancer avant le build (npm run build le fait automatiquement).
- * Variable optionnelle : SITE_URL (ex. https://vegesport.fr) pour les URLs absolues.
+ * Génère public/sitemap.xml + public/robots.txt.
+ * Exécuté automatiquement avant chaque build (npm run build).
+ *
+ * La variable VITE_SITE_URL (ou SITE_URL) définit le domaine.
+ * Défaut : https://www.mamie-vege.fr
  */
 
-import { writeFileSync, existsSync } from 'fs';
-import { readFileSync } from 'fs';
+import { writeFileSync, existsSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -13,21 +14,27 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const publicDir = join(root, 'public');
 
-const SITE_URL = process.env.SITE_URL || process.env.VITE_PUBLIC_SITE_URL || 'https://example.com';
-
 function loadEnv() {
-  const path = join(root, '.env');
-  if (!existsSync(path)) return;
-  readFileSync(path, 'utf8').split('\n').forEach((line) => {
-    const i = line.indexOf('=');
-    if (i <= 0) return;
-    const key = line.slice(0, i).trim();
-    const val = line.slice(i + 1).trim().replace(/^["']|["']$/g, '');
-    if (key && !process.env[key]) process.env[key] = val;
-  });
+  for (const name of ['.env.local', '.env']) {
+    const p = join(root, name);
+    if (!existsSync(p)) continue;
+    readFileSync(p, 'utf8').split('\n').forEach((line) => {
+      const i = line.indexOf('=');
+      if (i <= 0) return;
+      const key = line.slice(0, i).trim();
+      const val = line.slice(i + 1).trim().replace(/^["']|["']$/g, '');
+      if (key && !process.env[key]) process.env[key] = val;
+    });
+  }
 }
 loadEnv();
-const baseUrl = (process.env.SITE_URL || process.env.VITE_PUBLIC_SITE_URL || SITE_URL).replace(/\/$/, '');
+
+const baseUrl = (
+  process.env.VITE_SITE_URL ||
+  process.env.SITE_URL ||
+  process.env.VITE_PUBLIC_SITE_URL ||
+  'https://www.mamie-vege.fr'
+).replace(/\/$/, '');
 
 function getSlug(title) {
   if (!title || typeof title !== 'string') return '';
@@ -40,30 +47,45 @@ function getSlug(title) {
 }
 
 const staticRoutes = [
-  { path: '', priority: '1.0', changefreq: 'weekly' },
-  { path: '/recettes', priority: '0.9', changefreq: 'weekly' },
+  { path: '/',         priority: '1.0', changefreq: 'weekly' },
+  { path: '/recettes', priority: '0.9', changefreq: 'daily' },
   { path: '/planning', priority: '0.9', changefreq: 'weekly' },
-  { path: '/blog', priority: '0.9', changefreq: 'weekly' },
-  { path: '/connexion', priority: '0.5', changefreq: 'monthly' },
+  { path: '/blog',     priority: '0.9', changefreq: 'weekly' },
+  { path: '/mentions-legales', priority: '0.3', changefreq: 'yearly' },
 ];
 
 let recipeSlugs = [];
-let articleIds = [];
+let articleEntries = [];
+
 try {
   const { recipes } = await import('../src/data/recipes.js');
   recipeSlugs = (recipes || []).map((r) => getSlug(r.title)).filter(Boolean);
-} catch {
-  // données peut être chargées depuis Supabase en prod, on garde les routes statiques
-}
+} catch { /* Supabase-only en prod */ }
+
 try {
   const { articles } = await import('../src/data/blog.js');
-  articleIds = (articles || []).map((a) => a.id);
+  articleEntries = (articles || []).map((a) => ({
+    id: a.id,
+    slug: getSlug(a.title),
+  }));
 } catch {}
 
 const urls = [
-  ...staticRoutes.map((r) => ({ loc: `${baseUrl}${r.path || '/'}`, priority: r.priority, changefreq: r.changefreq })),
-  ...recipeSlugs.map((slug) => ({ loc: `${baseUrl}/recettes/${slug}`, priority: '0.8', changefreq: 'monthly' })),
-  ...articleIds.map((id) => ({ loc: `${baseUrl}/blog/${id}`, priority: '0.7', changefreq: 'monthly' })),
+  ...staticRoutes.map((r) => ({
+    loc: `${baseUrl}${r.path}`,
+    priority: r.priority,
+    changefreq: r.changefreq,
+  })),
+  ...recipeSlugs.map((slug) => ({
+    loc: `${baseUrl}/recettes/${slug}`,
+    priority: '0.8',
+    changefreq: 'monthly',
+  })),
+  ...articleEntries.map(({ id, slug }) => ({
+    loc: `${baseUrl}/blog/${id}/${slug}`,
+    priority: '0.7',
+    changefreq: 'monthly',
+  })),
 ];
 
 const lastmod = new Date().toISOString().slice(0, 10);
@@ -86,12 +108,18 @@ writeFileSync(join(publicDir, 'sitemap.xml'), sitemap, 'utf8');
 
 const robotsTxt = `User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /profil
+Disallow: /donnees-personnelles
+Disallow: /auth/callback
+Disallow: /connexion
 
 Sitemap: ${baseUrl}/sitemap.xml
 `;
+
 writeFileSync(join(publicDir, 'robots.txt'), robotsTxt, 'utf8');
 
-console.log('sitemap.xml et robots.txt générés avec', urls.length, 'URLs (base:', baseUrl, ')');
+console.log(`✓ sitemap.xml (${urls.length} URLs) + robots.txt générés (base: ${baseUrl})`);
 if (baseUrl === 'https://example.com') {
-  console.warn('En prod, définis SITE_URL ou VITE_PUBLIC_SITE_URL dans .env (ex. https://vegesport.fr)');
+  console.warn('⚠ Définis VITE_SITE_URL dans .env (ex. https://www.mamie-vege.fr)');
 }

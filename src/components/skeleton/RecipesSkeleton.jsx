@@ -33,7 +33,7 @@ export default function RecipesSkeleton() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
               <div key={i} className="overflow-hidden rounded-xl">
-                <SkeletonBox className="aspect-[4/3] w-full rounded-t-xl" />
+                <SkeletonBox className="aspect-[16/10] w-full rounded-t-xl" />
                 <div className="p-4 space-y-2">
                   <SkeletonLine width="90%" className="h-5" />
                   <SkeletonLine width="5rem" />
