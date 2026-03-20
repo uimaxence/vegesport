@@ -5,7 +5,7 @@ import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { canonicalUrl } from '../lib/seo';
 import { getSlug } from '../lib/slug';
-import { blogCategories } from '../data/blog';
+import { blogCategories } from '../data/blogCategories';
 import BlogSkeleton from '../components/skeleton/BlogSkeleton';
 
 export default function Blog() {

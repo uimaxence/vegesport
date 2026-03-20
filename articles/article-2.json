@@ -1,0 +1,359 @@
+{
+  "id": 2,
+  "title": "Meal prep végétarien : préparer ses repas de la semaine en 3 heures",
+  "excerpt": "Comment organiser sa préparation de repas végétariens pour sportifs en une seule session. Méthode pas à pas, ordre des tâches et recettes adaptées au batch cooking.",
+  "category": "Organisation",
+  "date": "2026-03-20",
+  "read_time": 8,
+  "image": "https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=600&h=400&fit=crop",
+  "author": "Maxence",
+  "meta_title": "Meal prep végétarien sportif : préparer ses repas en 3h | Et si mamie était végé ?",
+  "meta_description": "Méthode complète pour préparer ses repas végétariens de sportif en une seule session de 3 heures. Ordre des tâches, recettes adaptées et conseils de conservation.",
+  "content": "",
+  "content_json": [
+    {
+      "type": "paragraph",
+      "text": "Tu rentres épuisé d'une séance, il est 20h et ton frigo est vide. Résultat : tu commandes une pizza ou tu avales n'importe quoi. Le meal prep — préparer ses repas à l'avance en une seule session — est la solution la plus efficace pour éviter ce scénario. En 3 heures le dimanche, tu peux couvrir 80 % de tes repas de la semaine, tout en maintenant une alimentation végétarienne riche en protéines."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Pourquoi le meal prep change vraiment les choses pour le sportif végétarien ?"
+    },
+    {
+      "type": "paragraph",
+      "text": "La principale difficulté d'une alimentation végétale sportive, c'est la régularité. Les légumineuses demandent du temps de cuisson, le tofu se marine mieux à l'avance, les céréales complètes cuisent plus longtemps que le riz blanc. Sans organisation, on prend les mauvaises décisions par manque de temps."
+    },
+    {
+      "type": "paragraph",
+      "text": "Le meal prep résout ce problème à la racine. Selon une étude publiée dans le International Journal of Behavioral Nutrition and Physical Activity, les personnes qui planifient leurs repas à l'avance ont une alimentation significativement plus variée et plus équilibrée que celles qui décident au dernier moment (source : santepubliquefrance.fr). Pour le sportif, cela se traduit directement par une meilleure récupération et des apports en protéines plus constants."
+    },
+    {
+      "type": "source",
+      "label": "Santé Publique France — Alimentation et planification des repas",
+      "url": "https://www.santepubliquefrance.fr/determinants-de-sante/nutrition-et-activite-physique/articles/nutrition"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Ce qu'il faut préparer en priorité : les bases du batch cooking"
+    },
+    {
+      "type": "paragraph",
+      "text": "Tout le meal prep repose sur une idée simple : cuisiner les ingrédients de base en grande quantité, puis les assembler différemment selon les jours. On ne prépare pas 5 repas identiques — on prépare 5 briques que l'on combinera différemment."
+    },
+    {
+      "type": "paragraph",
+      "text": "Les 4 bases à toujours avoir au frigo en début de semaine :"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Une céréale complète : quinoa, riz complet ou pâtes complètes (200–300 g sec, soit 4–6 portions).",
+        "Une ou deux légumineuses cuites : lentilles vertes, pois chiches ou haricots rouges (400–600 g cuits, soit 4–6 portions).",
+        "Une source de protéines prête à l'emploi : tofu mariné et poêlé, ou tempeh grillé.",
+        "Une base de sauce ou tartinade : houmous maison, sauce tomate aux lentilles corail, curry de pois chiches."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Avec ces 4 éléments, tu peux composer une dizaine de repas différents en quelques minutes : bowls, wraps, salades composées, pâtes, soupes. La monotonie n'est pas une fatalité du meal prep — c'est un problème de méthode."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "La méthode en 5 étapes pour 3 heures de préparation"
+    },
+    {
+      "type": "paragraph",
+      "text": "L'ordre dans lequel tu cuisines est aussi important que ce que tu cuisines. L'objectif : faire tourner plusieurs cuissons en parallèle pour ne jamais rester inactif."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Étape 1 — Planifier et sortir tous les ingrédients (15 min)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Avant d'allumer le feu, pose tout sur le plan de travail. Relis les recettes que tu vas préparer. Note les temps de cuisson de chaque élément pour organiser ta session dans le bon ordre. C'est ces 15 minutes de préparation mentale qui t'évitent une heure de chaos ensuite."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Étape 2 — Lancer ce qui cuit le plus longtemps en premier (5 min actives)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Commence par mettre le riz complet ou les lentilles vertes à cuire — ils prennent 25 à 40 minutes. Lance aussi le four si tu rôtis des légumes ou de la patate douce. Ces cuissons longues se déroulent pendant que tu fais autre chose."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Étape 3 — Préparer les bases en parallèle (45–60 min)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Pendant que le riz cuit, tu prépares le houmous (10 min au mixeur), tu marines et poêles le tofu (15 min), tu coupes les légumes pour les bowls ou les salades de la semaine. Tu fais tourner 3 ou 4 choses simultanément — c'est là que les 3 heures deviennent réalistes."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Étape 4 — Cuisiner les plats complets (60–80 min)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Une fois les bases prêtes, tu assembles les plats qui nécessitent une cuisson complète : chili sin carne, curry de pois chiches, sauce lentilles corail. Ces plats se conservent 4 à 5 jours au réfrigérateur et se congèlent très bien pour une deuxième semaine."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Étape 5 — Portionner, étiqueter et ranger (20 min)"
+    },
+    {
+      "type": "paragraph",
+      "text": "Répartis chaque préparation dans des contenants hermétiques. Note la date de préparation sur chaque boîte avec un marqueur ou un autocollant. Range au frigo ce que tu vas manger dans les 4 jours, congèle le reste. Ce rangement méthodique t'évite de gaspiller et de chercher chaque soir ce que tu peux manger."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Planning type d'une session meal prep végétarienne de 3 heures"
+    },
+    {
+      "type": "table",
+      "headers": ["Horaire", "Action", "Ce qui se prépare"],
+      "rows": [
+        ["0:00 – 0:15", "Planification", "Sortir les ingrédients, relire les recettes"],
+        ["0:15 – 0:20", "Lancer les cuissons longues", "Riz complet (40 min), légumes au four (30 min)"],
+        ["0:20 – 0:50", "Préparer les bases", "Houmous, marinade tofu, découpe légumes"],
+        ["0:50 – 1:10", "Poêler le tofu", "Tofu mariné, tempeh si besoin"],
+        ["1:10 – 1:50", "Cuire les plats chauds", "Chili, curry, sauce lentilles corail"],
+        ["1:50 – 2:30", "Cuisiner les porridges / snacks", "Barres énergétiques, overnight oats"],
+        ["2:30 – 3:00", "Portionner et ranger", "Contenants, étiquetage, frigo/congélateur"]
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Les recettes les plus adaptées au meal prep végétarien sportif"
+    },
+    {
+      "type": "paragraph",
+      "text": "Toutes les recettes ne se prêtent pas au batch cooking. Voici celles qui tiennent bien au frigo, se réchauffent sans perdre en qualité, et qui couvrent les besoins en protéines du sportif."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Le bowl lentilles-quinoa-tofu : la base de la semaine"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ce bowl se prépare en grande quantité, se conserve 4 jours au frigo et s'adapte selon les jours en changeant la sauce ou les légumes. Avec 38 g de protéines par portion, c'est le plat pilier du sportif végétarien."
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [21]
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Le chili sin carne : idéal à congeler"
+    },
+    {
+      "type": "paragraph",
+      "text": "Le chili se bonifie avec le temps et supporte très bien la congélation. Prépares-en une grande cocotte le dimanche, répartis en portions individuelles : tu as des dîners prêts pour 2 semaines."
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [13]
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Le curry de pois chiches : rapide et polyvalent"
+    },
+    {
+      "type": "paragraph",
+      "text": "25 minutes de cuisson, 3 à 4 portions, facile à réchauffer. Le curry de pois chiches tient 5 jours au frigo et se sert aussi bien avec du riz qu'avec du quinoa ou du pain complet."
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [22]
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Les pâtes complètes sauce lentilles corail : le plat réconfort"
+    },
+    {
+      "type": "paragraph",
+      "text": "La sauce aux lentilles corail se prépare en 25 minutes et se congèle parfaitement. Elle remplace une bolognaise avec un profil nutritionnel bien plus intéressant pour le sportif végétarien."
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [24]
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Le houmous maison : la tartinade de la semaine"
+    },
+    {
+      "type": "paragraph",
+      "text": "10 minutes au mixeur, 6 portions, et tu as une tartinade riche en protéines pour les tartines du matin, les wraps du midi et les crudités du soir. Bien meilleur et moins cher que le houmous du commerce."
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [12]
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Les barres énergétiques maison : les snacks de la semaine"
+    },
+    {
+      "type": "paragraph",
+      "text": "20 minutes de préparation, 8 barres, 1 semaine de collations réglée. Pas besoin de four, elles se conservent au frigo et partent facilement dans un sac de sport."
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [17]
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Le porridge : préparer ses petits-déjeuners à l'avance"
+    },
+    {
+      "type": "paragraph",
+      "text": "Prépare 3 à 4 portions d'overnight oats le dimanche soir : flocons d'avoine, lait végétal, protéines, fruits. Le lendemain matin, tu n'as qu'à sortir le pot du frigo. Le porridge chaud se prépare aussi très vite si tu préfères."
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [1]
+    },
+    {
+      "type": "cta_planning"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Conservation : combien de temps peut-on garder ses préparations ?"
+    },
+    {
+      "type": "paragraph",
+      "text": "La conservation est la question clé du meal prep. Selon les recommandations de l'ANSES en matière de sécurité alimentaire, voici les durées à respecter :"
+    },
+    {
+      "type": "source",
+      "label": "ANSES — Sécurité sanitaire des aliments et durées de conservation",
+      "url": "https://www.anses.fr/fr/content/les-dur%C3%A9es-de-conservation-des-aliments"
+    },
+    {
+      "type": "table",
+      "headers": ["Préparation", "Durée au frigo (0–4°C)", "Congélation possible ?"],
+      "rows": [
+        ["Légumineuses cuites (lentilles, pois chiches…)", "4–5 jours", "Oui, 3 mois"],
+        ["Céréales cuites (riz, quinoa, pâtes…)", "3–4 jours", "Oui, 2 mois"],
+        ["Tofu poêlé / tempeh grillé", "3–4 jours", "Oui, 2 mois"],
+        ["Plats cuisinés (chili, curry, sauce…)", "4–5 jours", "Oui, 3 mois"],
+        ["Houmous et tartinades", "5–7 jours", "Non (texture altérée)"],
+        ["Barres énergétiques maison", "7 jours", "Oui, 1 mois"],
+        ["Overnight oats / porridge", "2–3 jours", "Non"]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Règle générale : tout ce qui contient des légumineuses ou des céréales cuites se congèle très bien. Tout ce qui est cru ou à base de produits laitiers végétaux se conserve au frigo mais ne se congèle pas."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Le matériel de base pour bien débuter le meal prep"
+    },
+    {
+      "type": "paragraph",
+      "text": "Pas besoin d'investir dans du matériel coûteux. L'essentiel pour démarrer :"
+    },
+    {
+      "type": "list",
+      "items": [
+        "6 à 8 boîtes hermétiques en verre ou en plastique BPA-free de taille moyenne (700–1000 ml) — les boîtes en verre passent directement au four et au lave-vaisselle.",
+        "2 à 3 contenants plus grands pour les plats en vrac (chili, curry) avant de portionner.",
+        "Un robot mixeur ou un mixeur plongeant pour le houmous et les sauces.",
+        "Une grande marmite d'au moins 4 litres pour les légumineuses et les plats mijotés.",
+        "Des autocollants ou un marqueur pour dater chaque préparation."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Les erreurs courantes à éviter en meal prep végétarien"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Préparer trop de plats différents en même temps. Pour débuter, 3 recettes par session suffisent largement.",
+        "Oublier les petits-déjeuners et les collations. Le meal prep ne concerne pas que les déjeuners et dîners.",
+        "Ne pas variér les sauces et assaisonnements. Le même bowl lentilles-quinoa devient monotone sans rotation de sauces (tahini-citron, sauce soja-gingembre, vinaigrette moutarde…).",
+        "Congeler sans étiqueter. Après une semaine, tous les Tupperware se ressemblent.",
+        "Cuisiner trop pour la semaine entière. 4 à 5 jours max au frigo, pas 7 : la qualité nutritionnelle et gustative se dégrade."
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "FAQ — Meal prep végétarien pour sportifs"
+    },
+    {
+      "type": "faq",
+      "items": [
+        {
+          "question": "Combien de temps faut-il vraiment pour préparer ses repas végétariens pour la semaine ?",
+          "answer": "Entre 2h30 et 3h pour une session complète couvrant 4 à 5 jours de repas principaux, petits-déjeuners et collations. Les premières sessions prennent plus de temps — compte 3h30 à 4h. Avec de la pratique et une organisation rodée, tu descends facilement à 2h30."
+        },
+        {
+          "question": "Peut-on faire du meal prep sans cuisiner chaud ?",
+          "answer": "Oui, en partie. Les overnight oats, le houmous, les barres énergétiques maison et les salades de légumineuses (avec des pois chiches en boîte) ne nécessitent pas de cuisson. Pour couvrir tous les besoins en protéines d'un sportif, un minimum de cuisson reste nécessaire pour les légumineuses sèches ou le tofu."
+        },
+        {
+          "question": "Est-ce que les légumineuses perdent leurs protéines après plusieurs jours au frigo ?",
+          "answer": "Non. La teneur en protéines des légumineuses cuites reste stable 4 à 5 jours au réfrigérateur. En revanche, la texture peut légèrement changer et certaines vitamines hydrosolubles (vitamine C notamment) se dégradent un peu. Pour les protéines spécifiquement, il n'y a aucune perte significative."
+        },
+        {
+          "question": "Quelles boîtes choisir pour le meal prep ?",
+          "answer": "Les boîtes en verre (type Pyrex) sont idéales : elles ne retiennent pas les odeurs, passent au four et au micro-ondes, et durent des années. Pour l'aspect pratique et le transport, les boîtes en plastique BPA-free sont correctes. Évite les contenants trop grands : une portion par boîte facilite la gestion et évite d'ouvrir le même plat plusieurs fois."
+        },
+        {
+          "question": "Comment éviter la monotonie quand on fait du meal prep toutes les semaines ?",
+          "answer": "Fais tourner 3 à 4 recettes piliers en changeant les assaisonnements chaque semaine. Le même bowl lentilles-quinoa-tofu n'aura pas le même goût avec une sauce tahini-citron, une sauce soja-gingembre ou une vinaigrette moutarde-miel. Change aussi les légumes selon la saison. L'ennui vient rarement des ingrédients, mais toujours de la sauce."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Sources"
+    },
+    {
+      "type": "sources_list",
+      "items": [
+        {
+          "label": "Santé Publique France — Nutrition et planification des repas",
+          "url": "https://www.santepubliquefrance.fr/determinants-de-sante/nutrition-et-activite-physique/articles/nutrition"
+        },
+        {
+          "label": "ANSES — Durées de conservation des aliments",
+          "url": "https://www.anses.fr/fr/content/les-dur%C3%A9es-de-conservation-des-aliments"
+        },
+        {
+          "label": "Manger Bouger (PNNS) — Organiser ses repas",
+          "url": "https://www.mangerbouger.fr/manger-mieux/la-fabrique-a-menus"
+        },
+        {
+          "label": "ANSES — Table de composition nutritionnelle Ciqual",
+          "url": "https://ciqual.anses.fr/"
+        }
+      ]
+    }
+  ]
+}

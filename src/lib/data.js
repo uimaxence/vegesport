@@ -13,7 +13,6 @@ const useLocalDataOnly = () =>
 // Pas d'import statique : ces modules (~110KB) n'entrent plus dans le bundle prod.
 // Ils sont chargés à la demande (dev ou fallback en cas de panne Supabase).
 let _localRecipes = null;
-let _localArticles = null;
 
 function normalizeContentBlocks(raw) {
   if (Array.isArray(raw)) return raw;
@@ -63,36 +62,6 @@ async function getLocalRecipes() {
   const mod = await import('../data/recipes');
   _localRecipes = mod.recipes || [];
   return _localRecipes;
-}
-
-async function getLocalArticles() {
-  if (_localArticles) return _localArticles;
-  const mod = await import('../data/blog');
-  const authorsMod = await import('../data/authors');
-  const authorsMap = authorsMod.authors || {};
-  const raw = mod.articles || [];
-  _localArticles = raw.map((a) => {
-    const contentJson = normalizeContentBlocks(a.contentJson);
-    const extracted = extractFaqAndSourcesFromBlocks(contentJson);
-    const authorInfo = a.author && authorsMap[a.author] ? {
-      displayName: authorsMap[a.author].displayName,
-      titre: authorsMap[a.author].titre,
-      bio: authorsMap[a.author].bio,
-      linksPro: authorsMap[a.author].linksPro || [],
-    } : null;
-    return {
-      ...a,
-      metaTitle: a.metaTitle || a.title,
-      metaDescription: a.metaDescription || a.excerpt || '',
-      authorInfo,
-      contentJson,
-      faqJson: Array.isArray(a.faqJson) && a.faqJson.length ? a.faqJson : extracted.faq,
-      schemaType: a.schemaType || 'Article',
-      sourcesJson: Array.isArray(a.sourcesJson) && a.sourcesJson.length ? a.sourcesJson : extracted.sources,
-      updatedAt: a.updatedAt || a.date,
-    };
-  });
-  return _localArticles;
 }
 
 // ─── Appel REST direct (contourne supabase-js + son init auth) ───────────────

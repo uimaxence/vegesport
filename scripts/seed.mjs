@@ -1,5 +1,5 @@
 /**
- * Seed Supabase avec les recettes et articles du projet.
+ * Seed Supabase avec les recettes du projet.
  * Utilise la clé service_role (contourne RLS) si définie, sinon la clé anon (peut échouer sur les tables avec RLS).
  * Prérequis : supabase/schema.sql exécuté, .env avec VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY.
  * Pour le seed : ajoute SUPABASE_SERVICE_ROLE_KEY dans .env (Dashboard Supabase > Settings > API > service_role).
@@ -11,7 +11,6 @@ import { readFileSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { recipes } from '../src/data/recipes.js';
-import { articles } from '../src/data/blog.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
@@ -50,7 +49,7 @@ if (!url || !anonKey) {
   process.exit(1);
 }
 
-// La clé service_role contourne RLS : obligatoire pour insérer dans recipes/blog_articles depuis le seed
+// La clé service_role contourne RLS : obligatoire pour insérer dans recipes depuis le seed
 if (!serviceRoleKey) {
   console.error('Pour le seed, ajoute SUPABASE_SERVICE_ROLE_KEY dans ton .env');
   console.error('(Dashboard Supabase > Settings > API > service_role - à ne jamais exposer côté front).');
@@ -82,26 +81,6 @@ function toRecipeRow(r) {
   };
 }
 
-function toArticleRow(a) {
-  return {
-    id: a.id,
-    title: a.title,
-    excerpt: a.excerpt,
-    meta_title: a.metaTitle || a.title,
-    meta_description: a.metaDescription || a.excerpt || '',
-    category: a.category,
-    date: a.date,
-    read_time: a.readTime,
-    image: a.image,
-    author: a.author,
-    content: a.content,
-    content_json: a.contentJson || null,
-    faq_json: a.faqJson ?? [],
-    schema_type: a.schemaType || 'Article',
-    sources_json: a.sourcesJson ?? [],
-  };
-}
-
 async function main() {
   console.log('Insertion des recettes…');
   for (const r of recipes) {
@@ -113,16 +92,7 @@ async function main() {
   }
   console.log(recipes.length, 'recettes traitées.');
 
-  console.log('Insertion des articles…');
-  for (const a of articles) {
-    const row = toArticleRow(a);
-    const { error } = await supabase.from('blog_articles').upsert(row, { onConflict: 'id' });
-    if (error) {
-      console.error('Erreur article', a.id, error.message);
-    }
-  }
-  console.log(articles.length, 'articles traités.');
-  console.log('Seed terminé.');
+  console.log('Seed recettes terminé.');
 }
 
 main().catch((e) => {
