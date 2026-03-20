@@ -33,7 +33,7 @@ function List({ items = [] }) {
 
 function RecipesGrid({ recipeIds = [], recipes = [] }) {
   const picked = recipeIds
-    .map((id) => recipes.find((r) => r.id === id))
+    .map((id) => recipes.find((r) => String(r.id) === String(id)))
     .filter(Boolean);
 
   if (picked.length === 0) return null;

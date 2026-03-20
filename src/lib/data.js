@@ -15,6 +15,49 @@ const useLocalDataOnly = () =>
 let _localRecipes = null;
 let _localArticles = null;
 
+function normalizeContentBlocks(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+function extractFaqAndSourcesFromBlocks(blocks) {
+  const faq = [];
+  const sources = [];
+
+  for (const block of Array.isArray(blocks) ? blocks : []) {
+    const type = String(block?.type || '').toLowerCase();
+    if (type === 'faq' && Array.isArray(block?.items)) {
+      for (const item of block.items) {
+        const question = item?.question ?? item?.name;
+        const answer = item?.answer ?? item?.acceptedAnswer?.text ?? item?.acceptedAnswer;
+        if (question && answer) faq.push({ question, answer });
+      }
+    }
+    if (type === 'sources_list' && Array.isArray(block?.items)) {
+      for (const item of block.items) {
+        const label = item?.label ?? item?.name;
+        const url = item?.url ?? item?.href;
+        if (label || url) sources.push({ label: label || url, url });
+      }
+    }
+    if (type === 'source') {
+      const label = block?.label ?? block?.name;
+      const url = block?.url ?? block?.href;
+      if (label || url) sources.push({ label: label || url, url });
+    }
+  }
+
+  return { faq, sources };
+}
+
 async function getLocalRecipes() {
   if (_localRecipes) return _localRecipes;
   const mod = await import('../data/recipes');
@@ -29,6 +72,8 @@ async function getLocalArticles() {
   const authorsMap = authorsMod.authors || {};
   const raw = mod.articles || [];
   _localArticles = raw.map((a) => {
+    const contentJson = normalizeContentBlocks(a.contentJson);
+    const extracted = extractFaqAndSourcesFromBlocks(contentJson);
     const authorInfo = a.author && authorsMap[a.author] ? {
       displayName: authorsMap[a.author].displayName,
       titre: authorsMap[a.author].titre,
@@ -40,9 +85,10 @@ async function getLocalArticles() {
       metaTitle: a.metaTitle || a.title,
       metaDescription: a.metaDescription || a.excerpt || '',
       authorInfo,
-      faqJson: a.faqJson || [],
+      contentJson,
+      faqJson: Array.isArray(a.faqJson) && a.faqJson.length ? a.faqJson : extracted.faq,
       schemaType: a.schemaType || 'Article',
-      sourcesJson: a.sourcesJson || [],
+      sourcesJson: Array.isArray(a.sourcesJson) && a.sourcesJson.length ? a.sourcesJson : extracted.sources,
       updatedAt: a.updatedAt || a.date,
     };
   });
@@ -138,6 +184,8 @@ function mapRecipeSummaryRow(row) {
 function mapArticleRow(row) {
   if (!row) return null;
   const authorRow = row.authors || row.author;
+  const contentJson = normalizeContentBlocks(row.content_json);
+  const extracted = extractFaqAndSourcesFromBlocks(contentJson);
   return {
     id: row.id,
     title: row.title,
@@ -156,17 +204,10 @@ function mapArticleRow(row) {
       linksPro: authorRow.links_pro || [],
     } : null,
     content: row.content,
-    contentJson: (() => {
-      const raw = row.content_json;
-      if (Array.isArray(raw)) return raw;
-      if (typeof raw === 'string') {
-        try { return JSON.parse(raw || '[]'); } catch { return []; }
-      }
-      return [];
-    })(),
-    faqJson: row.faq_json || [],
+    contentJson,
+    faqJson: Array.isArray(row.faq_json) && row.faq_json.length ? row.faq_json : extracted.faq,
     schemaType: row.schema_type || 'Article',
-    sourcesJson: row.sources_json || [],
+    sourcesJson: Array.isArray(row.sources_json) && row.sources_json.length ? row.sources_json : extracted.sources,
     updatedAt: row.updated_at,
   };
 }
