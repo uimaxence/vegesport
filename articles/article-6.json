@@ -1,0 +1,359 @@
+{
+    "id": 6,
+    "title": "Glucides et sport végétarien : guide complet pour optimiser sa performance",
+    "excerpt": "Timing des glucides, quantités recommandées et meilleures sources végétales. Tout savoir sur les glucides pour le sportif végétarien et végétalien, avec des exemples concrets par sport.",
+    "category": "Nutrition",
+    "date": "2026-03-20",
+    "read_time": 9,
+    "image": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600&h=400&fit=crop",
+    "author": "Maxence",
+    "meta_title": "Glucides et sport végétarien : quantités, timing et meilleures sources | Et si mamie était végé ?",
+    "meta_description": "Combien de glucides manger quand on est sportif végétarien ? Quand les prendre et quelles sources choisir ? Le guide complet avec des exemples concrets par type de sport.",
+    "content": "",
+    "content_json": [
+      {
+        "type": "paragraph",
+        "text": "Les glucides sont le carburant principal du sportif. Pourtant, dans le monde végétarien, on parle beaucoup de protéines et très peu des glucides — alors qu'ils sont souvent la première limite à la performance. Trop peu avant une séance, et tu manques d'énergie. Mal répartis dans la journée, et la récupération traîne. Ce guide t'explique combien en prendre, quand les prendre, et quelles sources végétales privilégier selon ton sport."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Pourquoi les glucides sont indispensables pour le sportif végétarien"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les glucides alimentent le glycogène musculaire et hépatique — les réserves d'énergie que ton corps mobilise en priorité pendant l'effort. Quand ces réserves sont vides, la performance chute brutalement : c'est le « mur » du marathonien, la baisse d'intensité en fin de séance de muscu, ou la fatigue qui s'installe après 45 minutes de sport collectif."
+      },
+      {
+        "type": "paragraph",
+        "text": "Pour le sportif végétarien, les glucides végétaux ont un avantage structurel : ils arrivent souvent avec des fibres, des vitamines et des minéraux qui accompagnent l'effort. Les céréales complètes, les légumineuses et les fruits libèrent l'énergie de façon progressive — ce qui limite les pics glycémiques et maintient l'énergie stable sur la durée."
+      },
+      {
+        "type": "source",
+        "label": "ANSES — Glucides : rôles nutritionnels et apports conseillés",
+        "url": "https://www.anses.fr/fr/content/les-glucides"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Combien de glucides par jour selon ton sport ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les besoins en glucides varient selon le type de sport, le volume d'entraînement et l'objectif. Le Programme National Nutrition Santé recommande que les glucides représentent 40 à 55 % de l'apport énergétique total pour la population générale. Pour les sportifs, cette part monte significativement avec le volume d'entraînement."
+      },
+      {
+        "type": "source",
+        "label": "Manger Bouger (PNNS) — Les féculents et glucides dans l'alimentation",
+        "url": "https://www.mangerbouger.fr/les-9-familles/feculents"
+      },
+      {
+        "type": "table",
+        "headers": ["Profil sportif", "Besoins en glucides", "Exemple pour 70 kg"],
+        "rows": [
+          ["Sport loisir (2–3h/semaine)", "3–5 g/kg/j", "210–350 g/jour"],
+          ["Endurance modérée (4–6h/semaine)", "5–7 g/kg/j", "350–490 g/jour"],
+          ["Endurance intensive (7–10h/semaine)", "6–10 g/kg/j", "420–700 g/jour"],
+          ["Musculation / force", "4–6 g/kg/j", "280–420 g/jour"],
+          ["Sports collectifs (foot, basket…)", "5–7 g/kg/j", "350–490 g/jour"],
+          ["Veille et jour de compétition", "8–12 g/kg/j", "560–840 g/jour"]
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Ces fourchettes sont issues des recommandations du Comité International Olympique (CIO) et de l'INSEP pour les sportifs. L'important : adapter la quantité au volume d'entraînement réel de la semaine, pas à un chiffre fixe. Les jours de repos, les besoins sont bien plus bas que les jours de séance longue."
+      },
+      {
+        "type": "source",
+        "label": "INSEP — Alimentation et performance sportive : les glucides",
+        "url": "https://www.insep.fr/fr/nutrition-du-sportif"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Les meilleures sources de glucides végétales pour le sport"
+      },
+      {
+        "type": "paragraph",
+        "text": "Toutes les sources de glucides ne se valent pas pour le sportif. L'index glycémique (IG), la richesse en fibres, et la densité en micronutriments font une vraie différence selon le moment où tu les consommes. Voici les sources à privilégier et dans quel contexte les utiliser."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Les céréales complètes : la base de l'énergie durable"
+      },
+      {
+        "type": "paragraph",
+        "text": "Riz complet, quinoa, pâtes complètes, flocons d'avoine, pain complet : ce sont les sources glucidiques à mettre en priorité dans tes repas du quotidien. Leur index glycémique modéré (45 à 65) assure une libération progressive du glucose dans le sang — idéal pour maintenir l'énergie entre les repas et éviter les coups de barre. Le quinoa et l'avoine apportent en plus une quantité non négligeable de protéines (13–14 g/100 g sec)."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Les légumineuses : glucides et protéines dans le même aliment"
+      },
+      {
+        "type": "paragraph",
+        "text": "Lentilles, pois chiches, haricots rouges : leur index glycémique est parmi les plus bas de tous les aliments (IG 25 à 40). Ils libèrent leur énergie très lentement, stabilisent la glycémie sur des heures et apportent simultanément des protéines végétales. Parfaits pour les repas de la journée d'entraînement, mais à éviter en grande quantité juste avant l'effort (fermentation, inconfort digestif)."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Les fruits : glucides rapides naturels pour avant et pendant l'effort"
+      },
+      {
+        "type": "paragraph",
+        "text": "La banane, les dattes, les raisins secs, les figues séchées : ce sont les glucides rapides naturels du sportif végétalien. La banane mûre apporte environ 23 g de glucides pour 100 g avec un index glycémique de 55 — facile à digérer, idéale 30 à 60 minutes avant l'effort ou pendant une sortie longue. Les dattes (IG 45–55) sont encore plus concentrées en glucides (~70 g/100 g) et constituent une excellente alternative naturelle aux gels industriels."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Les tubercules : glucides et minéraux post-effort"
+      },
+      {
+        "type": "paragraph",
+        "text": "Patate douce, pomme de terre, betterave : ces tubercules combinent glucides et micronutriments utiles à la récupération (potassium, magnésium, vitamines B). La patate douce est particulièrement intéressante : IG modéré (50–60), riche en bêta-carotène et en potassium. Elle s'intègre facilement dans un bowl de récupération après une longue sortie ou une séance intense."
+      },
+      {
+        "type": "table",
+        "headers": ["Aliment", "Glucides / 100 g", "Index glycémique", "Meilleur moment"],
+        "rows": [
+          ["Dattes séchées", "~70 g", "45–55", "Pendant l'effort, collation pré-séance"],
+          ["Riz blanc cuit", "~28 g", "72", "Post-effort immédiat (recharge rapide)"],
+          ["Banane mûre", "~23 g", "55", "30–60 min avant l'effort"],
+          ["Riz complet cuit", "~25 g", "50–55", "Repas du quotidien, dîner"],
+          ["Pâtes complètes cuites", "~26 g", "40–50", "Repas principal, veille de compétition"],
+          ["Flocons d'avoine", "~60 g (sec)", "55", "Petit-déjeuner 2–3h avant l'effort"],
+          ["Quinoa cuit", "~22 g", "53", "Déjeuner, bowl post-entraînement"],
+          ["Patate douce cuite", "~20 g", "50–60", "Post-effort, dîner récupération"],
+          ["Lentilles cuites", "~20 g", "25–30", "Déjeuner, repas jour de repos"],
+          ["Pois chiches cuits", "~22 g", "35–40", "Salade, bowl, repas ordinaire"],
+          ["Raisins secs", "~75 g", "65", "Pendant l'effort, collation"],
+          ["Pain complet", "~42 g", "50–55", "Petit-déjeuner, collation pré-séance"]
+        ]
+      },
+      {
+        "type": "source",
+        "label": "Table Ciqual ANSES — Composition nutritionnelle des aliments",
+        "url": "https://ciqual.anses.fr/"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Le timing des glucides : quand manger quoi ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Le timing est aussi important que la quantité. Prendre 100 g de glucides 15 minutes avant une séance n'aura pas le même effet que les mêmes 100 g répartis sur la journée. Voici la stratégie par moment de la journée."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "2 à 3 heures avant l'entraînement : le repas pré-séance"
+      },
+      {
+        "type": "paragraph",
+        "text": "C'est le repas le plus important pour la performance. Objectif : 1 à 4 g de glucides par kilo de poids corporel selon la durée et l'intensité prévues. Pour une séance de 60 à 90 minutes, 50 à 80 g de glucides suffisent. Pour une sortie longue de 2h+, monte à 100–150 g. Privilégie les glucides à IG modéré (avoine, riz complet, pâtes) et évite les aliments très fibreux ou gras qui ralentissent la digestion."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "30 à 60 minutes avant : la collation d'appoint"
+      },
+      {
+        "type": "paragraph",
+        "text": "Si ton dernier repas remonte à plus de 3 heures, une collation légère peut aider : 30 à 50 g de glucides à IG modéré-élevé. Une banane, 2 dattes, une petite compote ou une tartine de pain complet avec un peu de confiture. Pas de graisses, pas de fibres en grande quantité — la digestion doit être rapide."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Pendant l'effort (au-delà de 60–90 minutes)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Au-delà de 60 à 90 minutes d'effort continu, apporter des glucides pendant l'exercice améliore significativement la performance et retarde la fatigue. La recommandation standard est de 30 à 60 g de glucides par heure d'effort, pouvant monter à 90 g/heure pour les efforts très longs (ultra-trail, triathlon). En végétarien, les dattes, raisins secs, bananes et barres maison sont des alternatives efficaces et moins onéreuses que les gels industriels."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Dans les 30 à 60 minutes après l'effort : la fenêtre de récupération"
+      },
+      {
+        "type": "paragraph",
+        "text": "Juste après l'entraînement, les muscles sont particulièrement réceptifs au glucose — c'est la « fenêtre anabolique ». Apporter 1 à 1,5 g de glucides par kilo de poids corporel dans l'heure qui suit l'effort accélère la resynthèse du glycogène. Combinés à 20–25 g de protéines, ces glucides optimisent aussi la récupération musculaire. Un bowl riz + lentilles ou des pâtes avec de la sauce pois chiches fonctionnent parfaitement."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Exemples de repas glucidiques végétariens par moment"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Petit-déjeuner avant une sortie longue (~70–88 g de glucides)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Le porridge à base de flocons d'avoine, banane et raisins secs est le petit-déjeuner pré-effort le plus adapté : digestion facile, énergie progressive, environ 70 à 88 g de glucides selon les proportions. À consommer 2 à 3 heures avant le départ."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [30]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Déjeuner le jour d'entraînement (~78 g de glucides)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Un bowl riz complet + pois chiches + légumes rôtis couvre les besoins en glucides du déjeuner avec un index glycémique modéré. L'énergie est disponible progressivement sur 3 à 4 heures — idéal si la séance est en fin d'après-midi."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [25]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Pendant une longue sortie : la barre maison (~28 g de glucides/barre)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les barres énergétiques maison (dattes + flocons d'avoine + purée de cacahuète) sont la solution végétalienne la plus efficace et la moins chère pour s'alimenter pendant l'effort. Une barre apporte environ 20 à 28 g de glucides — une toutes les 45 minutes suffit pour un effort modéré."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [17]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Repas post-effort : recharge glycogène (~92 g de glucides)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Le bowl riz complet + patate douce + lentilles est le plat de récupération par excellence : glucides à IG modéré pour une recharge progressive du glycogène, protéines végétales pour la réparation musculaire, et minéraux (potassium, magnésium) utiles après la transpiration."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [31]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Dîner chargement glucidique (veille de compétition, ~86 g de glucides)"
+      },
+      {
+        "type": "paragraph",
+        "text": "La veille d'une compétition ou d'une séance longue, les pâtes complètes avec sauce aux lentilles corail combinent une grande densité glucidique avec une bonne dose de protéines végétales. Facile à digérer, peu fibreux si on retire la peau des lentilles corail (qui fondent naturellement à la cuisson)."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [24]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Post-effort rapide : fajitas végé quinoa et haricots rouges (~78 g de glucides)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pour une récupération avec glucides rapides et protéines, les fajitas végétaliennes au quinoa et haricots rouges sont une bonne option après une séance intense. Le quinoa et le maïs fournissent des glucides disponibles rapidement, les haricots rouges apportent les protéines."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [33]
+      },
+      {
+        "type": "cta_planning"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Les erreurs courantes sur les glucides chez le sportif végétarien"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Manger trop peu de glucides par peur de grossir : en sport d'endurance, un déficit glucidique dégrade la performance bien avant d'affecter la composition corporelle. Les glucides ne font pas grossir si les apports totaux sont cohérents avec la dépense.",
+          "Manger des légumineuses seules juste avant l'effort : leur richesse en fibres et en FODMAPs peut provoquer des gaz et des crampes abdominales pendant l'entraînement. Garde les légumineuses pour les repas éloignés de la séance.",
+          "Confondre index glycémique et qualité nutritionnelle : un IG élevé n'est pas toujours mauvais — juste après l'effort, des glucides à IG élevé (riz blanc, banane, raisins secs) accélèrent la resynthèse du glycogène.",
+          "Oublier de s'alimenter pendant les efforts de plus de 90 minutes : sans apport glucidique pendant l'effort, les réserves de glycogène s'épuisent et la performance chute. 30 à 60 g de glucides par heure d'effort, c'est non négociable au-delà de 90 minutes.",
+          "Supprimer les glucides les jours de repos : même au repos, le corps a besoin de glucides pour reconstituer les réserves de glycogène. Réduire, oui — supprimer, non."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Glucides et sèche : est-ce compatible pour le sportif végétarien ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "La sèche (perte de masse grasse en maintenant la masse musculaire) ne nécessite pas de supprimer les glucides. Elle demande de les calibrer plus précisément. En période de sèche pour un sportif végétarien, les recommandations de l'ANSES orientent vers un maintien d'un apport glucidique suffisant pour soutenir les séances, avec une réduction modérée (15 à 20 %) par rapport à une période normale d'entraînement."
+      },
+      {
+        "type": "paragraph",
+        "text": "Concrètement : maintenir les glucides autour des séances (avant et après), réduire légèrement les portions lors des repas éloignés de l'entraînement. Les légumineuses sont particulièrement utiles en sèche : elles apportent simultanément glucides, protéines et fibres, ce qui favorise la satiété sans excès calorique."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "FAQ — Glucides et sport végétarien"
+      },
+      {
+        "type": "faq",
+        "items": [
+          {
+            "question": "Combien de grammes de glucides par jour pour un sportif végétarien ?",
+            "answer": "Cela dépend du volume d'entraînement. En règle générale : 3 à 5 g/kg/jour pour le sport loisir (2–3h par semaine), 5 à 7 g/kg/jour pour l'endurance modérée, et jusqu'à 10 g/kg/jour pour les séances très longues ou les jours de compétition. Pour un sportif de 70 kg avec 5 à 6 heures d'entraînement par semaine, cela représente entre 350 et 490 g de glucides par jour."
+          },
+          {
+            "question": "Quels sont les meilleurs glucides végétaux avant un entraînement ?",
+            "answer": "2 à 3 heures avant la séance : flocons d'avoine, riz complet, pâtes complètes, pain complet — des glucides à index glycémique modéré pour une énergie stable. 30 à 60 minutes avant : banane, dattes, compote ou une tranche de pain complet avec de la confiture — des glucides à absorption rapide pour un dernier boost sans surcharger la digestion."
+          },
+          {
+            "question": "Faut-il manger des glucides pendant un entraînement végétarien ?",
+            "answer": "Seulement au-delà de 60 à 90 minutes d'effort continu. En dessous, les réserves de glycogène sont suffisantes si le repas précédent était bien dosé. Au-delà, apporte 30 à 60 g de glucides par heure : dattes, raisins secs, banane, barres maison (dattes + avoine + purée de cacahuète). Ces alternatives végétales sont aussi efficaces que les gels industriels et souvent mieux tolérées digestivement."
+          },
+          {
+            "question": "Les glucides végétaux font-ils grossir ?",
+            "answer": "Non, pas plus que les glucides d'origine animale. La prise de poids dépend du bilan calorique total, pas de la source des glucides. Les glucides végétaux (céréales complètes, légumineuses, fruits) ont l'avantage d'être accompagnés de fibres qui ralentissent l'absorption et favorisent la satiété — ce qui rend naturellement plus difficile d'en consommer en excès par rapport aux glucides raffinés."
+          },
+          {
+            "question": "Peut-on avoir de bonnes performances en endurance en végétarien sans se supplémenter en glucides ?",
+            "answer": "Oui, tout à fait. Les glucides végétaux (céréales complètes, fruits, légumineuses, tubercules) couvrent largement les besoins d'un sportif d'endurance sans recours à des produits industriels. Les gels, barres et boissons énergétiques ne sont utiles que pour les efforts longs (2h+) où la commodité et la densité glucidique comptent. Pour les séances standard, l'alimentation végétale ordinaire suffit."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Sources"
+      },
+      {
+        "type": "sources_list",
+        "items": [
+          {
+            "label": "ANSES — Glucides : rôles nutritionnels et apports conseillés",
+            "url": "https://www.anses.fr/fr/content/les-glucides"
+          },
+          {
+            "label": "ANSES — Table de composition nutritionnelle Ciqual",
+            "url": "https://ciqual.anses.fr/"
+          },
+          {
+            "label": "Manger Bouger (PNNS) — Les féculents et glucides dans l'alimentation",
+            "url": "https://www.mangerbouger.fr/les-9-familles/feculents"
+          },
+          {
+            "label": "INSEP — Alimentation et performance sportive : les glucides",
+            "url": "https://www.insep.fr/fr/nutrition-du-sportif"
+          },
+          {
+            "label": "Santé Publique France — Alimentation et activité physique",
+            "url": "https://www.santepubliquefrance.fr/determinants-de-sante/nutrition-et-activite-physique"
+          }
+        ]
+      }
+    ]
+  }

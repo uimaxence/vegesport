@@ -1,0 +1,521 @@
+{
+    "id": 9,
+    "title": "Menu végétarien sportif sur 7 jours (simple et protéiné)",
+    "excerpt": "Un menu végétarien sportif sur une semaine, simple, protéiné et adapté au quotidien, avec des idées de repas pour mieux s'entraîner et récupérer.",
+    "category": "Organisation",
+    "date": "2026-03-20",
+    "read_time": 12,
+    "image": "https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=600&h=400&fit=crop",
+    "author": "Maxence",
+    "meta_title": "Menu végétarien sportif sur 7 jours (simple et protéiné) | Et si mamie était végé ?",
+    "meta_description": "Un menu végétarien sportif sur une semaine, simple, protéiné et adapté au quotidien, avec des idées de repas pour mieux s'entraîner et récupérer.",
+    "content": "",
+    "content_json": [
+      {
+        "type": "paragraph",
+        "text": "Tu veux manger végétarien, faire du sport, et éviter de te prendre la tête chaque jour devant le frigo. Ce menu sur 7 jours est fait pour ça : une base simple, modulable, avec suffisamment de protéines et de glucides pour soutenir tes entraînements, sans passer ta vie en cuisine."
+      },
+      {
+        "type": "paragraph",
+        "text": "Ce menu est une trame, pas une prescription. Adapte-le à ton poids, ton appétit, ton niveau d'activité et ton sport. Tu peux aussi répéter les plats que tu aimes pour simplifier la semaine — la variété est un objectif, pas une obligation absolue."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Principes du menu végétarien sportif"
+      },
+      {
+        "type": "paragraph",
+        "text": "Selon les recommandations de l'ANSES pour les sportifs, chaque repas principal devrait couvrir 25 à 35 g de protéines pour un sportif de 65 à 75 kg s'entraînant régulièrement. Ce menu s'appuie sur ces repères en intégrant systématiquement une source de protéines végétales à chaque repas."
+      },
+      {
+        "type": "source",
+        "label": "ANSES — Apports nutritionnels conseillés pour les sportifs",
+        "url": "https://www.anses.fr/fr/content/les-prot%C3%A9ines"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Chaque repas principal contient une source de protéines végétales : lentilles, pois chiches, tofu, tempeh, haricots rouges ou blancs.",
+          "On ajoute des glucides complexes à chaque repas : riz complet, pâtes complètes, quinoa, flocons d'avoine, pain complet.",
+          "On intègre de bonnes graisses quotidiennement : huile d'olive, colza, noix, graines, oléagineux.",
+          "On varie les légumes (crus et cuits) pour les fibres, vitamines et minéraux.",
+          "On boit régulièrement dans la journée, surtout les jours d'entraînement : au moins 1,5 à 2 litres d'eau."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Tableau récapitulatif de la semaine"
+      },
+      {
+        "type": "table",
+        "headers": ["Jour", "Petit-déjeuner", "Déjeuner", "Dîner"],
+        "rows": [
+          ["Lundi", "Porridge avoine + banane + amandes", "Salade lentilles + carottes + pain complet", "Curry de pois chiches + riz complet"],
+          ["Mardi", "Tartines pain complet + houmous + fruit", "Bowl quinoa + tofu mariné + légumes", "Chili sin carne + riz basmati"],
+          ["Mercredi", "Muesli + yaourt végétal + graines", "Galettes haricots blancs + salade", "Pâtes complètes sauce lentilles corail"],
+          ["Jeudi", "Porridge avoine + fruits rouges + chia", "Salade boulgour + pois chiches + herbes", "Poêlée tofu/légumes façon wok + riz"],
+          ["Vendredi", "Tartines + purée d'amande + banane", "Wraps houmous + tofu + crudités", "Poêlée pois chiches + épinards + pain"],
+          ["Samedi", "Bol sportif avoine + yaourt végétal + fruits", "Buddha bowl riz + pois chiches + légumes", "Soupe lentilles corail + pain complet"],
+          ["Dimanche", "Pancakes végétariens + fruits + noisette", "Hachis parmentier végétarien", "Salade composée + légumineuses + noix"]
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Jour 1 — Lundi (reprise de semaine)"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Petit-déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Porridge : flocons d'avoine + boisson végétale + banane + poignée d'amandes ou noix. Simple, rapide et suffisamment dense pour tenir jusqu'au déjeuner sans fringale."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Salade de lentilles vertes (lentilles cuites, carottes râpées, oignon rouge, persil, vinaigrette moutarde) + pain complet. Un fruit en dessert. Les lentilles apportent environ 9 g de protéines pour 100 g cuites — une portion de 200 g couvre déjà 18 g de protéines."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Collation (si séance le soir)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Yaourt végétal (soja de préférence, enrichi en protéines si possible) + quelques graines de courge ou tournesol."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Dîner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Curry de pois chiches au lait de coco léger avec riz complet et légumes verts (brocoli, haricots verts, épinards selon saison). Un plat complet — protéines, glucides, fibres — qui se prépare en 25 minutes et se congèle très bien pour la semaine suivante."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [22]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Jour 2 — Mardi (jour avec séance de sport)"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Petit-déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Tartines de pain complet avec houmous + tomates ou concombre. Un fruit (orange ou kiwi pour la vitamine C, qui améliore l'absorption du fer des légumineuses)."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Avant l'entraînement (si besoin)"
+      },
+      {
+        "type": "paragraph",
+        "text": "1 banane ou 1 pomme, 30 à 60 minutes avant la séance. Suffisant pour une séance d'1h à 1h30 si le déjeuner était bien dosé."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Bowl quinoa + tofu mariné poêlé + légumes rôtis (carottes, poivrons, courgettes) + graines de sésame. Un repas complet à 28 g de protéines, avec des glucides pour tenir toute l'après-midi."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [26]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Collation post-entraînement"
+      },
+      {
+        "type": "paragraph",
+        "text": "Smoothie : boisson végétale + 1 banane + 1 c. à s. de purée d'oléagineux (cacahuète, amande). Glucides et protéines pour relancer la récupération dans l'heure qui suit la séance."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Dîner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Chili sin carne (haricots rouges, maïs, tomates, oignon, épices) + riz basmati ou complet. Salade verte en accompagnement. Idéal à préparer en grande quantité le dimanche — il se bonifie avec le temps."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [13]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Jour 3 — Mercredi (journée posée ou renfo léger)"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Petit-déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Muesli maison : flocons d'avoine, fruits secs, graines, quelques noix + yaourt végétal. Prépare un grand bocal le dimanche — il tient une semaine."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Galettes de haricots blancs et flocons d'avoine (façon « steak végé ») + pommes de terre au four + salade de chou ou coleslaw léger. Les galettes se réchauffent en 3 minutes à la poêle."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [23]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Collation"
+      },
+      {
+        "type": "paragraph",
+        "text": "1 fruit + poignée de noix ou amandes. Une des collations les plus simples et les plus efficaces : glucides naturels + protéines + bonnes graisses."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Dîner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pâtes complètes avec sauce lentilles corail (lentilles corail + coulis de tomate + carotte + oignon + herbes de Provence). Les lentilles corail fondent dans la sauce et donnent une texture proche d'une bolognaise végétale."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [24]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Jour 4 — Jeudi (séance cardio ou endurance)"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Petit-déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Porridge flocons d'avoine + boisson végétale + fruits rouges (frais ou surgelés) + graines de chia ou lin moulues. Les graines de chia apportent des oméga-3 végétaux (ALA) et de la satiété."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Avant l'entraînement"
+      },
+      {
+        "type": "paragraph",
+        "text": "1 banane ou 1 compote + éventuellement une petite poignée de fruits secs (raisins, dattes). Pour une sortie de plus de 90 minutes, prévois aussi un encas pour pendant l'effort."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Salade complète : pois chiches + boulgour ou couscous complet + tomates + concombre + poivrons + olives + herbes + huile d'olive. Fraîche, rassasiante, et préparable en 10 minutes avec des pois chiches en conserve."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [57]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Collation post-entraînement"
+      },
+      {
+        "type": "paragraph",
+        "text": "1 yaourt végétal + 1 fruit. Suffisant si le dîner arrive dans les 2 heures. Si la séance était longue ou intense, ajoute une poignée d'oléagineux."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Dîner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Poêlée de légumes façon wok (tofu, carottes, poivron, courgette, sauce soja) + riz ou nouilles. Un plat rapide — 20 minutes — qui s'adapte aux légumes disponibles dans le frigo."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [58]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Jour 5 — Vendredi (boulot + sport en fin de journée)"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Petit-déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Tartines de pain complet + purée d'amande ou de cacahuète + rondelles de banane + 1 boisson chaude. Rapide à préparer et dense en énergie pour bien démarrer."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Wraps végétariens : houmous, tofu grillé, crudités (carottes, salade, concombre), un peu de maïs. À emporter si tu manges au bureau — il suffit de préparer les ingrédients le matin."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [41]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Avant l'entraînement"
+      },
+      {
+        "type": "paragraph",
+        "text": "1 fruit ou 1 petite barre énergétique maison 30 à 45 minutes avant la séance."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Dîner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Poêlée de pois chiches aux épinards avec paprika, ail et oignon + pain complet. Un dîner express — moins de 20 minutes — idéal pour les soirs où tu rentres tard et fatigué."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [54]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Jour 6 — Samedi (sortie longue ou séance plus longue)"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Petit-déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Bol « sportif » : flocons d'avoine + boisson végétale + yaourt végétal + fruits + graines de chanvre ou tournesol. Charge en glucides avant la sortie — mange 2 à 3 heures avant le départ si possible."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Pendant l'effort (si sortie longue de 2h+)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Banane, mélange maison fruits secs + oléagineux, compote à boire. Objectif : 30 à 60 g de glucides par heure d'effort au-delà de 90 minutes."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Buddha bowl : base riz complet ou quinoa + pois chiches rôtis ou tofu + légumes variés crus et cuits + sauce tahini-citron. Un repas de récupération complet — glucides, protéines, bonnes graisses, fibres."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [25]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Collation"
+      },
+      {
+        "type": "paragraph",
+        "text": "1 fruit + quelques noix. La récupération continue aussi l'après-midi — ne saute pas cette collation après une longue sortie."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Dîner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Soupe de légumes épaissie aux lentilles corail + pain complet + houmous. Réconfortant, chaud et riche en protéines végétales. Parfait pour finir une grosse journée d'entraînement."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [29]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Jour 7 — Dimanche (repos actif ou journée famille)"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Petit-déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pancakes ou crêpes végétariennes à base de farine complète et lait végétal, servis avec des fruits frais et un peu de purée de noisette ou cacahuète. Le petit-déjeuner du dimanche — un peu plus généreux, sans culpabilité."
+      },
+      {
+        "type": "paragraph",
+        "text": "⚠️ Recette à créer : Pancakes végétariens farine complète + lait végétal + purée de noisette. Aucune recette de pancakes végétariens sans œuf ni protéine en poudre n'existe actuellement dans la base."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Déjeuner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Plat « façon mamie » revisité : hachis parmentier végétarien avec lentilles vertes à la place de la viande hachée + purée de pommes de terre + légumes. Un plat familial, réconfortant, et étonnamment riche en protéines."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [43]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Collation"
+      },
+      {
+        "type": "paragraph",
+        "text": "1 fruit ou une part de gâteau maison aux flocons d'avoine et fruits (sucre modéré). Le dimanche c'est aussi le moment de se faire plaisir sans se priver."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Dîner"
+      },
+      {
+        "type": "paragraph",
+        "text": "Salade composée légère : mélange de feuilles vertes, restes de légumineuses (pois chiches ou lentilles du meal prep), quelques noix, légumes de saison, vinaigrette maison. Un dîner simple pour finir la semaine."
+      },
+      {
+        "type": "cta_planning"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Astuces batch cooking pour tenir ce menu sans y passer des heures"
+      },
+      {
+        "type": "paragraph",
+        "text": "Ce menu ne fonctionne au quotidien que si les bases sont préparées à l'avance. Voici les 4 gestes batch cooking à faire le dimanche en 2 heures pour tenir toute la semaine sans stress."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Cuire un gros volume de légumineuses : 500 g de lentilles vertes + 400 g de pois chiches secs (ou utiliser des boîtes) → utilisés dans la salade du lundi, le curry, le buddha bowl, la salade du dimanche.",
+          "Préparer un bocal de houmous maison : 10 minutes au mixeur, utilisé toute la semaine pour les tartines, les wraps et les trempettes.",
+          "Cuire une grande quantité de céréales : 300 g de riz complet sec + 200 g de quinoa → base pour les bowls, buddha bowl et accompagnements du mardi au samedi.",
+          "Préparer un grand plat de chili sin carne ou de curry : 4 à 6 portions, utilisé au fil de la semaine ou congelé en portions individuelles."
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Avec ces 4 préparations, la moitié des repas de la semaine est déjà prête. Il ne reste plus qu'à assembler, réchauffer et ajouter les légumes frais."
+      },
+      {
+        "type": "source",
+        "label": "ANSES — Durées de conservation des aliments cuisinés",
+        "url": "https://www.anses.fr/fr/content/les-dur%C3%A9es-de-conservation-des-aliments"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "FAQ — Menu végétarien sportif sur 7 jours"
+      },
+      {
+        "type": "faq",
+        "items": [
+          {
+            "question": "Ce menu végétarien sportif apporte-t-il assez de protéines ?",
+            "answer": "Oui, pour un sportif de 65 à 75 kg s'entraînant 4 à 5 fois par semaine. Chaque repas principal de ce menu contient une source de protéines végétales (légumineuses, tofu, tempeh) qui couvre 15 à 38 g de protéines selon les plats. Sur la journée, le total se situe entre 90 et 120 g selon les portions — dans les fourchettes recommandées par l'ANSES pour les sportifs végétariens. Pour un sportif plus lourd ou avec un volume d'entraînement plus important, augmenter les portions de légumineuses ou ajouter une protéine en poudre post-séance suffit à ajuster."
+          },
+          {
+            "question": "Peut-on adapter ce menu à un végétalien (vegan) ?",
+            "answer": "La quasi-totalité de ce menu est déjà végétalienne. Les seuls points à vérifier : le yaourt végétal (choisir un yaourt de soja sans gélatine d'origine animale), le houmous (la recette maison est 100 % végétalienne), et les pancakes du dimanche (remplacer les œufs par une banane écrasée ou du tofu soyeux). Toutes les recettes proposées dans le menu sont véganes ou facilement adaptables."
+          },
+          {
+            "question": "Ce menu convient-il à tous les sports ou seulement à l'endurance ?",
+            "answer": "Il est conçu pour être polyvalent : les jours avec séance sont identifiés et le menu intègre des glucides pré et post-entraînement adaptés. Pour les sports d'endurance (running, vélo), les portions de glucides peuvent être augmentées les veilles et jours de longues sorties. Pour la musculation, augmenter les portions de tofu, tempeh et légumineuses permet d'atteindre les 1,8 à 2 g/kg/j recommandés pour la prise de masse."
+          },
+          {
+            "question": "Combien de temps faut-il pour préparer ce menu chaque semaine ?",
+            "answer": "Environ 2 heures de batch cooking le dimanche couvrent les bases de la semaine : légumineuses cuites, houmous, céréales, et un ou deux plats chauds. Le reste de la semaine, la plupart des repas se préparent en 10 à 20 minutes en assemblant les bases déjà prêtes. Les plats les plus rapides (wraps, salade de pois chiches, poêlée express) font moins de 15 minutes."
+          },
+          {
+            "question": "Faut-il des compléments alimentaires pour suivre ce menu végétarien sportif ?",
+            "answer": "Pour un végétarien qui consomme encore des œufs et des produits laitiers, ce menu couvre la plupart des besoins. Pour un végétalien strict, la vitamine B12 est obligatoire (supplémentation systématique) et la vitamine D est recommandée de septembre à avril. Un bilan sanguin annuel permet de vérifier le statut en fer, B12 et vitamine D — les trois marqueurs les plus souvent en déficit chez les sportifs végétariens selon les données de l'ANSES."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Sources"
+      },
+      {
+        "type": "sources_list",
+        "items": [
+          {
+            "label": "ANSES — Apports nutritionnels conseillés pour les sportifs",
+            "url": "https://www.anses.fr/fr/content/les-prot%C3%A9ines"
+          },
+          {
+            "label": "ANSES — Alimentation végétarienne et végétalienne : avis de l'agence",
+            "url": "https://www.anses.fr/fr/content/alimentation-v%C3%A9g%C3%A9tarienne-et-v%C3%A9g%C3%A9talienne"
+          },
+          {
+            "label": "ANSES — Durées de conservation des aliments cuisinés",
+            "url": "https://www.anses.fr/fr/content/les-dur%C3%A9es-de-conservation-des-aliments"
+          },
+          {
+            "label": "Manger Bouger (PNNS) — Organiser ses repas et planifier sa semaine",
+            "url": "https://www.mangerbouger.fr/manger-mieux/la-fabrique-a-menus"
+          },
+          {
+            "label": "INSEP — Nutrition du sportif",
+            "url": "https://www.insep.fr/fr/nutrition-du-sportif"
+          }
+        ]
+      }
+    ]
+  }

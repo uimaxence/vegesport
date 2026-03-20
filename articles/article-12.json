@@ -1,0 +1,307 @@
+{
+    "id": 12,
+    "title": "Recettes végétariennes pour sports d'endurance (running, vélo, trail…)",
+    "excerpt": "Recettes végétariennes riches en glucides pour running, vélo, trail : énergie durable et récupération. Idées simples pour tes sorties longues.",
+    "category": "Nutrition",
+    "date": "2026-03-20",
+    "read_time": 10,
+    "image": "https://images.unsplash.com/photo-1571008887538-b36bb32f8531?w=600&h=400&fit=crop",
+    "author": "Maxence",
+    "meta_title": "Recettes végétariennes pour sports d'endurance (running, vélo…) | Et si mamie était végé ?",
+    "meta_description": "Recettes végétariennes riches en glucides pour running, vélo, trail : énergie durable et récupération. Idées simples pour tes sorties longues.",
+    "content": "",
+    "content_json": [
+      {
+        "type": "paragraph",
+        "text": "Pour les sports d'endurance, l'énergie vient surtout des glucides. En végétarien, c'est même un avantage structurel : fruits, céréales complètes, légumineuses et légumes te donnent une énergie stable sans pics de glycémie. Cet article te propose des recettes et idées concrètes pensées pour avant, pendant et après tes sorties running, vélo ou trail, avec des ingrédients disponibles dans n'importe quel supermarché français."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Pourquoi une alimentation végétarienne est adaptée à l'endurance"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les sports d'endurance consomment prioritairement du glycogène musculaire — les réserves de glucides stockées dans les muscles et le foie. Plus ces réserves sont pleines au départ, plus tu peux maintenir l'intensité longtemps. Une alimentation végétale riche en glucides complexes (céréales complètes, légumineuses, fruits) favorise naturellement des réserves de glycogène élevées."
+      },
+      {
+        "type": "paragraph",
+        "text": "L'INSEP et l'ANSES recommandent entre 6 et 10 g de glucides par kilo de poids corporel par jour pour les sportifs d'endurance à volume élevé — un objectif facilement atteignable avec une alimentation végétale variée. En parallèle, la richesse en antioxydants des végétaux (vitamine C, vitamine E, polyphénols) contribue à réduire le stress oxydatif post-effort et accélère la récupération."
+      },
+      {
+        "type": "source",
+        "label": "INSEP — Besoins nutritionnels en endurance",
+        "url": "https://www.insep.fr/fr/nutrition-du-sportif"
+      },
+      {
+        "type": "source",
+        "label": "ANSES — Glucides : rôles nutritionnels et besoins",
+        "url": "https://www.anses.fr/fr/content/les-glucides"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Les besoins nutritionnels du sportif d'endurance végétarien"
+      },
+      {
+        "type": "table",
+        "headers": ["Nutriment", "Besoin journalier (endurance)", "Principales sources végétales"],
+        "rows": [
+          ["Glucides", "6–10 g/kg/j selon volume", "Avoine, riz complet, pâtes, fruits, légumineuses"],
+          ["Protéines", "1,4–1,8 g/kg/j (végé)", "Lentilles, tofu, tempeh, quinoa, edamame"],
+          ["Fer", "Besoins augmentés (hémolyse)", "Lentilles + vit. C, graines de courge, flocons d'avoine"],
+          ["Magnésium", "Pertes par transpiration", "Graines, oléagineux, chocolat noir, quinoa"],
+          ["Sodium / Potassium", "Réhydratation post-effort", "Sel iodé, banane, patate douce, avocat"],
+          ["Oméga-3 ALA", "Anti-inflammatoire", "Huile de colza, noix, graines de lin, graines de chia"]
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Avant la sortie longue : charger les réserves de glycogène"
+      },
+      {
+        "type": "paragraph",
+        "text": "Le repas pré-effort est le plus important pour la performance en endurance. L'objectif : maximiser les réserves de glycogène musculaire sans surcharger la digestion. La règle générale : 1 à 4 g de glucides par kilo de poids corporel dans les 1 à 4 heures précédant l'effort, selon la durée prévue de la sortie."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Petit-déjeuner 2–3 heures avant (~70–88 g glucides)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Porridge boost endurance : 80 g de flocons d'avoine + boisson végétale + banane écrasée + raisins secs + graines de chia. Environ 70 à 88 g de glucides, 12 g de protéines, digestion facile. La version idéale pour une longue sortie du matin."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [30]
+      },
+      {
+        "type": "paragraph",
+        "text": "Si tu préfères une version plus légère ou que tu pars plus tôt, ce porridge pré-sortie est plus simple et tout aussi efficace."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [37]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Collation 1 heure avant"
+      },
+      {
+        "type": "paragraph",
+        "text": "Si le petit-déjeuner remonte à plus de 3 heures, une collation légère en glucides rapides aide à partir avec les réserves pleines : 2 tranches de pain complet + confiture ou miel, 1 banane, et un grand verre d'eau avec une pincée de sel pour le sodium pré-effort."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Pendant l'effort : maintenir l'énergie au-delà de 90 minutes"
+      },
+      {
+        "type": "paragraph",
+        "text": "Au-delà de 90 minutes d'effort continu, les réserves de glycogène s'épuisent. La recommandation standard est de 30 à 60 g de glucides par heure d'effort, pouvant monter à 90 g/heure pour des efforts très longs (trail, ultra, triathlon). Les options végétales maison sont aussi efficaces que les gels industriels et souvent mieux tolérées."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Barres maison dattes + flocons d'avoine + purée de cacahuète : 20–28 g de glucides par barre.",
+          "2–3 dattes Medjool : environ 20 g de glucides, IG modéré, très bien tolérées.",
+          "30 g de raisins secs : environ 22 g de glucides, pratiques à emporter.",
+          "Compote à boire sans sucres ajoutés : 20–25 g de glucides, facile à avaler en mouvement.",
+          "Boisson maison : eau + jus de citron + 1 c. à s. de miel + pincée de sel (sodium + glucides rapides)."
+        ]
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [17]
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [42]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Après la sortie longue : récupération glucides + protéines"
+      },
+      {
+        "type": "paragraph",
+        "text": "Dans l'heure qui suit une sortie longue, la priorité est de recharger les réserves de glycogène (1 à 1,5 g de glucides/kg) et d'apporter des protéines pour la récupération musculaire (20 à 40 g). Voici cinq recettes végétariennes pensées pour cette fenêtre de récupération."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "1. Riz complet, patate douce et lentilles (~90 g glucides, 20 g protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Le plat de récupération végétalien par excellence après une longue sortie : riz complet pour les glucides à IG modéré, patate douce pour le potassium et les glucides, lentilles pour les protéines et le fer, brocoli vapeur pour les antioxydants."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [31]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "2. Pâtes complètes sauce pois chiches et tomate (~82 g glucides, 24 g protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Idéal après 2h+ de vélo ou de trail. La densité glucidique des pâtes complètes relance rapidement la resynthèse du glycogène, et les pois chiches apportent les protéines végétales pour la réparation musculaire."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [28]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "3. Gnocchis patate douce, épinards et tofu (~62 g glucides, 24 g protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Réconfortant, nourrissant, parfait pour une récupération post-marathon ou post-trail. Les gnocchis maison à base de patate douce sont plus riches en micronutriments que les gnocchis industriels à base de pomme de terre blanche."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [32]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "4. Fajitas végé quinoa et haricots rouges (~78 g glucides, 22 g protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pour une récupération avec glucides rapides après une séance intense : le quinoa et le maïs fournissent des glucides disponibles rapidement, les haricots rouges apportent les protéines. À assembler en moins de 30 minutes."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [33]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "5. Soupe potimarron et lentilles corail (~48 g glucides, 14 g protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "L'option récupération douce pour l'hiver. La soupe réhydrate, les lentilles corail apportent les protéines, et le pain complet avec houmous à côté complète l'apport glucidique et protéique. Idéale après une sortie en temps froid ou humide."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [34, 12]
+      },
+      {
+        "type": "cta_planning"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Exemple de journée type — coureur de 70 kg (prépa semi-marathon)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pour un sportif de 70 kg préparant un semi-marathon avec une sortie longue de 20 km le samedi matin, voici à quoi ressemblent les deux journées clés de la semaine."
+      },
+      {
+        "type": "table",
+        "headers": ["Moment", "Veille de la sortie longue", "Jour J (20 km)"],
+        "rows": [
+          ["Petit-déjeuner", "Porridge banane-raisins + pain complet", "Porridge léger + banane (2–3h avant)"],
+          ["Collation matin", "Fruit + poignée d'amandes", "—"],
+          ["Déjeuner", "Pâtes complètes + lentilles corail + légumes", "Récupération : riz complet + lentilles + légumes"],
+          ["Pendant l'effort", "—", "2 barres maison + boisson eau/citron/miel/sel"],
+          ["Collation après-midi", "Pain complet + houmous + noix", "Smoothie protéiné dans l'heure post-arrivée"],
+          ["Dîner", "Riz complet + patate douce + lentilles", "Chili sin carne + riz ou pâtes sauce pois chiches"]
+        ]
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [36]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Astuces pratiques pour le sportif d'endurance végétarien en France"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Batch cooking dominical : cuire 500 g de riz complet + 400 g de lentilles le dimanche couvre les bases de récupération pour toute la semaine.",
+          "Saisonnalité : patate douce et betterave en automne-hiver, quinoa et légumes rôtis au printemps-été — adapter les recettes de récupération à la saison.",
+          "Surveillance du fer : lentilles + vitamine C (jus de citron, poivron cru) à chaque repas riche en légumineuses pour optimiser l'absorption. Bilan ferritine 1 à 2 fois par an.",
+          "Magnésium : perdu par la transpiration lors des sorties longues — graines de courge, flocons d'avoine, chocolat noir et oléagineux sont tes alliés.",
+          "Disponibilité : pois chiches en boîte, tofu, flocons d'avoine bio et quinoa se trouvent dans tous les supermarchés français — pas besoin d'épiceries spécialisées."
+        ]
+      },
+      {
+        "type": "source",
+        "label": "ANSES — Fer et biodisponibilité dans les aliments végétaux",
+        "url": "https://ciqual.anses.fr/"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "FAQ — Recettes végétariennes pour sports d'endurance"
+      },
+      {
+        "type": "faq",
+        "items": [
+          {
+            "question": "Combien de glucides faut-il manger avant une longue sortie running ou vélo végétarien ?",
+            "answer": "Entre 1 et 4 g de glucides par kilo de poids corporel dans les 1 à 4 heures précédant l'effort, selon la durée prévue. Pour une sortie de 2 heures, un porridge d'avoine avec banane et raisins secs (70 à 88 g de glucides) consommé 2 à 3 heures avant suffit pour la plupart des coureurs de 60 à 80 kg. Pour une sortie de 3h+, augmenter la portion ou ajouter une collation légère 1 heure avant."
+          },
+          {
+            "question": "Peut-on s'alimenter uniquement avec des aliments végétaux pendant un trail ou un ultra ?",
+            "answer": "Oui, tout à fait. Dattes, raisins secs, bananes, barres maison dattes-avoine-purée de cacahuète et compotes à boire sont des alternatives végétales efficaces aux gels industriels. Pour les ultra-trails (plus de 6 à 8 heures), des aliments solides comme du pain de mie avec purée de noisette, des figues séchées ou des boules d'énergie maison permettent de varier et d'éviter la lassitude gustative."
+          },
+          {
+            "question": "Faut-il des protéines avant une sortie endurance végétarienne ?",
+            "answer": "Les protéines ne sont pas la priorité avant une séance d'endurance — ce sont les glucides qui comptent. Un repas pré-effort contenant 15 à 25 g de protéines (présents naturellement dans un bol de porridge ou un bowl de légumineuses) est suffisant. L'apport protéique devient prioritaire après la séance, dans l'heure qui suit, pour lancer la récupération musculaire."
+          },
+          {
+            "question": "Quelle est la meilleure recette végétarienne de récupération après une longue sortie ?",
+            "answer": "Le bowl riz complet + patate douce + lentilles est souvent cité comme le plus complet : glucides à IG modéré pour une recharge progressive du glycogène, protéines végétales pour la réparation musculaire, potassium (patate douce) pour la réhydratation et le fonctionnement musculaire. Pour une récupération plus rapide, les pâtes complètes avec sauce pois chiches offrent une densité glucidique supérieure dans un plat préparable en 25 minutes."
+          },
+          {
+            "question": "Les sportifs d'endurance végétariens ont-ils besoin de compléments alimentaires ?",
+            "answer": "Trois compléments méritent une attention particulière pour les végétariens pratiquant l'endurance : la vitamine B12 (obligatoire pour les végétaliens), le fer (bilan sanguin recommandé 1 à 2 fois par an, surtout pour les coureurs — l'impact au sol détruit des globules rouges), et les oméga-3 DHA/EPA via l'huile d'algues si pas de consommation de poisson. La vitamine D est recommandée de septembre à avril pour tous les Français, sportifs ou non."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Sources"
+      },
+      {
+        "type": "sources_list",
+        "items": [
+          {
+            "label": "INSEP — Besoins nutritionnels en endurance",
+            "url": "https://www.insep.fr/fr/nutrition-du-sportif"
+          },
+          {
+            "label": "ANSES — Glucides : rôles nutritionnels et besoins",
+            "url": "https://www.anses.fr/fr/content/les-glucides"
+          },
+          {
+            "label": "ANSES — Alimentation végétarienne et végétalienne (2021)",
+            "url": "https://www.anses.fr/fr/content/alimentation-v%C3%A9g%C3%A9tarienne-et-v%C3%A9g%C3%A9talienne"
+          },
+          {
+            "label": "ANSES — Table Ciqual : fer et biodisponibilité dans les aliments végétaux",
+            "url": "https://ciqual.anses.fr/"
+          },
+          {
+            "label": "Manger Bouger (PNNS) — Activité physique et alimentation",
+            "url": "https://www.mangerbouger.fr/bouger-plus/etre-actif-au-quotidien/alimentation-et-activite-physique"
+          }
+        ]
+      }
+    ]
+  }

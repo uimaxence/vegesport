@@ -1,0 +1,311 @@
+{
+    "id": 4,
+    "title": "Marathon végétalien : comment j'ai couru mon premier 42 km sans produit animal",
+    "excerpt": "Lucas, 28 ans, sportif végétalien, raconte sa préparation nutritionnelle complète pour son premier marathon. Alimentation semaine par semaine, suppléments, jour J et résultat : 3h42.",
+    "category": "Témoignage",
+    "date": "2026-03-20",
+    "read_time": 8,
+    "image": "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=600&h=400&fit=crop",
+    "author": "Maxence",
+    "meta_title": "Marathon végétalien : témoignage et plan nutritionnel complet | Et si mamie était végé ?",
+    "meta_description": "Lucas, 28 ans, a couru son premier marathon en 3h42 en mangeant 100 % végétalien. Il partage son plan nutritionnel complet, ses suppléments et ses recettes de préparation.",
+    "content": "",
+    "content_json": [
+      {
+        "type": "paragraph",
+        "text": "Quand j'ai annoncé à mon entourage que je préparais un marathon en étant végétalien, les réactions ont été... mitigées. « Tu ne vas jamais tenir », « Tu vas manquer de fer », « C'est dangereux ». Un an plus tard, j'ai franchi la ligne d'arrivée en 3h42, sans crampe, sans mur, et sans produit animal dans l'assiette depuis 18 mois. Voici exactement comment je m'y suis pris."
+      },
+      {
+        "type": "paragraph",
+        "text": "Je ne suis pas diététicien ni coach sportif. Ce témoignage reflète mon expérience personnelle sur une préparation de 16 semaines. Les repères nutritionnels que je cite s'appuient sur les recommandations de l'ANSES et du Programme National Nutrition Santé — adapte-les à ton propre profil."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Pourquoi courir un marathon en végétalien m'a semblé possible"
+      },
+      {
+        "type": "paragraph",
+        "text": "J'avais déjà couru deux semi-marathons en omnivore avant de passer végétalien. Quand j'ai changé d'alimentation, j'ai attendu 3 mois pour observer comment mon corps réagissait à l'entraînement. Résultat : ma récupération s'était améliorée, j'avais moins de courbatures après les longues sorties, et mon niveau d'énergie était plus stable dans la journée. J'ai décidé de tenter le 42 km."
+      },
+      {
+        "type": "paragraph",
+        "text": "Ce que j'ai compris ensuite, c'est que le marathon est avant tout une épreuve de gestion de l'énergie — et que les glucides végétaux (céréales complètes, fruits, légumineuses) sont une source d'énergie parfaitement adaptée à l'endurance. L'ANSES recommande 6 à 10 g de glucides par kilo de poids corporel par jour pour les sports d'endurance à volume élevé — un objectif facile à atteindre avec une alimentation végétale variée."
+      },
+      {
+        "type": "source",
+        "label": "ANSES — Besoins nutritionnels des sportifs d'endurance",
+        "url": "https://www.anses.fr/fr/content/alimentation-des-sportifs"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Ma préparation nutritionnelle sur 16 semaines"
+      },
+      {
+        "type": "paragraph",
+        "text": "J'ai suivi un plan de préparation classique de 16 semaines, avec 4 à 5 sorties par semaine dont une longue sortie le week-end. Sur le plan alimentaire, j'ai organisé ma nutrition en 3 phases distinctes."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Phase 1 — Semaines 1 à 6 : construire les bases"
+      },
+      {
+        "type": "paragraph",
+        "text": "Objectif : installer des habitudes alimentaires solides et vérifier mes apports en micronutriments. J'ai commencé par un bilan sanguin complet (ferritine, B12, vitamine D, zinc). Résultat : vitamine D un peu basse, tout le reste dans les normes. J'ai ajouté une supplémentation en vitamine D3 (lichen) et en oméga-3 DHA/EPA (huile d'algues)."
+      },
+      {
+        "type": "paragraph",
+        "text": "Sur l'alimentation, j'ai mis en place un meal prep hebdomadaire le dimanche : lentilles cuites en grand volume, riz complet, sauce tomate aux pois chiches, houmous maison. Ça m'a évité de chercher quoi manger après les séances du soir."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Phase 2 — Semaines 7 à 12 : augmenter les glucides avec le volume"
+      },
+      {
+        "type": "paragraph",
+        "text": "Avec la montée en volume (jusqu'à 60 km/semaine au pic), j'ai augmenté mes apports en glucides. Les longues sorties dépassaient désormais 2h30 — j'ai commencé à m'entraîner avec des barres maison et des fruits secs pour tester ma tolérance digestive à l'effort. Règle que j'ai apprise à mes dépens : ce qu'on mange pendant l'effort, ça se teste à l'entraînement, pas le jour J."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Phase 3 — Semaines 13 à 16 : affûtage et chargement glucidique"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les 3 dernières semaines, j'ai réduit le volume mais maintenu l'intensité. Les 3 jours précédant la course, j'ai pratiqué un chargement glucidique : augmenter les glucides à environ 8–10 g/kg/jour pour maximiser les réserves de glycogène. Concrètement : plus de pâtes complètes, de riz, de pain complet et de fruits. Moins de graisses et de fibres pour éviter les problèmes digestifs le jour J."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Ce que j'ai mangé concrètement semaine type"
+      },
+      {
+        "type": "table",
+        "headers": ["Repas", "Contenu", "Objectif"],
+        "rows": [
+          ["Petit-déjeuner", "Porridge avoine + banane + raisins secs + purée d'amande", "Glucides lents + énergie durable"],
+          ["Déjeuner", "Bowl riz complet + lentilles + légumes rôtis + graines", "Protéines + glucides + fibres"],
+          ["Collation pré-séance", "Banane + 2 dattes ou 1 barre maison", "Glucides rapides sans surcharge"],
+          ["Collation post-séance", "Smoothie protéiné (banane + lait de soja + graines de chanvre)", "Récupération rapide"],
+          ["Dîner", "Pâtes complètes + sauce lentilles corail ou chili sin carne", "Recharge glycogène + protéines"],
+          ["Avant le coucher (si séance longue)", "Yaourt de soja + poignée de noix", "Protéines lentes pour la nuit"]
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Mes recettes piliers pendant la préparation"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Le porridge du matin longue sortie"
+      },
+      {
+        "type": "paragraph",
+        "text": "Mon petit-déjeuner 2h30 avant chaque longue sortie : avoine, boisson végétale, banane, raisins secs, graines de chia. Environ 70 g de glucides, digestion facile, énergie stable. Je le faisais en version plus légère (sans chia ni graines) le matin de la course elle-même."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [30]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Les barres maison pour l'effort"
+      },
+      {
+        "type": "paragraph",
+        "text": "J'ai arrêté les gels industriels après la semaine 4 — trop sucrés, goût difficile à avaler après 30 km. Ces barres maison (dattes + flocons d'avoine + purée de cacahuète) ont été ma solution jusqu'au bout. Je les préparais le dimanche avec le reste du meal prep."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [17]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Le dîner de veille de course"
+      },
+      {
+        "type": "paragraph",
+        "text": "La veille du marathon, j'ai mangé des pâtes complètes sauce pois chiches — mon plat « pasta party » végétalien. Pas d'épices agressives, pas de légumes trop fibreux, une bonne dose de glucides. Simple, connu de mon système digestif, efficace."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [28]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "La récupération post-course"
+      },
+      {
+        "type": "paragraph",
+        "text": "Dans l'heure après l'arrivée, j'ai bu un smoothie vert protéiné (épinards + banane + lait d'amande + protéine de pois) pour relancer la récupération musculaire. Le soir, un bol de riz complet avec patate douce et lentilles pour recharger les réserves de glycogène."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [4]
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [31]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Mes suppléments pendant les 16 semaines"
+      },
+      {
+        "type": "paragraph",
+        "text": "Je ne prenais pas de suppléments par principe, mais par nécessité identifiée par bilan sanguin. En me basant sur les recommandations de l'ANSES et les conseils de mon médecin, voici ce que j'ai pris :"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Vitamine B12 (cyanocobalamine) : 50 µg par jour, tous les jours — le seul complément obligatoire en végétalien.",
+          "Vitamine D3 de lichen : 1000 UI par jour d'octobre à avril — mon bilan montrait un déficit.",
+          "Oméga-3 DHA/EPA (huile d'algues) : 250 mg de DHA par jour — pas de poisson dans mon alimentation.",
+          "Magnésium bisglycinate : 200 mg le soir pendant les semaines à fort volume — pour les crampes et la qualité du sommeil."
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Je n'ai pas pris de créatine (j'avais lu que c'était pertinent pour les végétaliens en musculation, mais moins utile pour l'endurance pure). Pas de fer non plus — mon bilan était normal, et supplémenter sans carence avérée est contre-productif."
+      },
+      {
+        "type": "source",
+        "label": "Vidal — Suppléments en vitamine B12 : indications et dosages",
+        "url": "https://www.vidal.fr/parapharmacie/vitamines-mineraux/vitamine-b12-cobalamine.html"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Le jour J : alimentation de 5h du matin à l'arrivée"
+      },
+      {
+        "type": "paragraph",
+        "text": "La course démarrait à 8h30. Voici exactement ce que j'ai mangé et bu ce jour-là."
+      },
+      {
+        "type": "table",
+        "headers": ["Horaire", "Ce que j'ai mangé / bu", "Pourquoi"],
+        "rows": [
+          ["5h00", "Porridge léger : 60 g d'avoine + boisson végétale + 1 banane", "Glucides lents, digestion facile"],
+          ["6h30", "1 banane + 1 datte + eau", "Dernier apport glucidique avant le départ"],
+          ["8h30", "Départ — eau au ravitaillement km 5", "Hydratation dès le début"],
+          ["Km 10, 20, 30", "1 barre maison + eau à chaque ravitaillement", "~20 g glucides toutes les 45–50 min"],
+          ["Km 35", "1 datte + eau + pincée de sel (crampes préventives)", "Sodium + énergie pour le final"],
+          ["Arrivée (3h42)", "Eau, banane, puis smoothie protéiné dans l'heure", "Réhydratation + récupération"]
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "La stratégie de 20 g de glucides toutes les 45–50 minutes pendant l'effort est cohérente avec les recommandations du Comité International Olympique pour les efforts supérieurs à 90 minutes. L'objectif : ne jamais laisser les réserves de glycogène tomber trop bas."
+      },
+      {
+        "type": "source",
+        "label": "INSEP — Nutrition et performance en endurance",
+        "url": "https://www.insep.fr/fr/nutrition-du-sportif"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Ce qui a marché, ce que je ferais différemment"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Ce qui a bien marché"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Le meal prep hebdomadaire : sans ça, impossible de tenir les apports sur 16 semaines avec un boulot à plein temps.",
+          "Le bilan sanguin en début de prépa : avoir des données réelles plutôt que de supposer.",
+          "Les barres maison : meilleure tolérance digestive que les gels, et bien moins chères.",
+          "Augmenter les glucides progressivement avec le volume : pas de fringale, pas de baisse d'énergie."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Ce que je ferais différemment"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Commencer le chargement glucidique 4 jours avant et non 3 — j'aurais pu arriver avec des réserves encore plus pleines.",
+          "Tester les barres maison dès la semaine 1, pas la semaine 4 : l'adaptation digestive à l'alimentation pendant l'effort prend du temps.",
+          "Prévoir une collation de récupération protéinée dans le sac de course, pas seulement une banane à l'arrivée."
+        ]
+      },
+      {
+        "type": "cta_planning"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "FAQ — Marathon végétalien et nutrition"
+      },
+      {
+        "type": "faq",
+        "items": [
+          {
+            "question": "Est-il possible de courir un marathon en étant végétalien sans manquer d'énergie ?",
+            "answer": "Oui, à condition que l'alimentation soit bien planifiée. Les glucides végétaux (céréales complètes, légumineuses, fruits) couvrent parfaitement les besoins en énergie d'un marathonien. L'ANSES recommande 6 à 10 g de glucides par kilo de poids corporel par jour pour les sports d'endurance à volume élevé — un objectif facilement atteignable avec une alimentation végétale variée. Le risque d'hypoglycémie n'est pas lié au fait d'être végétalien, mais à une mauvaise gestion de l'alimentation pendant l'effort."
+          },
+          {
+            "question": "Quels sont les risques nutritionnels spécifiques d'un marathon végétalien ?",
+            "answer": "Les trois risques principaux sont : un déficit en vitamine B12 (supplémentation obligatoire), un déficit en fer (à surveiller par bilan sanguin), et un apport insuffisant en glucides pendant la préparation ou le jour J. La vitamine D et les oméga-3 DHA/EPA méritent aussi une attention particulière. Un bilan sanguin complet en début de préparation permet d'identifier les carences éventuelles avant qu'elles n'impactent la performance."
+          },
+          {
+            "question": "Que manger la veille d'un marathon quand on est végétalien ?",
+            "answer": "Un repas à dominante glucidique, connu de ton système digestif et peu fibreux : pâtes complètes ou riz avec une sauce légère (tomate, pois chiches écrasés), sans épices agressives, peu de graisses. Évite les légumineuses en grande quantité (fermentation) et les légumes très fibreux. Mange tôt (avant 20h) pour avoir le temps de digérer. L'hydratation commence aussi la veille : 2 à 2,5 litres d'eau dans la journée."
+          },
+          {
+            "question": "Faut-il manger pendant un marathon végétalien et quoi emporter ?",
+            "answer": "Oui, au-delà de 90 minutes d'effort, un apport de 30 à 60 g de glucides par heure est recommandé pour maintenir la performance. Des barres maison (dattes + avoine + purée de cacahuète), des dattes seules, des fruits secs ou des compotes en gourde sont d'excellentes alternatives végétales aux gels industriels. L'avantage des barres maison : tu sais exactement ce qu'elles contiennent, et tu les as testées à l'entraînement."
+          },
+          {
+            "question": "Combien de temps faut-il pour préparer un premier marathon en végétalien ?",
+            "answer": "Un plan de 16 semaines est le standard pour un premier marathon, végétalien ou non. La transition nutritionnelle vers le végétalisme demande idéalement 2 à 3 mois de stabilisation avant de commencer une préparation intensive — le temps que le corps s'adapte, que les réserves en micronutriments se stabilisent, et que tu trouves tes repas piliers. Si tu es déjà végétalien depuis plus de 6 mois avec un suivi nutritionnel correct, tu peux démarrer une prépa marathon directement."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Sources"
+      },
+      {
+        "type": "sources_list",
+        "items": [
+          {
+            "label": "ANSES — Alimentation des sportifs d'endurance",
+            "url": "https://www.anses.fr/fr/content/alimentation-des-sportifs"
+          },
+          {
+            "label": "ANSES — Alimentation végétarienne et végétalienne : avis de l'agence",
+            "url": "https://www.anses.fr/fr/content/alimentation-v%C3%A9g%C3%A9tarienne-et-v%C3%A9g%C3%A9talienne"
+          },
+          {
+            "label": "Vidal — Vitamine B12 : supplémentation et dosages",
+            "url": "https://www.vidal.fr/parapharmacie/vitamines-mineraux/vitamine-b12-cobalamine.html"
+          },
+          {
+            "label": "INSEP — Nutrition et performance en endurance",
+            "url": "https://www.insep.fr/fr/nutrition-du-sportif"
+          },
+          {
+            "label": "Manger Bouger (PNNS) — Les glucides dans l'alimentation du sportif",
+            "url": "https://www.mangerbouger.fr/les-9-familles/feculents"
+          }
+        ]
+      }
+    ]
+  }

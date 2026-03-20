@@ -1,0 +1,263 @@
+{
+    "id": 7,
+    "title": "Recettes végétariennes riches en protéines pour booster tes séances",
+    "excerpt": "Des recettes végétariennes riches en protéines, simples et rassasiantes, pour soutenir tes entraînements sans viande ni prise de tête.",
+    "category": "Nutrition",
+    "date": "2026-03-20",
+    "read_time": 9,
+    "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&h=400&fit=crop",
+    "author": "Maxence",
+    "meta_title": "Recettes végétariennes riches en protéines pour sportifs | Et si mamie était végé ?",
+    "meta_description": "Des recettes végétariennes riches en protéines, simples et rassasiantes, pour soutenir tes entraînements sans viande ni prise de tête.",
+    "content": "",
+    "content_json": [
+      {
+        "type": "paragraph",
+        "text": "Quand on fait du sport et qu'on mange végétarien, la grande question revient toujours : « Est-ce que je mange assez de protéines ? ». L'idée ici, c'est de te montrer qu'on peut très bien nourrir ses muscles sans viande, avec des recettes simples, accessibles et réellement efficaces."
+      },
+      {
+        "type": "paragraph",
+        "text": "Pas besoin de passer des heures en cuisine ni d'acheter des ingrédients introuvables. Toutes les recettes de cet article se préparent avec des produits disponibles dans n'importe quel supermarché français, et la plupart se gardent plusieurs jours au frigo — idéal pour le meal prep de la semaine."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Combien de protéines par repas pour un sportif végétarien ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pour un sportif, les recommandations de l'ANSES situent les besoins entre 1,2 et 2 g de protéines par kilo de poids corporel par jour, selon l'intensité et le type de sport. Pour un sportif végétarien, certains experts conseillent de viser le haut de ces fourchettes pour compenser la digestibilité légèrement plus faible des protéines végétales."
+      },
+      {
+        "type": "source",
+        "label": "ANSES — Apports en protéines : consommation, qualité et besoins",
+        "url": "https://www.anses.fr/fr/content/les-prot%C3%A9ines"
+      },
+      {
+        "type": "paragraph",
+        "text": "Concrètement, si tu pèses 70 kg et que tu t'entraînes régulièrement, viser 90 à 120 g de protéines par jour est un bon ordre de grandeur. Répartis sur 3 à 4 repas, ça représente 25 à 35 g de protéines par repas principal — un objectif facilement atteignable avec les recettes ci-dessous."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Les meilleures sources de protéines végétales pour le sport"
+      },
+      {
+        "type": "paragraph",
+        "text": "Avant de passer aux recettes, voici les aliments à mettre régulièrement dans l'assiette, avec leur teneur indicative en protéines (données Ciqual ANSES) :"
+      },
+      {
+        "type": "source",
+        "label": "Table Ciqual ANSES — Composition nutritionnelle des aliments",
+        "url": "https://ciqual.anses.fr/"
+      },
+      {
+        "type": "table",
+        "headers": ["Aliment", "Protéines / 100 g", "Intérêt pour le sportif"],
+        "rows": [
+          ["Lentilles (cuites)", "~9 g", "Fer + glucides complexes + fibres"],
+          ["Pois chiches (cuits)", "~8–9 g", "Polyvalent, satiété élevée"],
+          ["Haricots rouges (cuits)", "~8 g", "Glucides + protéines, idéal post-effort"],
+          ["Tofu ferme", "12–15 g", "Tous les acides aminés essentiels"],
+          ["Tempeh", "18–20 g", "Fermenté, meilleure digestibilité"],
+          ["Quinoa (sec)", "~14 g", "Profil complet en acides aminés"],
+          ["Flocons d'avoine", "~13–14 g", "Glucides + protéines, parfait le matin"],
+          ["Graines de courge", "~25 g", "Zinc + magnésium en bonus"]
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "L'idée est de combiner plusieurs de ces sources dans la journée. Une alimentation végétale bien construite couvre les besoins sans forcer : légumineuses + céréales complètes + produits à base de soja, répartis sur les repas."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "7 recettes végétariennes riches en protéines pour le sport"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "1. Bowl lentilles, quinoa et tofu mariné (~38 g de protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Le plat pilier du sportif végétarien : protéines complètes grâce à l'association lentilles + quinoa + tofu, glucides complexes pour la récupération, et graines de courge pour le zinc. Se prépare en batch cooking et se garde 4 jours au frigo."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [21]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "2. Chili sin carne aux haricots rouges et maïs (~22 g de protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les haricots rouges apportent protéines et glucides dans le même plat. Servi avec du riz complet ou du quinoa, le chili couvre à la fois les besoins en protéines et la recharge du glycogène après une séance d'endurance ou de musculation."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [13]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "3. Curry de pois chiches au lait de coco léger (~22 g de protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les pois chiches apportent à la fois protéines et glucides complexes. Ce curry se prépare en 25 minutes, se congèle parfaitement et accompagne aussi bien du riz que du pain complet — pratique pour les soirs de semaine après l'entraînement."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [22]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "4. Galettes de haricots blancs et flocons d'avoine (~20 g de protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Une alternative végétale au steak haché, avec une excellente densité protéique. À servir en burger végétarien, avec une salade et du houmous, ou simplement avec des légumes rôtis. Se réchauffent très bien le lendemain."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [23]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "5. Pâtes complètes sauce lentilles corail (~26 g de protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les lentilles corail cuisent en 15 minutes sans trempage et fondent dans la sauce pour une texture quasi bolognaise. Un plat réconfortant post-entraînement avec une belle combinaison de glucides et de protéines végétales."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [24]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "6. Wraps tofu croustillant et houmous (~28 g de protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Un repas rapide à emporter ou à préparer en 20 minutes. Le tofu grillé apporte les protéines, le houmous ajoute des pois chiches et de la satiété. Ajoute une poignée de graines de courge pour booster encore l'apport protéique."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [5]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "7. Bol protéiné au petit-déjeuner (~28 g de protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Flocons d'avoine + lait végétal enrichi + protéines + fruits + purée d'oléagineux : un petit-déjeuner complet qui couvre près de 30 g de protéines dès le matin. Idéal après une séance matinale ou pour bien démarrer une journée d'entraînement."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [1]
+      },
+      {
+        "type": "cta_planning"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Exemple de journée végétarienne sportive à ~110 g de protéines"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pour un sportif de 65–70 kg avec un entraînement régulier (3 à 5 séances par semaine), voici comment atteindre 110 g de protéines sur une journée en combinant les recettes de cet article. Les chiffres sont indicatifs, basés sur la table Ciqual ANSES."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Petit-déjeuner : bol protéiné avoine (recette 7) → ~28 g de protéines.",
+          "Déjeuner : bowl lentilles-quinoa-tofu (recette 1) → ~38 g de protéines.",
+          "Collation : houmous maison + crudités + une poignée d'amandes → ~12 g de protéines.",
+          "Dîner : chili sin carne + riz complet (recette 2) → ~25–30 g de protéines."
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Total estimé : 103 à 108 g de protéines. En ajustant légèrement les portions ou en ajoutant un yaourt de soja en collation, tu dépasses facilement 110 g sans forcer."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Faut-il des protéines en poudre quand on est sportif végétarien ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les protéines en poudre (pois, riz, chanvre) peuvent être un coup de pouce pratique quand tu as un gros volume d'entraînement ou peu de temps pour cuisiner. Mais la base doit rester une alimentation variée — les compléments viennent en support si tu as du mal à couvrir tes besoins."
+      },
+      {
+        "type": "paragraph",
+        "text": "Si tu places déjà des légumineuses, des céréales complètes, du soja et des oléagineux dans ta journée comme dans les recettes ci-dessus, tu peux très bien t'en passer. Si tu es souvent en déplacement ou que tu sautes des repas, un shaker après l'entraînement peut simplement t'aider à atteindre ton quota plus facilement."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "FAQ — Recettes végétariennes protéinées pour sportifs"
+      },
+      {
+        "type": "faq",
+        "items": [
+          {
+            "question": "Quelles sont les recettes végétariennes les plus riches en protéines pour les sportifs ?",
+            "answer": "Les recettes les plus denses en protéines pour un sportif végétarien sont celles qui combinent plusieurs sources : bowl lentilles + quinoa + tofu (38 g de protéines par portion), curry de pois chiches avec riz (22–25 g), pâtes complètes sauce lentilles corail (26 g) et galettes de haricots blancs (20 g). En ajoutant des graines de courge ou du tempeh dans n'importe quelle recette, tu augmentes facilement l'apport de 5 à 8 g supplémentaires."
+          },
+          {
+            "question": "Comment avoir assez de protéines en végétarien sans manger tout le temps des légumineuses ?",
+            "answer": "En variant les sources : tofu, tempeh, flocons d'avoine, quinoa, graines de courge, yaourts de soja, oléagineux. Ces aliments permettent de répartir les protéines sur tous les repas sans dépendre uniquement des légumineuses. Un porridge à l'avoine au petit-déjeuner, un wrap au tofu au déjeuner et un curry le soir couvrent facilement 90 à 100 g de protéines sans une seule lentille dans la journée."
+          },
+          {
+            "question": "Peut-on préparer ces recettes végétariennes protéinées à l'avance ?",
+            "answer": "Oui, la plupart sont parfaitement adaptées au meal prep. Le chili sin carne, le curry de pois chiches, la sauce lentilles corail et le bowl lentilles-quinoa-tofu se conservent 4 à 5 jours au réfrigérateur et se congèlent très bien. Les galettes de haricots blancs se réchauffent à la poêle en 3 minutes. Seules les recettes fraîches (wraps, smoothies) se préparent à la dernière minute."
+          },
+          {
+            "question": "Combien de protéines par repas pour un sportif végétarien de 70 kg ?",
+            "answer": "Pour un sportif de 70 kg visant 1,6 g de protéines par kilo de poids corporel par jour (soit ~112 g/jour), il faut atteindre environ 28 à 35 g de protéines par repas principal sur 3 repas, plus 10 à 15 g en collation. Les recettes de cet article couvrent cet objectif : le bowl lentilles-quinoa-tofu atteint 38 g à lui seul."
+          },
+          {
+            "question": "Les recettes végétariennes protéinées conviennent-elles aussi aux végétaliens ?",
+            "answer": "La quasi-totalité des recettes de cet article est végétalienne (vegan) : elles n'utilisent ni viande, ni poisson, ni produits laitiers, ni œufs. Le porridge protéiné utilise du lait d'amande et une protéine de pois — tous deux végétaliens. Seul le houmous peut contenir des produits laitiers si tu l'achètes en magasin : vérifie l'étiquette ou fais-le maison avec la recette proposée."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Sources"
+      },
+      {
+        "type": "sources_list",
+        "items": [
+          {
+            "label": "ANSES — Apports en protéines : consommation, qualité et besoins",
+            "url": "https://www.anses.fr/fr/content/les-prot%C3%A9ines"
+          },
+          {
+            "label": "ANSES — Table de composition nutritionnelle Ciqual",
+            "url": "https://ciqual.anses.fr/"
+          },
+          {
+            "label": "ANSES — Alimentation végétarienne et végétalienne : avis de l'agence",
+            "url": "https://www.anses.fr/fr/content/alimentation-v%C3%A9g%C3%A9tarienne-et-v%C3%A9g%C3%A9talienne"
+          },
+          {
+            "label": "Manger Bouger (PNNS) — Les protéines dans l'alimentation",
+            "url": "https://www.mangerbouger.fr/les-9-familles/proteines"
+          }
+        ]
+      }
+    ]
+  }

@@ -74,8 +74,7 @@ export function usePageMeta({
     if (noindex) {
       upsertMeta('name', 'robots', 'noindex, nofollow');
     } else {
-      const existing = document.querySelector('meta[name="robots"]');
-      if (existing) existing.remove();
+      upsertMeta('name', 'robots', 'index, follow');
     }
 
     upsertMeta('property', 'og:title', pageTitle);

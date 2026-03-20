@@ -1,0 +1,369 @@
+{
+    "id": 10,
+    "title": "Recettes végétariennes pré et post entraînement pour sportifs",
+    "excerpt": "Des idées de repas et collations végétariennes avant et après l'entraînement, pour l'énergie et la récupération, sans prise de tête.",
+    "category": "Nutrition",
+    "date": "2026-03-20",
+    "read_time": 11,
+    "image": "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&h=400&fit=crop",
+    "author": "Maxence",
+    "meta_title": "Recettes végétariennes pré et post entraînement (simples et efficaces) | Et si mamie était végé ?",
+    "meta_description": "Des idées de repas et collations végétariennes avant et après l'entraînement, pour l'énergie et la récupération, sans prise de tête.",
+    "content": "",
+    "content_json": [
+      {
+        "type": "paragraph",
+        "text": "Manger végétarien quand on fait du sport, ce n'est pas seulement « remplacer la viande ». Avant et après l'entraînement, ton assiette a un vrai impact sur ton énergie, ta récupération, tes courbatures et ton envie de revenir t'entraîner. Cet article te propose des repères simples et des recettes concrètes pour chaque moment clé autour de ta séance."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Ce que ton corps a besoin avant et après l'entraînement"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les besoins ne sont pas les mêmes avant et après l'effort. Avant, on cherche à fournir de l'énergie disponible rapidement et à éviter les problèmes digestifs. Après, on cherche à réparer les muscles, recharger les réserves de glycogène et réhydrater. Selon les recommandations de l'INSEP et les données de l'ANSES pour les sportifs, voici le cadre de base :"
+      },
+      {
+        "type": "source",
+        "label": "INSEP — Nutrition avant, pendant et après l'effort",
+        "url": "https://www.insep.fr/fr/nutrition-du-sportif"
+      },
+      {
+        "type": "table",
+        "headers": ["Moment", "Objectif principal", "Nutriments prioritaires", "Ce qu'il faut éviter"],
+        "rows": [
+          ["2–3h avant", "Charger les réserves d'énergie", "Glucides complexes + protéines légères", "Graisses en excès, fibres en excès"],
+          ["30–60 min avant", "Dernier apport d'énergie rapide", "Glucides simples, digestion facile", "Repas lourd, légumineuses seules"],
+          ["Pendant (>90 min)", "Maintenir l'énergie", "Glucides rapides, sodium", "Graisses, protéines, fibres"],
+          ["Dans l'heure après", "Lancer la récupération", "Protéines + glucides rapides", "Sauter la collation post-séance"],
+          ["Repas post-effort", "Récupération complète", "Protéines + glucides complexes + minéraux", "Repas trop tardif ou trop léger"]
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Que manger avant l'entraînement en végétarien ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Avant l'entraînement, on cherche surtout de l'énergie facilement utilisable (glucides), une digestion confortable, et un peu de protéines — surtout si le repas est loin dans le temps. Les légumineuses en grande quantité juste avant l'effort sont à éviter : leur richesse en fibres et en FODMAPs peut provoquer des gaz et des crampes pendant la séance."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Repas 2–3 heures avant la séance"
+      },
+      {
+        "type": "paragraph",
+        "text": "C'est le moment idéal pour un vrai repas complet : glucides complexes pour l'énergie, protéines modérées pour éviter le catabolisme, légumes pour les micronutriments. Trois options végétariennes qui fonctionnent bien :"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Option 1 — Bowl riz complet, pois chiches et légumes (~78 g glucides, ~20 g protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Riz complet, pois chiches, légumes rôtis, filet d'huile d'olive. Des glucides à IG modéré pour une énergie stable sur 3 à 4 heures, des protéines pour préserver la masse musculaire pendant l'effort."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [25]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Option 2 — Pâtes complètes sauce lentilles corail (~86 g glucides, ~26 g protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les pâtes complètes + lentilles corail sont particulièrement adaptées avant une séance d'endurance ou de renforcement musculaire. Les lentilles corail cuisent vite, fondent dans la sauce et ne surchargent pas la digestion."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [24]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Option 3 — Bowl quinoa, tofu et crudités (~52 g glucides, ~28 g protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Un peu moins glucidique, plus protéiné. Idéal avant une séance de musculation ou un entraînement de force où les protéines pré-séance jouent un rôle important."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [26]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Collations 30–60 minutes avant la séance"
+      },
+      {
+        "type": "paragraph",
+        "text": "Si ton dernier repas remonte à plus de 3 heures, une petite collation riche en glucides et facile à digérer peut aider. Pas de graisses, pas de grosses portions de fibres. Les options les plus simples :"
+      },
+      {
+        "type": "list",
+        "items": [
+          "1 banane mûre (23 g glucides, IG 55, digestion rapide).",
+          "1 compote sans sucres ajoutés (20–25 g glucides).",
+          "1 tartine de pain complet avec une fine couche de purée de fruits ou de confiture.",
+          "1 petite poignée de raisins secs ou 2–3 dattes (glucides rapides, très bien tolérés à l'effort).",
+          "Barres maison dattes + flocons d'avoine (voir recettes ci-dessous)."
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Évite les grosses quantités de graisses juste avant l'effort (trop d'oléagineux, plats frits, beaucoup d'avocat) — elles ralentissent la digestion et peuvent provoquer des inconforts pendant la séance."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Snacks végétariens à emporter pour l'entraînement"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pour les efforts de plus de 90 minutes, s'alimenter pendant la séance devient nécessaire. Les barres maison sont une excellente alternative végétalienne aux gels industriels : moins chères, sans additifs, et bien tolérées digestivement une fois qu'on les a testées à l'entraînement."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Barres énergétiques maison dattes-avoine (~28 g glucides/barre)"
+      },
+      {
+        "type": "paragraph",
+        "text": "La recette pilier du sportif végétalien. Dattes + flocons d'avoine + purée de cacahuète + pépites de chocolat. Préparées en 20 minutes, sans cuisson, elles se conservent une semaine au frigo et se transportent facilement."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [17]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Barres énergétiques légères pour l'entraînement (~35 g glucides/barre)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Une version plus simple et encore plus rapide à préparer : dattes + flocons d'avoine + purée de cacahuète + graines de tournesol + cannelle. Moins de sucres ajoutés que les barres du commerce."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [42]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Que manger après l'entraînement en végétarien ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Après l'effort, les priorités sont claires : apporter des protéines pour la réparation musculaire (20 à 40 g selon l'intensité), recharger les réserves de glycogène (glucides), réhydrater et apporter des minéraux perdus par la transpiration (sodium, potassium, magnésium). Le tout dans l'heure qui suit si possible — c'est la fenêtre de récupération optimale."
+      },
+      {
+        "type": "source",
+        "label": "ANSES — Besoins nutritionnels des sportifs",
+        "url": "https://www.anses.fr/fr/content/alimentation-des-sportifs"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Collations post-entraînement rapides (dans l'heure qui suit)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pas obligatoire si le repas suivant arrive dans moins de 2 heures, mais très utile si tu t'entraînes le matin ou si le dîner est loin. Objectif : 20 g de protéines + 30 à 50 g de glucides."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Smoothie vert de récupération (~25 g protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Épinards + banane congelée + lait d'amande + protéine de pois vanille + beurre d'amande. 5 minutes, un mixeur, et 25 g de protéines disponibles rapidement pour lancer la récupération."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [4]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Tartines houmous express (~12 g protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pain complet + houmous maison + rondelles de tomate ou de concombre. Simple, rapide, et le houmous apporte des protéines de pois chiches et du tahini. Si tu utilises une protéine en poudre végétale, tu peux l'ajouter dans un smoothie à côté."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [12]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "5 repas végétariens post-entraînement complets"
+      },
+      {
+        "type": "paragraph",
+        "text": "Ces cinq repas sont conçus pour couvrir les besoins de récupération : protéines + glucides + minéraux. Tous se préparent en moins de 40 minutes, et la plupart sont adaptés au meal prep."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "1. Chili sin carne complet (~22 g protéines, ~55 g glucides)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Haricots rouges, maïs, tomates, oignon, épices. Servi avec du riz complet ou du quinoa. Un classique post-musculation ou post-sortie longue : protéines + glucides + fibres dans un seul plat. À préparer en grande quantité le dimanche."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [13]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "2. Curry de pois chiches au lait de coco (~22 g protéines, ~68 g glucides)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pois chiches, lait de coco léger, tomates, épices. Riz basmati ou complet. Un dîner de récupération réconfortant, parfait après une séance du soir. 25 minutes de préparation."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [22]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "3. Bowl lentilles, patate douce et tofu (~32 g protéines, ~72 g glucides)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Le plat de récupération le plus complet de ce blog : lentilles pour les protéines et le fer, patate douce pour les glucides et le potassium, tofu mariné pour les acides aminés essentiels, légumes verts pour les antioxydants. Un vrai « full récup » végétalien."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [27]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "4. Pâtes complètes sauce pois chiches (~24 g protéines, ~82 g glucides)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Idéal après une séance d'endurance ou un match de sport collectif : la densité glucidique des pâtes complètes relance la resynthèse du glycogène, et les pois chiches apportent les protéines. Ajoute des légumes rôtis (poivrons, aubergines) pour les minéraux."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [28]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "5. Soupe lentilles corail et légumes (~18 g protéines, ~48 g glucides)"
+      },
+      {
+        "type": "paragraph",
+        "text": "L'option hiver ou soir de récupération douce. La soupe réhydrate, les lentilles corail apportent les protéines, et le pain complet + houmous à côté complètent l'apport glucidique. Pratique et réconfortante après une séance en extérieur par temps froid."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [29]
+      },
+      {
+        "type": "cta_planning"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Tableau récapitulatif : quoi manger selon ton sport"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les besoins varient selon le type de sport. Voici les grandes orientations à adapter à ta pratique :"
+      },
+      {
+        "type": "table",
+        "headers": ["Type de sport", "Avant (2–3h)", "Pendant (si >90 min)", "Après (dans l'heure)"],
+        "rows": [
+          ["Endurance (running, vélo, trail)", "Glucides ++ : pâtes, riz, avoine", "30–60 g glucides/h : dattes, barres maison", "Glucides + protéines : bowl riz/lentilles, pâtes"],
+          ["Force / musculation", "Protéines + glucides : bowl quinoa-tofu", "Pas nécessaire <90 min", "Protéines ++ : smoothie protéiné, curry pois chiches"],
+          ["Sports collectifs (foot, basket…)", "Glucides + protéines : riz/pois chiches", "Banane, compote si match long", "Mix glucides/protéines : chili, bowl lentilles"],
+          ["Yoga, Pilates, stretching", "Repas léger : salade + légumineuses", "Non nécessaire", "Repas normal, hydratation suffisante"]
+        ]
+      },
+      {
+        "type": "source",
+        "label": "Manger Bouger (PNNS) — Alimentation et activité physique",
+        "url": "https://www.mangerbouger.fr/bouger-plus/etre-actif-au-quotidien/alimentation-et-activite-physique"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "FAQ — Recettes végétariennes pré et post entraînement"
+      },
+      {
+        "type": "faq",
+        "items": [
+          {
+            "question": "Que manger avant un entraînement végétarien le matin à jeun ?",
+            "answer": "Pour une séance matinale courte (moins de 60 minutes à intensité modérée), s'entraîner à jeun est possible pour la plupart des gens. Si tu as du mal ou si la séance est intense, une petite collation rapide suffit : 1 banane ou 1–2 dattes et un verre d'eau, pris 20 à 30 minutes avant. Pour une séance longue le matin (plus de 90 minutes), préfère un petit-déjeuner complet 2 heures avant : porridge d'avoine + banane + oléagineux."
+          },
+          {
+            "question": "Combien de temps après l'entraînement faut-il manger en végétarien ?",
+            "answer": "Idéalement dans les 30 à 60 minutes qui suivent la fin de la séance. C'est la fenêtre de récupération où les muscles sont les plus réceptifs aux glucides et aux protéines. Si le repas suivant arrive dans moins de 2 heures, une collation légère suffit (smoothie protéiné, yaourt végétal + fruit). Si le repas est loin, mange un vrai repas post-effort dans l'heure."
+          },
+          {
+            "question": "Peut-on manger des légumineuses avant un entraînement végétarien ?",
+            "answer": "Oui, mais avec précautions. Les légumineuses sont riches en fibres et en FODMAPs — elles peuvent provoquer des ballonnements ou des crampes si consommées en grande quantité juste avant l'effort. La règle : consomme-les dans un repas complet 2 à 3 heures avant la séance (lentilles corail dans des pâtes, pois chiches dans un bowl), pas en grande portion 30 à 60 minutes avant. La cuisson prolongée réduit aussi les effets digestifs."
+          },
+          {
+            "question": "Quels sont les meilleurs glucides végétaux à consommer pendant un effort long ?",
+            "answer": "Les dattes, les raisins secs, les bananes et les barres maison (dattes + avoine + purée de cacahuète) sont les meilleures options végétales pour s'alimenter pendant un effort de plus de 90 minutes. Ils apportent 20 à 30 g de glucides par portion, sont faciles à transporter et généralement bien tolérés digestivement. Objectif : 30 à 60 g de glucides par heure d'effort au-delà de 90 minutes."
+          },
+          {
+            "question": "Faut-il des protéines avant ou après l'entraînement en végétarien ?",
+            "answer": "Les deux ont un intérêt, mais le timing dépend du type de sport. Pour la musculation, un apport protéique après la séance est prioritaire (20 à 40 g dans l'heure qui suit). Avant, une quantité modérée de protéines dans le repas pré-séance (15 à 25 g) peut réduire le catabolisme. Pour l'endurance, les protéines pré-séance ont moins d'impact sur la performance — la priorité est aux glucides avant, et protéines + glucides après."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Sources"
+      },
+      {
+        "type": "sources_list",
+        "items": [
+          {
+            "label": "INSEP — Nutrition avant, pendant et après l'effort",
+            "url": "https://www.insep.fr/fr/nutrition-du-sportif"
+          },
+          {
+            "label": "ANSES — Besoins nutritionnels des sportifs",
+            "url": "https://www.anses.fr/fr/content/alimentation-des-sportifs"
+          },
+          {
+            "label": "ANSES — Table de composition nutritionnelle Ciqual",
+            "url": "https://ciqual.anses.fr/"
+          },
+          {
+            "label": "Manger Bouger (PNNS) — Alimentation et activité physique",
+            "url": "https://www.mangerbouger.fr/bouger-plus/etre-actif-au-quotidien/alimentation-et-activite-physique"
+          },
+          {
+            "label": "Santé Publique France — Activité physique et alimentation",
+            "url": "https://www.santepubliquefrance.fr/determinants-de-sante/nutrition-et-activite-physique"
+          }
+        ]
+      }
+    ]
+  }

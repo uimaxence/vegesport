@@ -1,0 +1,305 @@
+{
+    "id": 8,
+    "title": "Combien de protéines par jour quand on est sportif végétarien ?",
+    "excerpt": "Des repères clairs pour savoir combien de protéines viser en tant que sportif végétarien, avec des exemples chiffrés par poids et par sport, et une journée type détaillée.",
+    "category": "Nutrition",
+    "date": "2026-03-20",
+    "read_time": 10,
+    "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&h=400&fit=crop",
+    "author": "Maxence",
+    "meta_title": "Combien de protéines par jour pour un sportif végétarien ? | Et si mamie était végé ?",
+    "meta_description": "Découvre combien de protéines viser quand tu es sportif végétarien, avec des repères simples, un tableau par poids et sport, et des exemples concrets pour ta journée.",
+    "content": "",
+    "content_json": [
+      {
+        "type": "paragraph",
+        "text": "Quand on fait du sport et qu'on mange végétarien, la question des protéines revient en boucle. On entend tout et son contraire, entre « tu n'en auras jamais assez » et « tu n'as pas besoin de plus que les autres ». L'idée de cet article, c'est de poser des repères clairs, basés sur les recommandations utilisées en France et en Europe, puis de les traduire en assiettes concrètes."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Les repères de base : combien de protéines par kilo de poids corporel ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pour la population générale, l'ANSES situe les besoins autour de 0,83 g de protéines par kilo de poids corporel par jour. Chez le sportif, ces besoins augmentent parce que l'organisme a plus de travail de réparation musculaire et d'adaptation à l'entraînement."
+      },
+      {
+        "type": "source",
+        "label": "ANSES — Apports en protéines : consommation, qualité et besoins",
+        "url": "https://www.anses.fr/fr/content/les-prot%C3%A9ines"
+      },
+      {
+        "type": "paragraph",
+        "text": "Les synthèses utilisées en France pour les sportifs situent les besoins entre environ 1,2 et 1,6 g/kg/jour pour les sports d'endurance, et entre 1,6 et 2 g/kg/jour pour les sports de force ou la musculation. Ce sont des fourchettes de travail à adapter à ton profil, ton volume d'entraînement, et ton objectif."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Sportif d'endurance (running, vélo, natation) : 1,2–1,6 g/kg/j.",
+          "Sportif de force / musculation : 1,6–2 g/kg/j.",
+          "Sport collectif (foot, basket, rugby) : 1,4–1,7 g/kg/j.",
+          "Sport loisir 2–3 fois par semaine : 1,0–1,2 g/kg/j suffit dans la plupart des cas."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Sportif végétarien : faut-il viser plus de protéines qu'un omnivore ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Quand on parle de protéines végétales, deux sujets reviennent souvent : le profil en acides aminés (certains aliments végétaux sont moins « complets » pris isolément) et la digestibilité (une partie des protéines peut être un peu moins bien absorbée que celles d'origine animale, notamment à cause des fibres et des anti-nutritiments)."
+      },
+      {
+        "type": "paragraph",
+        "text": "C'est pour ça que certains experts conseillent aux sportifs végétariens de viser plutôt le haut des fourchettes de recommandations, ou d'augmenter légèrement la quantité totale par rapport à un omnivore — de l'ordre de 10 à 20 % — tout en misant sur la variété des sources. En pratique :"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Si la reco pour ton sport est autour de 1,2–1,6 g/kg/j, en mode végé vise plutôt la zone 1,4–1,8 g/kg/j.",
+          "Si tu es en musculation et que tu vises 1,6–2 g/kg/j, rester proche de 1,8–2 g/kg/j est pertinent.",
+          "Ce qui compte autant que la quantité : la variété. Associer légumineuses, céréales, soja et oléagineux sur la journée permet d'avoir un profil d'acides aminés très correct."
+        ]
+      },
+      {
+        "type": "source",
+        "label": "ANSES — Alimentation végétarienne et végétalienne : avis de l'agence",
+        "url": "https://www.anses.fr/fr/content/alimentation-v%C3%A9g%C3%A9tarienne-et-v%C3%A9g%C3%A9talienne"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Tableau : combien de protéines par jour selon ton poids et ton sport ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Pour rendre ça concret, voici un tableau récapitulatif des objectifs journaliers selon ton poids et ton type de sport. Les chiffres sont calculés sur la base des fourchettes hautes recommandées pour les sportifs végétariens."
+      },
+      {
+        "type": "table",
+        "headers": ["Poids", "Endurance (1,5 g/kg/j)", "Force / muscu (1,9 g/kg/j)", "Sport collectif (1,6 g/kg/j)", "Loisir (1,2 g/kg/j)"],
+        "rows": [
+          ["50 kg", "75 g/j", "95 g/j", "80 g/j", "60 g/j"],
+          ["55 kg", "83 g/j", "105 g/j", "88 g/j", "66 g/j"],
+          ["60 kg", "90 g/j", "114 g/j", "96 g/j", "72 g/j"],
+          ["65 kg", "98 g/j", "124 g/j", "104 g/j", "78 g/j"],
+          ["70 kg", "105 g/j", "133 g/j", "112 g/j", "84 g/j"],
+          ["75 kg", "113 g/j", "143 g/j", "120 g/j", "90 g/j"],
+          ["80 kg", "120 g/j", "152 g/j", "128 g/j", "96 g/j"],
+          ["85 kg", "128 g/j", "162 g/j", "136 g/j", "102 g/j"]
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Ces chiffres sont des ordres de grandeur, pas des ordonnances. L'idée n'est pas de peser ton assiette au gramme près, mais de savoir si tu es globalement dans les clous — ou si tu en es très loin."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Comment atteindre ces apports en mode végé ? Les ordres de grandeur par aliment"
+      },
+      {
+        "type": "paragraph",
+        "text": "Passer de « g de protéines par jour » à « vraie assiette » change tout. Quelques ordres d'idée pour te repérer (valeurs arrondies, basées sur la table Ciqual ANSES) :"
+      },
+      {
+        "type": "source",
+        "label": "Table Ciqual ANSES — Composition nutritionnelle des aliments",
+        "url": "https://ciqual.anses.fr/"
+      },
+      {
+        "type": "table",
+        "headers": ["Aliment", "Portion courante", "Protéines estimées"],
+        "rows": [
+          ["Lentilles cuites", "150 g", "~13–14 g"],
+          ["Pois chiches cuits", "150 g", "~12–13 g"],
+          ["Haricots rouges cuits", "150 g", "~12 g"],
+          ["Tofu ferme", "100 g", "~12–15 g"],
+          ["Tempeh", "100 g", "~18–20 g"],
+          ["Flocons d'avoine", "70 g (sec)", "~9–10 g"],
+          ["Quinoa cuit", "150 g", "~8 g"],
+          ["Yaourt de soja (protéiné)", "125 g", "~8–10 g"],
+          ["Amandes", "30 g (poignée)", "~6 g"],
+          ["Graines de courge", "30 g (2 c.à.s)", "~7 g"],
+          ["Protéine de pois en poudre", "30 g", "~24–25 g"]
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "En combinant 2 ou 3 de ces sources à chaque repas et collation, on arrive assez vite à 90–130 g de protéines par jour selon le poids et le sport, sans forcément sortir la poudre à chaque repas."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Exemple de journée type à environ 110–120 g de protéines"
+      },
+      {
+        "type": "paragraph",
+        "text": "Imaginons un sportif de 70 kg pratiquant la musculation ou un sport collectif régulièrement, qui vise environ 110–120 g de protéines par jour. Voici une journée type réaliste (les chiffres sont arrondis et indicatifs) :"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Petit-déjeuner (~28 g de protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Porridge protéiné : flocons d'avoine + lait d'amande + protéine de pois vanille + fruits rouges + beurre de cacahuète. Complet, rapide à préparer, et la protéine de pois pousse l'apport à 28 g dès le matin."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [1]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Déjeuner (~38 g de protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Bowl lentilles vertes + quinoa + tofu mariné poêlé + légumes + graines de courge. La combinaison lentilles-quinoa-tofu est la plus dense en protéines de ce blog — 38 g par portion sans aucun ajout de poudre."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [21]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Collation (~12 g de protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Houmous maison avec crudités (carottes, concombre, céleri) et une poignée d'amandes. Simple, préparable à l'avance, et 12 g de protéines sans y penser."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [12]
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Dîner (~25 g de protéines)"
+      },
+      {
+        "type": "paragraph",
+        "text": "Chili sin carne aux haricots rouges avec riz complet. Un classique du meal prep végétarien : riche en protéines, glucides pour la récupération, et il se prépare en grande quantité pour toute la semaine."
+      },
+      {
+        "type": "recipes",
+        "recipeIds": [13]
+      },
+      {
+        "type": "paragraph",
+        "text": "Total estimé sur la journée : 103 à 113 g de protéines. En ajustant les portions du déjeuner ou du dîner, ou en ajoutant un yaourt de soja protéiné le soir, tu cibles facilement 120 g."
+      },
+      {
+        "type": "cta_planning"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Faut-il absolument des protéines en poudre ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Non, tu n'es pas obligé d'en prendre. Les protéines en poudre sont surtout une question de praticité : utiles si tu as un gros volume d'entraînement et peu de temps pour cuisiner, ou si tu as du mal à atteindre tes besoins en mangeant normalement."
+      },
+      {
+        "type": "paragraph",
+        "text": "Si ta journée ressemble à celle qu'on vient de décrire — avec des légumineuses, des céréales complètes, du soja, des graines et des oléagineux — tu peux très bien couvrir tes besoins sans shaker. Si tu es souvent en déplacement, que tu sautes des repas ou que tu n'aimes pas les grosses portions, un petit shaker après la séance peut simplement t'aider à atteindre ton quota plus facilement et améliorer la répartition des apports sur la journée."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Comment adapter ces repères à ton cas ?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Quelques questions à te poser pour ajuster tes besoins :"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Quel sport fais-tu, et combien de fois par semaine ? Un trail runner à 60 km/semaine n'a pas les mêmes besoins qu'un pratiquant de yoga 3 fois par semaine.",
+          "Quel est ton objectif principal : performance, prise de muscle, perte de poids, ou juste la forme ?",
+          "Comment te sens-tu après les séances ? Des courbatures longues, une fatigue persistante ou une progression en panne peuvent signaler un déficit protéique."
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Si tu es débutant, rester au milieu des fourchettes (par exemple 1,4–1,5 g/kg/j) est souvent largement suffisant. Si tu as un gros volume d'entraînement et que tu vises la performance ou la prise de masse, rapproche-toi du haut des fourchettes. Dans tous les cas, si tu as des pathologies spécifiques ou un historique médical particulier, l'idéal reste de faire le point avec un diététicien-nutritionniste du sport."
+      },
+      {
+        "type": "source",
+        "label": "Ameli — Diététicien-nutritionniste : rôle et consultations",
+        "url": "https://www.ameli.fr/assure/sante/themes/alimentation-sante/roles-dieteticien-nutritionniste"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "FAQ — Protéines par jour pour le sportif végétarien"
+      },
+      {
+        "type": "faq",
+        "items": [
+          {
+            "question": "Combien de grammes de protéines par jour pour un sportif végétarien de 70 kg ?",
+            "answer": "Pour un sportif végétarien de 70 kg, les besoins varient selon le sport : environ 105 g/jour pour l'endurance (1,5 g/kg/j), 112 g pour les sports collectifs (1,6 g/kg/j), et jusqu'à 133 g pour la musculation intensive (1,9 g/kg/j). Ces chiffres tiennent compte de la digestibilité légèrement plus faible des protéines végétales. Ils sont atteignables sans protéine en poudre avec une alimentation bien construite autour des légumineuses, du tofu, des céréales complètes et des oléagineux."
+          },
+          {
+            "question": "Est-ce vraiment difficile d'avoir assez de protéines en mangeant végétarien et en faisant du sport ?",
+            "answer": "Non, à condition de varier les sources et de ne pas se limiter à des salades de crudités. Un bowl lentilles-quinoa-tofu au déjeuner apporte 38 g de protéines à lui seul. Un porridge avoine-protéine de pois au petit-déjeuner en apporte 28 g. Avec trois repas bien construits et une collation, un sportif de 70 kg atteint facilement 110–120 g de protéines par jour."
+          },
+          {
+            "question": "Faut-il peser ses aliments pour atteindre ses besoins en protéines végétales ?",
+            "answer": "Pas forcément au quotidien. Il est utile de le faire pendant 2 ou 3 jours pour calibrer ses portions et vérifier qu'on est dans les bonnes fourchettes — mais pas besoin d'en faire une habitude. Une fois que tu connais les sources protéiques et leurs teneurs approximatives, tu peux te fier à des repères visuels : une portion de légumineuses c'est une grosse louche, une portion de tofu c'est la moitié d'un bloc standard."
+          },
+          {
+            "question": "La qualité des protéines végétales est-elle suffisante pour la musculation ?",
+            "answer": "Oui, à condition de varier les sources sur la journée. Les protéines végétales prises isolément sont souvent incomplètes en acides aminés, mais une combinaison légumineuses + céréales complètes + soja sur la journée donne un profil complet comparable aux protéines animales. Des études montrent des gains musculaires équivalents entre régimes végétariens et omnivores à apports protéiques égaux, selon les données analysées par l'INSEP."
+          },
+          {
+            "question": "Comment savoir si je mange assez de protéines sans faire de prise de sang ?",
+            "answer": "Quelques signaux d'un apport insuffisant : récupération lente après les séances, courbatures qui durent plus de 48 à 72 heures, progression qui stagne malgré un entraînement régulier, et fatigue chronique en dehors des jours de repos. Pour vérifier tes apports, note ce que tu manges pendant 2 à 3 jours avec une application comme Cronometer ou Yazio et compare au tableau ci-dessus. Une consultation avec un diététicien du sport reste la méthode la plus fiable."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Sources"
+      },
+      {
+        "type": "sources_list",
+        "items": [
+          {
+            "label": "ANSES — Apports en protéines : consommation, qualité et besoins",
+            "url": "https://www.anses.fr/fr/content/les-prot%C3%A9ines"
+          },
+          {
+            "label": "ANSES — Alimentation végétarienne et végétalienne : avis de l'agence",
+            "url": "https://www.anses.fr/fr/content/alimentation-v%C3%A9g%C3%A9tarienne-et-v%C3%A9g%C3%A9talienne"
+          },
+          {
+            "label": "ANSES — Table de composition nutritionnelle Ciqual",
+            "url": "https://ciqual.anses.fr/"
+          },
+          {
+            "label": "Ameli — Diététicien-nutritionniste : rôle et consultations",
+            "url": "https://www.ameli.fr/assure/sante/themes/alimentation-sante/roles-dieteticien-nutritionniste"
+          },
+          {
+            "label": "INSEP — Nutrition et performance sportive",
+            "url": "https://www.insep.fr/fr/nutrition-du-sportif"
+          },
+          {
+            "label": "Manger Bouger (PNNS) — Les protéines dans l'alimentation",
+            "url": "https://www.mangerbouger.fr/les-9-familles/proteines"
+          }
+        ]
+      }
+    ]
+  }
