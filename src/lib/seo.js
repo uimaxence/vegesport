@@ -69,14 +69,70 @@ export function buildArticleJsonLd(article, url) {
     headline: article.metaTitle || article.title,
     description: article.metaDescription || article.excerpt || '',
     image: article.image ? [article.image] : [],
-    author: { '@type': 'Person', name: article.author || SITE_AUTHOR },
+    author: {
+      '@type': 'Person',
+      name: article.author || SITE_AUTHOR,
+      ...(article.authorInfo?.titre && { jobTitle: article.authorInfo.titre }),
+    },
     datePublished: article.date || new Date().toISOString().slice(0, 10),
+    dateModified: article.updatedAt?.slice?.(0, 10) || article.date || new Date().toISOString().slice(0, 10),
     publisher: {
       '@type': 'Organization',
       name: SITE_NAME,
       url: SITE_URL,
     },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    url,
+  };
+}
+
+export function buildFAQPageJsonLd(faqJson, articleTitle, url) {
+  if (!Array.isArray(faqJson) || faqJson.length === 0) return null;
+  const mainEntity = faqJson
+    .filter((q) => q.question && q.answer)
+    .map((q) => ({
+      '@type': 'Question',
+      name: q.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: q.answer,
+      },
+    }));
+  if (mainEntity.length === 0) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    name: articleTitle,
+    mainEntity,
+    url,
+  };
+}
+
+export function buildHowToJsonLd(article, url) {
+  if (article.schemaType !== 'HowTo' || !Array.isArray(article.contentJson)) return null;
+  const steps = article.contentJson
+    .reduce((acc, b) => {
+      if (b.type === 'heading' && b.level === 3 && b.text) {
+        acc.push({ name: b.text, text: '' });
+      } else if (b.type === 'paragraph' && b.text && acc.length > 0) {
+        acc[acc.length - 1].text = (acc[acc.length - 1].text + ' ' + b.text).trim();
+      }
+      return acc;
+    }, [])
+    .filter((s) => s.name)
+    .map((s, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+    }));
+  if (steps.length === 0) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: article.metaTitle || article.title,
+    description: article.metaDescription || article.excerpt || '',
+    step: steps,
     url,
   };
 }

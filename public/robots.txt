@@ -6,4 +6,14 @@ Disallow: /donnees-personnelles
 Disallow: /auth/callback
 Disallow: /connexion
 
+# Crawlers IA autorisés
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
 Sitemap: https://www.mamie-vege.fr/sitemap.xml

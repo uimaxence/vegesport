@@ -5,7 +5,13 @@ import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { useJsonLd } from '../hooks/useJsonLd';
 import { getSlug } from '../lib/slug';
-import { canonicalUrl, buildArticleJsonLd, buildBreadcrumbJsonLd } from '../lib/seo';
+import {
+  canonicalUrl,
+  buildArticleJsonLd,
+  buildBreadcrumbJsonLd,
+  buildFAQPageJsonLd,
+  buildHowToJsonLd,
+} from '../lib/seo';
 import ArticleBlocks from '../components/article/ArticleBlocks';
 
 export default function BlogArticle() {
@@ -57,14 +63,19 @@ export default function BlogArticle() {
     type: 'article',
   });
 
-  useJsonLd([
+  const jsonLdSchemas = [
     buildArticleJsonLd(article, articleUrl),
     buildBreadcrumbJsonLd([
       { name: 'Accueil', url: canonicalUrl('/') },
       { name: 'Blog', url: canonicalUrl('/blog') },
       { name: article.title, url: articleUrl },
     ]),
-  ]);
+  ];
+  const faqSchema = buildFAQPageJsonLd(article.faqJson, article.title, articleUrl);
+  if (faqSchema) jsonLdSchemas.push(faqSchema);
+  const howToSchema = buildHowToJsonLd(article, articleUrl);
+  if (howToSchema) jsonLdSchemas.push(howToSchema);
+  useJsonLd(jsonLdSchemas.filter(Boolean));
 
   const otherArticles = articles.filter(a => a.id !== article.id).slice(0, 3);
 
@@ -85,11 +96,21 @@ export default function BlogArticle() {
           {article.title}
         </h1>
 
-        <div className="flex items-center gap-4 mt-4 text-sm text-text-light">
-          <span>{article.author}</span>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-4 text-sm text-text-light">
+          <div>
+            <span className="font-medium text-text">{article.author}</span>
+            {article.authorInfo?.titre && (
+              <span className="text-text-light"> · {article.authorInfo.titre}</span>
+            )}
+          </div>
           <span>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
           <span className="flex items-center gap-1"><Clock size={14} /> {article.readTime} min</span>
         </div>
+        {article.authorInfo?.bio && (
+          <p className="mt-3 text-sm text-text-light leading-relaxed max-w-xl">
+            {article.authorInfo.bio}
+          </p>
+        )}
 
         <div className="mt-8 aspect-[2/1] rounded-sm overflow-hidden bg-bg-warm">
           <img src={article.image} alt={article.title} className="w-full h-full object-cover" />

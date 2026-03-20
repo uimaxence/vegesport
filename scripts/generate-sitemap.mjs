@@ -62,13 +62,43 @@ try {
   recipeSlugs = (recipes || []).map((r) => getSlug(r.title)).filter(Boolean);
 } catch { /* Supabase-only en prod */ }
 
+async function fetchArticlesFromSupabase() {
+  const supabaseUrl = String(process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
+  const anonKey = String(process.env.VITE_SUPABASE_ANON_KEY || '');
+  if (!supabaseUrl || !anonKey) return null;
+
+  const res = await fetch(
+    `${supabaseUrl}/rest/v1/blog_articles?select=id,title&order=date.desc`,
+    {
+      headers: {
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status} ${res.statusText}`);
+  }
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
+}
+
 try {
-  const { articles } = await import('../src/data/blog.js');
-  articleEntries = (articles || []).map((a) => ({
-    id: a.id,
-    slug: getSlug(a.title),
-  }));
-} catch {}
+  const data = await fetchArticlesFromSupabase();
+  if (Array.isArray(data)) {
+    articleEntries = data
+      .map((a) => ({
+        id: a.id,
+        slug: getSlug(a.title),
+      }))
+      .filter((a) => a.id != null && a.slug);
+  } else {
+    throw new Error('Supabase non configuré pour les articles du sitemap');
+  }
+} catch (e) {
+  console.error('Impossible de charger les articles depuis Supabase pour le sitemap:', e?.message || e);
+  articleEntries = [];
+}
 
 const urls = [
   ...staticRoutes.map((r) => ({
@@ -113,6 +143,16 @@ Disallow: /profil
 Disallow: /donnees-personnelles
 Disallow: /auth/callback
 Disallow: /connexion
+
+# Crawlers IA autorisés
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
 
 Sitemap: ${baseUrl}/sitemap.xml
 `;

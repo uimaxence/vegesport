@@ -87,12 +87,18 @@ function toArticleRow(a) {
     id: a.id,
     title: a.title,
     excerpt: a.excerpt,
+    meta_title: a.metaTitle || a.title,
+    meta_description: a.metaDescription || a.excerpt || '',
     category: a.category,
     date: a.date,
     read_time: a.readTime,
     image: a.image,
     author: a.author,
     content: a.content,
+    content_json: a.contentJson || null,
+    faq_json: a.faqJson ?? [],
+    schema_type: a.schemaType || 'Article',
+    sources_json: a.sourcesJson ?? [],
   };
 }
 

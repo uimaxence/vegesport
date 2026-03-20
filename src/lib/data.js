@@ -25,7 +25,27 @@ async function getLocalRecipes() {
 async function getLocalArticles() {
   if (_localArticles) return _localArticles;
   const mod = await import('../data/blog');
-  _localArticles = mod.articles || [];
+  const authorsMod = await import('../data/authors');
+  const authorsMap = authorsMod.authors || {};
+  const raw = mod.articles || [];
+  _localArticles = raw.map((a) => {
+    const authorInfo = a.author && authorsMap[a.author] ? {
+      displayName: authorsMap[a.author].displayName,
+      titre: authorsMap[a.author].titre,
+      bio: authorsMap[a.author].bio,
+      linksPro: authorsMap[a.author].linksPro || [],
+    } : null;
+    return {
+      ...a,
+      metaTitle: a.metaTitle || a.title,
+      metaDescription: a.metaDescription || a.excerpt || '',
+      authorInfo,
+      faqJson: a.faqJson || [],
+      schemaType: a.schemaType || 'Article',
+      sourcesJson: a.sourcesJson || [],
+      updatedAt: a.updatedAt || a.date,
+    };
+  });
   return _localArticles;
 }
 
@@ -117,6 +137,7 @@ function mapRecipeSummaryRow(row) {
 
 function mapArticleRow(row) {
   if (!row) return null;
+  const authorRow = row.authors || row.author;
   return {
     id: row.id,
     title: row.title,
@@ -127,9 +148,26 @@ function mapArticleRow(row) {
     date: row.date,
     readTime: row.read_time,
     image: row.image,
-    author: row.author,
+    author: row.author || authorRow?.display_name || authorRow?.name,
+    authorInfo: authorRow ? {
+      displayName: authorRow.display_name || authorRow.name,
+      titre: authorRow.titre,
+      bio: authorRow.bio,
+      linksPro: authorRow.links_pro || [],
+    } : null,
     content: row.content,
-    contentJson: row.content_json,
+    contentJson: (() => {
+      const raw = row.content_json;
+      if (Array.isArray(raw)) return raw;
+      if (typeof raw === 'string') {
+        try { return JSON.parse(raw || '[]'); } catch { return []; }
+      }
+      return [];
+    })(),
+    faqJson: row.faq_json || [],
+    schemaType: row.schema_type || 'Article',
+    sourcesJson: row.sources_json || [],
+    updatedAt: row.updated_at,
   };
 }
 
@@ -168,14 +206,16 @@ export async function fetchRecipeById(id) {
 }
 
 export async function fetchArticles() {
-  if (useLocalDataOnly()) return [...(await getLocalArticles())];
-  if (isSupabaseConfigured()) {
-    try {
-      const data = await restGet('blog_articles?select=*&order=date.desc');
-      if (Array.isArray(data)) return data.map(mapArticleRow).filter(Boolean);
-    } catch (e) {
-      console.warn('fetchArticles: fallback local', e?.message);
-    }
+  if (!isSupabaseConfigured()) {
+    throw new Error('Supabase non configuré: les articles doivent être lus depuis la BDD.');
   }
-  return [...(await getLocalArticles())];
+  try {
+    const data = await restGet(
+      'blog_articles?select=*,authors(display_name,name,titre,bio,links_pro)&order=date.desc'
+    );
+    if (Array.isArray(data)) return data.map(mapArticleRow).filter(Boolean);
+    return [];
+  } catch (e) {
+    throw new Error(`Impossible de charger les articles depuis la BDD: ${e?.message || 'erreur inconnue'}`);
+  }
 }
