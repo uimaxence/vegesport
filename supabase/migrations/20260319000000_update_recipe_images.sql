@@ -9,9 +9,13 @@ declare
 begin
 
   -- Recettes 1-34
-  update public.recipes set image = base_url || '40'  || ext where id = 41;
-  update public.recipes set image = base_url || '41'  || ext where id = 42;
-  update public.recipes set image = base_url || '42'  || ext where id = 43;
-  update public.recipes set image = base_url || '43'  || ext where id = 44;
-  update public.recipes set image = base_url || '44'  || ext where id = 51;
+  update public.recipes set image = base_url || '52'  || ext where id = 52;
+  update public.recipes set image = base_url || '53'  || ext where id = 53;
+  update public.recipes set image = base_url || '54'  || ext where id = 54;
+  update public.recipes set image = base_url || '55'  || ext where id = 55;
+  update public.recipes set image = base_url || '56'  || ext where id = 56;
+  update public.recipes set image = base_url || '57'  || ext where id = 57;
+  update public.recipes set image = base_url || '58'  || ext where id = 58;
+  update public.recipes set image = base_url || '59'  || ext where id = 59;
+  update public.recipes set image = base_url || '60'  || ext where id = 60;
 end $$;

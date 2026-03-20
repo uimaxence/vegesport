@@ -13,6 +13,7 @@ import {
   buildHowToJsonLd,
 } from '../lib/seo';
 import ArticleBlocks from '../components/article/ArticleBlocks';
+import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
 
 export default function BlogArticle() {
   const { id, slug } = useParams();
@@ -78,10 +79,12 @@ export default function BlogArticle() {
   useJsonLd(jsonLdSchemas.filter(Boolean));
 
   const otherArticles = articles.filter(a => a.id !== article.id).slice(0, 3);
+  const shareUrl = encodeURIComponent(articleUrl);
+  const shareTitle = encodeURIComponent(article.title);
 
   return (
     <div className="px-6 lg:px-8 py-12">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Breadcrumb */}
         <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-sm text-text-light mb-8 flex-wrap">
           <Link to="/" className="hover:text-text transition-colors">Accueil</Link>
@@ -91,78 +94,121 @@ export default function BlogArticle() {
           <span className="text-text truncate max-w-[250px]">{article.title}</span>
         </nav>
 
-        <p className="text-xs text-primary font-medium mb-3">{article.category}</p>
-        <h1 className="font-display text-3xl sm:text-4xl text-text leading-tight">
-          {article.title}
-        </h1>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] gap-10 lg:gap-12">
+          <article>
+            <p className="text-xs text-primary font-medium mb-3">{article.category}</p>
+            <h1 className="font-display text-3xl sm:text-4xl text-text leading-tight">
+              {article.title}
+            </h1>
 
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-4 text-sm text-text-light">
-          <div>
-            <span className="font-medium text-text">{article.author}</span>
-            {article.authorInfo?.titre && (
-              <span className="text-text-light"> · {article.authorInfo.titre}</span>
-            )}
-          </div>
-          <span>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-          <span className="flex items-center gap-1"><Clock size={14} /> {article.readTime} min</span>
-        </div>
-        {article.authorInfo?.bio && (
-          <p className="mt-3 text-sm text-text-light leading-relaxed max-w-xl">
-            {article.authorInfo.bio}
-          </p>
-        )}
-
-        <div className="mt-8 aspect-[2/1] rounded-sm overflow-hidden bg-bg-warm">
-          <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
-        </div>
-
-        <div className="mt-10">
-          {Array.isArray(article.contentJson) && article.contentJson.length > 0 ? (
-            <ArticleBlocks blocks={article.contentJson} recipes={recipes} />
-          ) : (
-            <div className="prose prose-sm max-w-none">
-              <p className="text-text-light leading-relaxed whitespace-pre-line">
-                {article.content}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-4 text-sm text-text-light">
+              <div>
+                <span className="font-medium text-text">{article.author}</span>
+                {article.authorInfo?.titre && (
+                  <span className="text-text-light"> · {article.authorInfo.titre}</span>
+                )}
+              </div>
+              <span>{new Date(article.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+              <span className="flex items-center gap-1"><Clock size={14} /> {article.readTime} min</span>
+            </div>
+            {article.authorInfo?.bio && (
+              <p className="mt-3 text-sm text-text-light leading-relaxed max-w-xl">
+                {article.authorInfo.bio}
               </p>
+            )}
+
+            <div className="mt-8 aspect-[2/1] rounded-sm overflow-hidden bg-bg-warm">
+              <img
+                src={getSafeImageSrc(article.image)}
+                alt={article.title}
+                onError={handleMediaImageError}
+                className="w-full h-full object-cover"
+              />
             </div>
-          )}
-        </div>
 
-        {/* Comments placeholder */}
-        <div className="mt-16 pt-8 border-t border-border">
-          <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-6">Commentaires</h2>
-          <div className="bg-bg-warm rounded-sm p-6 text-center">
-            <p className="text-sm text-text-light">
-              Les commentaires seront disponibles prochainement.
-            </p>
-            <p className="text-xs text-text-light/60 mt-1">
-              Connecte-toi pour être notifié de l'ouverture.
-            </p>
-          </div>
-        </div>
+            <div className="mt-10">
+              {Array.isArray(article.contentJson) && article.contentJson.length > 0 ? (
+                <ArticleBlocks blocks={article.contentJson} recipes={recipes} />
+              ) : (
+                <div className="prose prose-sm max-w-none">
+                  <p className="text-[18px] text-text-light leading-relaxed whitespace-pre-line">
+                    {article.content}
+                  </p>
+                </div>
+              )}
+            </div>
 
-        {/* More articles */}
-        {otherArticles.length > 0 && (
-          <div className="mt-16">
-            <h2 className="font-display text-2xl text-text mb-8">À lire aussi</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {otherArticles.map(a => (
-                <Link key={a.id} to={`/blog/${a.id}/${getSlug(a.title)}`} className="group">
-                  <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
-                    <img
-                      src={a.image}
-                      alt={a.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+            {/* Comments placeholder */}
+            <div className="mt-16 pt-8 border-t border-border">
+              <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-6">Commentaires</h2>
+              <div className="bg-bg-warm rounded-sm p-6 text-center">
+                <p className="text-sm text-text-light">
+                  Les commentaires seront disponibles prochainement.
+                </p>
+                <p className="text-xs text-text-light/60 mt-1">
+                  Connecte-toi pour être notifié de l'ouverture.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <aside className="lg:pt-14">
+            <div className="lg:sticky lg:top-24 space-y-8">
+              <section className="rounded-sm border border-border p-4">
+                <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-4 flex items-center gap-2">
+                  <Share2 size={14} /> Partager
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  <a
+                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 text-xs rounded-sm bg-bg-warm hover:bg-bg-warm/80 text-text-light transition-colors"
+                  >
+                    LinkedIn
+                  </a>
+                  <a
+                    href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 text-xs rounded-sm bg-bg-warm hover:bg-bg-warm/80 text-text-light transition-colors"
+                  >
+                    X / Twitter
+                  </a>
+                  <a
+                    href={`mailto:?subject=${shareTitle}&body=${shareUrl}`}
+                    className="px-3 py-1.5 text-xs rounded-sm bg-bg-warm hover:bg-bg-warm/80 text-text-light transition-colors"
+                  >
+                    Email
+                  </a>
+                </div>
+              </section>
+
+              {otherArticles.length > 0 && (
+                <section>
+                  <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-4">Articles liés</h2>
+                  <div className="space-y-4">
+                    {otherArticles.map(a => (
+                      <Link key={a.id} to={`/blog/${a.id}/${getSlug(a.title)}`} className="group block">
+                        <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
+                          <img
+                            src={getSafeImageSrc(a.image)}
+                            alt={a.title}
+                            onError={handleMediaImageError}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                        <h3 className="mt-2 text-sm font-medium text-text group-hover:text-primary transition-colors leading-snug">
+                          {a.title}
+                        </h3>
+                      </Link>
+                    ))}
                   </div>
-                  <h3 className="mt-2 text-sm font-medium text-text group-hover:text-primary transition-colors">
-                    {a.title}
-                  </h3>
-                </Link>
-              ))}
+                </section>
+              )}
             </div>
-          </div>
-        )}
+          </aside>
+        </div>
       </div>
     </div>
   );

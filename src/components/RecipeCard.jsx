@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { getSlug } from '../lib/slug';
+import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
 
 export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout = 'grid' }) {
   if (layout === 'compact') {
@@ -8,8 +9,9 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="group flex items-center gap-4 py-3 rounded-xl hover:bg-black/[0.03] transition-colors -mx-1 px-1">
         <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-black/5 flex items-center justify-center">
           <img
-            src={recipe.image}
+            src={getSafeImageSrc(recipe.image)}
             alt={recipe.title}
+            onError={handleMediaImageError}
             className="w-full h-full object-contain scale-60 group-hover:scale-60 transition-transform duration-500"
             loading="lazy"
             decoding="async"
@@ -34,8 +36,9 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="block">
         <div className="aspect-[16/10] relative bg-[rgb(0,0,0,0.04)] overflow-hidden rounded-t-xl flex items-center justify-center">
           <img
-            src={recipe.image}
+            src={getSafeImageSrc(recipe.image)}
             alt={recipe.title}
+            onError={handleMediaImageError}
             className="w-full h-full object-contain scale-60 group-hover:scale-60 transition-transform duration-500"
             loading="lazy"
             decoding="async"

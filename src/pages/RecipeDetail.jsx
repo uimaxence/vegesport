@@ -9,6 +9,7 @@ import { getSlug } from '../lib/slug';
 import { canonicalUrl, buildRecipeJsonLd, buildBreadcrumbJsonLd, categoryLabel } from '../lib/seo';
 import RecipeCard from '../components/RecipeCard';
 import RecipeComments from '../components/RecipeComments';
+import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
 
 function parseIngredient(ing) {
   const s = ing.trim();
@@ -754,8 +755,9 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           <div className="lg:w-1/2">
             <div className="aspect-[16/10] rounded-sm overflow-hidden bg-bg-warm flex items-center justify-center">
               <img
-                src={effectiveRecipe?.image || recipe.image}
+                src={getSafeImageSrc(effectiveRecipe?.image || recipe.image)}
                 alt={effectiveRecipe?.title || recipe.title}
+                onError={handleMediaImageError}
                 className="w-full h-full object-contain scale-60"
                 style={{ objectPosition: 'center' }}
                 decoding="async"

@@ -103,6 +103,8 @@ function extractFaqAndSourcesFromBlocks(blocks) {
 function toArticleRow(input) {
   const contentJson = normalizeBlocks(input.content_json ?? input.contentJson);
   const extracted = extractFaqAndSourcesFromBlocks(contentJson);
+  const baseStorageUrl = `${String(url).replace(/\/$/, '')}/storage/v1/object/public/blog/`;
+  const defaultImage = input.id ? `${baseStorageUrl}${input.id}.webp` : null;
   return {
     id: input.id,
     title: input.title,
@@ -112,7 +114,7 @@ function toArticleRow(input) {
     category: input.category,
     date: input.date,
     read_time: input.read_time ?? input.readTime ?? 5,
-    image: input.image ?? null,
+    image: input.image ?? defaultImage,
     author: input.author ?? null,
     content: input.content ?? '',
     content_json: contentJson,

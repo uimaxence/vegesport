@@ -7,6 +7,7 @@ import { canonicalUrl, buildWebSiteJsonLd } from '../lib/seo';
 import RecipeCard from '../components/RecipeCard';
 import { getSlug } from '../lib/slug';
 import vuePlanning from '../assets/vue planning.png';
+import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
 
 function HeroRecipeCard({ recipe }) {
   return (
@@ -16,8 +17,9 @@ function HeroRecipeCard({ recipe }) {
     >
       <div className="aspect-[3/4] overflow-hidden bg-bg-warm flex items-center justify-center">
         <img
-          src={recipe.image}
+          src={getSafeImageSrc(recipe.image)}
           alt={recipe.title}
+          onError={handleMediaImageError}
           className="w-full h-full object-contain scale-60 group-hover:scale-60 transition-transform duration-500"
         />
       </div>
@@ -292,8 +294,9 @@ export default function Home() {
               <Link key={article.id} to={`/blog/${article.id}/${getSlug(article.title)}`} className="group">
                 <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
                   <img
-                    src={article.image}
+                    src={getSafeImageSrc(article.image)}
                     alt={article.title}
+                    onError={handleMediaImageError}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                 </div>

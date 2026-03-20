@@ -10,3 +10,4 @@ Notes:
 - Les blocs UI sont lus depuis `content_json`.
 - `faq_json` et `sources_json` sont extraits automatiquement depuis `content_json` si absents.
 - Les blocs `recipes` affichent les cards selon `recipeIds`.
+- Image article: si `image` est absente du JSON, l'import utilise automatiquement `blog/{id}.webp` dans le bucket Supabase `blog`.

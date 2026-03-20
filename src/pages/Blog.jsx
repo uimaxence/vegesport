@@ -7,6 +7,7 @@ import { canonicalUrl } from '../lib/seo';
 import { getSlug } from '../lib/slug';
 import { blogCategories } from '../data/blogCategories';
 import BlogSkeleton from '../components/skeleton/BlogSkeleton';
+import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
 
 export default function Blog() {
   usePageMeta({
@@ -64,8 +65,9 @@ export default function Blog() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
               <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
                 <img
-                  src={featured.image}
+                  src={getSafeImageSrc(featured.image)}
                   alt={featured.title}
+                  onError={handleMediaImageError}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
               </div>
@@ -92,8 +94,9 @@ export default function Blog() {
             <Link key={article.id} to={`/blog/${article.id}/${getSlug(article.title)}`} className="group">
               <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
                 <img
-                  src={article.image}
+                  src={getSafeImageSrc(article.image)}
                   alt={article.title}
+                  onError={handleMediaImageError}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
               </div>
