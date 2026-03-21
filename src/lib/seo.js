@@ -19,19 +19,49 @@ export function categoryLabel(slug) {
   return categoryLabels[slug] || slug;
 }
 
-export function buildRecipeJsonLd(recipe, url) {
+const RECIPE_STEP_NAME_MAX = 80;
+
+function recipeStepHowToName(stepText, index) {
+  const raw = (stepText || '').replace(/\s+/g, ' ').trim();
+  if (!raw) return `Étape ${index + 1}`;
+  if (raw.length <= RECIPE_STEP_NAME_MAX) return raw;
+  return `${raw.slice(0, RECIPE_STEP_NAME_MAX - 1)}…`;
+}
+
+/**
+ * @param {object} recipe
+ * @param {string} url — URL canonique de la fiche recette
+ * @param {{ aggregateRating?: { ratingValue: number, ratingCount: number, bestRating?: number, worstRating?: number }, videoUrl?: string }} [extras]
+ */
+export function buildRecipeJsonLd(recipe, url, extras = {}) {
   if (!recipe) return null;
   const totalMin = recipe.time || 0;
-  return {
+  const description = recipe.steps?.[0]
+    ? recipe.steps[0].slice(0, 200)
+    : `Recette végétarienne ${recipe.title} — ${recipe.calories} kcal, ${recipe.protein}g de protéines.`;
+  const heroImage = recipe.image || null;
+  const videoUrl = extras.videoUrl ?? recipe.video_url ?? recipe.videoUrl;
+
+  const recipeInstructions = (recipe.steps || []).map((step, i) => {
+    const stepObj = {
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: recipeStepHowToName(step, i),
+      url: `${url}#etape-${i + 1}`,
+      text: step,
+    };
+    if (heroImage) stepObj.image = heroImage;
+    return stepObj;
+  });
+
+  const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Recipe',
     name: recipe.title,
-    image: recipe.image ? [recipe.image] : [],
+    image: heroImage ? [heroImage] : [],
     author: { '@type': 'Person', name: SITE_AUTHOR },
     datePublished: recipe.created_at?.slice?.(0, 10) || new Date().toISOString().slice(0, 10),
-    description: recipe.steps?.[0]
-      ? recipe.steps[0].slice(0, 200)
-      : `Recette végétarienne ${recipe.title} — ${recipe.calories} kcal, ${recipe.protein}g de protéines.`,
+    description,
     prepTime: `PT${Math.max(5, Math.round(totalMin * 0.4))}M`,
     cookTime: `PT${Math.max(5, totalMin - Math.round(totalMin * 0.4))}M`,
     totalTime: `PT${totalMin}M`,
@@ -52,13 +82,32 @@ export function buildRecipeJsonLd(recipe, url) {
       fatContent: `${recipe.fat}g`,
     },
     recipeIngredient: recipe.ingredients || [],
-    recipeInstructions: (recipe.steps || []).map((step, i) => ({
-      '@type': 'HowToStep',
-      position: i + 1,
-      text: step,
-    })),
+    recipeInstructions,
     url,
   };
+
+  const agg = extras.aggregateRating;
+  if (agg && agg.ratingCount >= 1 && agg.ratingValue != null) {
+    jsonLd.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: agg.ratingValue,
+      ratingCount: agg.ratingCount,
+      bestRating: agg.bestRating ?? 5,
+      worstRating: agg.worstRating ?? 1,
+    };
+  }
+
+  if (videoUrl) {
+    jsonLd.video = {
+      '@type': 'VideoObject',
+      name: recipe.title,
+      description,
+      contentUrl: videoUrl,
+      ...(heroImage ? { thumbnailUrl: heroImage } : {}),
+    };
+  }
+
+  return jsonLd;
 }
 
 export function buildArticleJsonLd(article, url) {

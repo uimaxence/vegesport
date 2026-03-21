@@ -10,6 +10,7 @@ import { canonicalUrl, buildRecipeJsonLd, buildBreadcrumbJsonLd, categoryLabel }
 import RecipeCard from '../components/RecipeCard';
 import RecipeComments from '../components/RecipeComments';
 import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 function parseIngredient(ing) {
   const s = ing.trim();
@@ -375,6 +376,33 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
     return () => clearInterval(id);
   }, [timer?.running]);
 
+  const [commentRatingAgg, setCommentRatingAgg] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!recipe?.id || !isSupabaseConfigured()) {
+        setCommentRatingAgg(null);
+        return;
+      }
+      const { data, error } = await supabase
+        .from('comments')
+        .select('rating')
+        .eq('recipe_id', recipe.id)
+        .not('rating', 'is', null)
+        .gt('rating', 0);
+      if (cancelled) return;
+      if (error || !data?.length) {
+        setCommentRatingAgg(null);
+        return;
+      }
+      const sum = data.reduce((s, row) => s + Number(row.rating), 0);
+      const ratingValue = Math.round((sum / data.length) * 10) / 10;
+      setCommentRatingAgg({ ratingValue, ratingCount: data.length });
+    })();
+    return () => { cancelled = true; };
+  }, [recipe?.id]);
+
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -443,7 +471,9 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
   });
 
   useJsonLd([
-    buildRecipeJsonLd(effectiveRecipe || recipe, recipeUrl),
+    buildRecipeJsonLd(effectiveRecipe || recipe, recipeUrl, {
+      aggregateRating: commentRatingAgg || undefined,
+    }),
     buildBreadcrumbJsonLd([
       { name: 'Accueil', url: canonicalUrl('/') },
       { name: 'Recettes', url: canonicalUrl('/recettes') },
@@ -888,7 +918,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
             <div className="deco-wave mb-4" />
             <ol className="space-y-4">
               {steps.map((step, i) => (
-                <li key={i} className="flex gap-4">
+                <li key={i} id={`etape-${i + 1}`} className="flex gap-4 scroll-mt-24">
                   <span className="flex-shrink-0 w-6 h-6 rounded-sm bg-bg-warm text-xs flex items-center justify-center text-text-light font-medium">
                     {i + 1}
                   </span>
