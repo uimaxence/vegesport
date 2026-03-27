@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ArrowLeft, Clock, Share2 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -21,6 +21,9 @@ export default function BlogArticle() {
   const { articles, recipes, loading, error } = useData();
   const article = articles.find((a) => a.id === parseInt(id, 10));
   const canonicalSlug = article ? getSlug(article.title) : '';
+  const articleUrl = article && canonicalSlug
+    ? canonicalUrl(`/blog/${article.id}/${canonicalSlug}`)
+    : '';
 
   // Rediriger vers l'URL canonique avec le slug si absent ou incorrect
   useEffect(() => {
@@ -29,6 +32,40 @@ export default function BlogArticle() {
       navigate(`/blog/${id}/${canonicalSlug}`, { replace: true });
     }
   }, [article, id, slug, canonicalSlug, navigate]);
+
+  const metaReady = Boolean(article && articleUrl);
+
+  usePageMeta(
+    metaReady
+      ? {
+          title: article.metaTitle || article.title,
+          description: article.metaDescription || article.excerpt || (article.content ? article.content.slice(0, 155) + '…' : undefined),
+          fullTitle: Boolean(article.metaTitle),
+          canonical: articleUrl,
+          image: article.image,
+          type: 'article',
+        }
+      : {}
+  );
+
+  const jsonLdData = useMemo(() => {
+    if (!article || !articleUrl) return null;
+    const jsonLdSchemas = [
+      buildArticleJsonLd(article, articleUrl),
+      buildBreadcrumbJsonLd([
+        { name: 'Accueil', url: canonicalUrl('/') },
+        { name: 'Blog', url: canonicalUrl('/blog') },
+        { name: article.title, url: articleUrl },
+      ]),
+    ];
+    const faqSchema = buildFAQPageJsonLd(article.faqJson, article.title, articleUrl);
+    if (faqSchema) jsonLdSchemas.push(faqSchema);
+    const howToSchema = buildHowToJsonLd(article, articleUrl);
+    if (howToSchema) jsonLdSchemas.push(howToSchema);
+    return jsonLdSchemas.filter(Boolean);
+  }, [article, articleUrl]);
+
+  useJsonLd(jsonLdData);
 
   if (loading) {
     return (
@@ -52,31 +89,6 @@ export default function BlogArticle() {
       </div>
     );
   }
-
-  const articleUrl = canonicalUrl(`/blog/${article.id}/${canonicalSlug}`);
-
-  usePageMeta({
-    title: article.metaTitle || article.title,
-    description: article.metaDescription || article.excerpt || (article.content ? article.content.slice(0, 155) + '…' : undefined),
-    fullTitle: Boolean(article.metaTitle),
-    canonical: articleUrl,
-    image: article.image,
-    type: 'article',
-  });
-
-  const jsonLdSchemas = [
-    buildArticleJsonLd(article, articleUrl),
-    buildBreadcrumbJsonLd([
-      { name: 'Accueil', url: canonicalUrl('/') },
-      { name: 'Blog', url: canonicalUrl('/blog') },
-      { name: article.title, url: articleUrl },
-    ]),
-  ];
-  const faqSchema = buildFAQPageJsonLd(article.faqJson, article.title, articleUrl);
-  if (faqSchema) jsonLdSchemas.push(faqSchema);
-  const howToSchema = buildHowToJsonLd(article, articleUrl);
-  if (howToSchema) jsonLdSchemas.push(howToSchema);
-  useJsonLd(jsonLdSchemas.filter(Boolean));
 
   const otherArticles = articles.filter(a => a.id !== article.id).slice(0, 3);
   const shareUrl = encodeURIComponent(articleUrl);

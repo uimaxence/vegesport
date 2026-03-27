@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Pencil, Trash2, Package } from 'lucide-react';
-import { deleteRecipe, fetchAdminRecipes } from '../../lib/admin';
+import { Plus, Pencil, Trash2, Package, FileText, FileJson } from 'lucide-react';
+import { deleteRecipe, fetchAdminRecipes, createRecipe } from '../../lib/admin';
+import JsonImportPanel from '../../components/admin/JsonImportPanel';
 
 const PAGE_SIZE = 50;
 
@@ -13,6 +14,7 @@ export default function AdminRecipes() {
   const [listError, setListError] = useState(null);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [showImport, setShowImport] = useState(false);
 
   const loadFirstPage = useCallback(async () => {
     setLoading(true);
@@ -73,12 +75,27 @@ export default function AdminRecipes() {
           <h1 className="font-display text-2xl sm:text-3xl text-text">Admin · Recettes</h1>
           <div className="flex items-center gap-3">
             <Link
+              to="/admin/articles"
+              className="inline-flex items-center gap-2 text-sm text-text-light hover:text-text px-3 py-2 rounded-lg border border-border hover:border-black/20"
+            >
+              <FileText size={18} />
+              Articles
+            </Link>
+            <Link
               to="/admin/ingredients"
               className="inline-flex items-center gap-2 text-sm text-text-light hover:text-text px-3 py-2 rounded-lg border border-border hover:border-black/20"
             >
               <Package size={18} />
               Ingrédients
             </Link>
+            <button
+              type="button"
+              onClick={() => setShowImport((v) => !v)}
+              className="inline-flex items-center gap-2 text-sm text-text-light hover:text-text px-3 py-2 rounded-lg border border-border hover:border-black/20"
+            >
+              <FileJson size={18} />
+              Importer JSON
+            </button>
             <Link
               to="/admin/recettes/nouvelle"
               className="inline-flex items-center gap-2 text-sm bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark"
@@ -88,6 +105,19 @@ export default function AdminRecipes() {
             </Link>
           </div>
         </div>
+
+        {showImport && (
+          <div className="mb-8">
+            <JsonImportPanel
+              type="recipe"
+              onImport={async (data) => {
+                await createRecipe(data);
+                await loadFirstPage();
+              }}
+              onClose={() => setShowImport(false)}
+            />
+          </div>
+        )}
 
         {listError && (
           <p className="text-red-600 text-sm mb-4">{listError}</p>

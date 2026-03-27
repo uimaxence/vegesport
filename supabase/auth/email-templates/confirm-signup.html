@@ -5,22 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Confirme ton inscription</title>
 </head>
-<body style="margin:0; padding:0; font-family: system-ui, -apple-system, sans-serif; background:#f5f0eb; color:#333;">
+<body style="margin:0; padding:0; font-family: system-ui, -apple-system, sans-serif; background:#f5f0eb; color:#1a1a1a;">
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0;">
+    Bienvenue ! Confirme ton email pour activer ton compte et commencer ton planning veggie.
+  </div>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f0eb;">
     <tr>
       <td style="padding: 32px 16px;">
-        <table role="presentation" width="100%" maxwidth="480" cellspacing="0" cellpadding="0" style="max-width: 480px; margin: 0 auto; background: #fff; border-radius: 8px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 520px; margin: 0 auto; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
           <tr>
-            <td>
-              <h2 style="margin: 0 0 16px; font-size: 1.25rem; font-weight: 600;">Confirme ton inscription</h2>
-              <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.5;">Clique sur le lien ci-dessous pour confirmer ton adresse email et activer ton compte&nbsp;:</p>
+            <td style="background:#E8450E; padding: 22px 28px; text-align:center;">
+              <img
+                src="https://www.mamie-vege.fr/images/mamie-fallback.png"
+                alt="Et si mamie etait vege ?"
+                width="190"
+                style="display:block; margin:0 auto 10px; max-width:190px; width:100%; height:auto;"
+              />
+              <p style="margin:0; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:#FFE7DE;">
+                Inscription
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 28px;">
+              <h1 style="margin: 0 0 14px; font-size: 24px; line-height: 1.2; color:#1A1A1A;">
+                Confirme ton email
+              </h1>
+              <p style="margin: 0 0 22px; font-size: 15px; line-height: 1.6; color:#6B6B6B;">
+                Salut !<br />
+                Clique sur le bouton ci-dessous pour valider ton adresse email et activer ton compte
+                sur <strong>Et si mamie etait vege ?</strong>.
+              </p>
               <p style="margin: 0 0 24px;">
-                <a href="{{ .ConfirmationURL }}" style="display: inline-block; padding: 12px 24px; background: #2d5016; color: #fff; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 4px;">Confirmer mon email</a>
+                <a href="{{ .ConfirmationURL }}" style="display:inline-block; padding: 13px 24px; background:#E8450E; color:#ffffff; text-decoration:none; font-size:14px; font-weight:700; border-radius:10px;">
+                  Confirmer mon inscription
+                </a>
               </p>
-              <p style="margin: 0; font-size: 13px; color: #666;">Si le bouton ne s’affiche pas, copie ce lien dans ton navigateur&nbsp;:<br />
-                <a href="{{ .ConfirmationURL }}" style="color: #2d5016; word-break: break-all;">{{ .ConfirmationURL }}</a>
+              <p style="margin: 0; font-size: 13px; color:#6B6B6B; line-height:1.5;">
+                Si le bouton ne fonctionne pas, copie-colle ce lien dans ton navigateur :
+              </p> 
+              <p style="margin: 8px 0 0;">
+                <a href="{{ .ConfirmationURL }}" style="font-size:13px; color:#E8450E; word-break:break-all;">
+                  {{ .ConfirmationURL }}
+                </a>
               </p>
-              <p style="margin: 24px 0 0; font-size: 12px; color: #888;">et si mamie était végé ? — Recettes végétariennes</p>
+              <p style="margin: 22px 0 0; font-size: 12px; color:#8a948a;">
+                A bientot,<br />
+                L'equipe Et si mamie etait vege ?
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 14px 28px 18px; border-top:1px solid #edf0ea;">
+              <p style="margin:0; font-size:11px; color:#8a948a; text-align:center;">
+                Et si mamie etait vege ? - Recettes vegetariennes sportives
+              </p>
             </td>
           </tr>
         </table>

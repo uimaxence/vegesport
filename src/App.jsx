@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { DataProvider } from './context/DataContext';
@@ -13,6 +14,8 @@ const Home = lazy(() => import('./pages/Home'));
 const Recipes = lazy(() => import('./pages/Recipes'));
 const RecipeDetail = lazy(() => import('./pages/RecipeDetail'));
 const Planning = lazy(() => import('./pages/Planning'));
+const PlanningFunnel = lazy(() => import('./pages/PlanningFunnel'));
+const PlanningSetup = lazy(() => import('./pages/PlanningSetup'));
 const Blog = lazy(() => import('./pages/Blog'));
 const BlogArticle = lazy(() => import('./pages/BlogArticle'));
 const Login = lazy(() => import('./pages/Login'));
@@ -23,6 +26,7 @@ const MentionsLegales = lazy(() => import('./pages/MentionsLegales'));
 const AdminRecipes = lazy(() => import('./pages/admin/AdminRecipes'));
 const AdminRecipeForm = lazy(() => import('./pages/admin/AdminRecipeForm'));
 const AdminIngredients = lazy(() => import('./pages/admin/AdminIngredients'));
+const AdminArticles = lazy(() => import('./pages/admin/AdminArticles'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageFallback() {
@@ -35,11 +39,13 @@ function PageFallback() {
 
 function AppRoutes() {
   const { user, favorites, savedPlannings, toggleFavorite, savePlanning } = useAuth();
+  const location = useLocation();
+  const isPlanningSetup = location.pathname.startsWith('/planning/setup');
 
   return (
     <>
       <ScrollToTop />
-      <Navbar user={user} />
+      {!isPlanningSetup && <Navbar user={user} />}
       <main className="flex-1">
         <Suspense fallback={<PageFallback />}>
           <Routes>
@@ -50,9 +56,11 @@ function AppRoutes() {
             <Route path="/recettes/:slug" element={
               <RecipeDetail favorites={favorites} toggleFavorite={toggleFavorite} />
             } />
-            <Route path="/planning" element={
-              <Planning user={user} savePlanning={savePlanning} />
+            <Route path="/planning/:planningId/recette/:slug" element={
+              <RecipeDetail favorites={favorites} toggleFavorite={toggleFavorite} />
             } />
+            <Route path="/planning" element={<PlanningFunnel />} />
+            <Route path="/planning/setup" element={<PlanningSetup />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:id/:slug?" element={<BlogArticle />} />
             <Route path="/connexion" element={<Login />} />
@@ -71,12 +79,13 @@ function AppRoutes() {
               <Route path="/admin/recettes/nouvelle" element={<AdminRecipeForm />} />
               <Route path="/admin/recettes/:id/edit" element={<AdminRecipeForm />} />
               <Route path="/admin/ingredients" element={<AdminIngredients />} />
+              <Route path="/admin/articles" element={<AdminArticles />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>
-      <Footer />
+      {!isPlanningSetup && <Footer />}
     </>
   );
 }

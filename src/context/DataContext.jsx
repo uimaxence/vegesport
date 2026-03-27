@@ -1,11 +1,12 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { fetchRecipes, fetchArticles, fetchRecipeById } from '../lib/data';
+import { fetchRecipes, fetchArticles, fetchRecipeById, fetchIngredientRayons } from '../lib/data';
 
 const DataContext = createContext(null);
 
 export function DataProvider({ children }) {
   const [recipes, setRecipes] = useState([]);
   const [articles, setArticles] = useState([]);
+  const [ingredientRayons, setIngredientRayons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [recipeById, setRecipeById] = useState(() => new Map());
@@ -14,11 +15,12 @@ export function DataProvider({ children }) {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    Promise.all([fetchRecipes(), fetchArticles()])
-      .then(([r, a]) => {
+    Promise.all([fetchRecipes(), fetchArticles(), fetchIngredientRayons()])
+      .then(([r, a, ir]) => {
         if (!cancelled) {
           setRecipes(Array.isArray(r) ? r : []);
           setArticles(Array.isArray(a) ? a : []);
+          setIngredientRayons(Array.isArray(ir) ? ir : []);
         }
       })
       .catch((e) => {
@@ -57,6 +59,7 @@ export function DataProvider({ children }) {
   const value = {
     recipes: recipes ?? [],
     articles: articles ?? [],
+    ingredientRayons,
     loading,
     error,
     refetchRecipes,

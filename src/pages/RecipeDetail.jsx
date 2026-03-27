@@ -1,6 +1,6 @@
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Clock, Flame, Heart, Users, ChefHat, X, Check, Share2, Copy } from 'lucide-react';
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useParams, useSearchParams, Link, useLocation } from 'react-router-dom';
+import { ArrowLeft, Clock, Heart, Users, ChefHat, X, Check, Share2, Copy, ChevronRight } from 'lucide-react';
+import { useState, useMemo, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -9,8 +9,17 @@ import { getSlug } from '../lib/slug';
 import { canonicalUrl, buildRecipeJsonLd, buildBreadcrumbJsonLd, categoryLabel } from '../lib/seo';
 import RecipeCard from '../components/RecipeCard';
 import RecipeComments from '../components/RecipeComments';
-import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
+import { getSafeImageSrc, handleMediaImageError, isRecipeImageMissing } from '../lib/imageFallback';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { ownerMacros, ingredientScale } from '../lib/household';
+import { getMealTypeFromHour, getCurrentDayId } from '../utils/dashboardPlanning';
+
+const ALLOWED_MEAL_MULTIPLIERS = new Set([0.5, 1, 1.5, 2]);
+
+function normalizeMealMultiplier(value) {
+  const num = Number(value);
+  return ALLOWED_MEAL_MULTIPLIERS.has(num) ? num : 1;
+}
 
 function parseIngredient(ing) {
   const s = ing.trim();
@@ -65,6 +74,138 @@ function isCommonPantry(ingredientName) {
 
 // ─── Timer ───────────────────────────────────────────────────────────────────
 
+const TIMER_ALERT_SOUND_SRC = '/sound/universfield-simple-notification-152054.mp3';
+
+/** Glisser le bouton vers la droite pour arrêter l’alarme sonore (mode cuisine). */
+function TimerSlideToDismiss({ onDismiss }) {
+  const trackRef = useRef(null);
+  const [maxOffset, setMaxOffset] = useState(0);
+  const maxOffsetRef = useRef(0);
+  const [offset, setOffset] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const dragStart = useRef(null);
+  const offsetRef = useRef(0);
+  const onDismissRef = useRef(onDismiss);
+
+  const KNOB = 44;
+  const PAD = 6;
+
+  useEffect(() => {
+    onDismissRef.current = onDismiss;
+  }, [onDismiss]);
+
+  const measure = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const w = el.getBoundingClientRect().width;
+    const next = Math.max(0, w - KNOB - PAD * 2);
+    maxOffsetRef.current = next;
+    setMaxOffset(next);
+  }, []);
+
+  useLayoutEffect(() => {
+    measure();
+    const el = trackRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [measure]);
+
+  useEffect(() => {
+    offsetRef.current = offset;
+  }, [offset]);
+
+  useEffect(() => {
+    setOffset((o) => Math.min(o, maxOffsetRef.current));
+  }, [maxOffset]);
+
+  const activeListenersRef = useRef(null);
+
+  useEffect(
+    () => () => {
+      const L = activeListenersRef.current;
+      if (L) {
+        window.removeEventListener('pointermove', L.onMove);
+        window.removeEventListener('pointerup', L.onEnd);
+        window.removeEventListener('pointercancel', L.onEnd);
+        activeListenersRef.current = null;
+      }
+      dragStart.current = null;
+    },
+    []
+  );
+
+  const onPointerDown = useCallback((e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (dragStart.current) return;
+
+    const pointerId = e.pointerId;
+    dragStart.current = { x: e.clientX, off: offsetRef.current };
+    setDragging(true);
+
+    const onMove = (ev) => {
+      if (ev.pointerId !== pointerId || !dragStart.current) return;
+      const dx = ev.clientX - dragStart.current.x;
+      const max = maxOffsetRef.current;
+      const next = Math.min(max, Math.max(0, dragStart.current.off + dx));
+      offsetRef.current = next;
+      setOffset(next);
+    };
+
+    const onEnd = (ev) => {
+      if (ev.pointerId !== pointerId) return;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onEnd);
+      window.removeEventListener('pointercancel', onEnd);
+      activeListenersRef.current = null;
+      dragStart.current = null;
+      setDragging(false);
+
+      const o = offsetRef.current;
+      const max = maxOffsetRef.current;
+      const thr = max > 0 ? Math.max(max * 0.72, max - 14) : 0;
+      if (max > 0 && o >= thr) {
+        offsetRef.current = 0;
+        setOffset(0);
+        onDismissRef.current();
+      } else {
+        offsetRef.current = 0;
+        setOffset(0);
+      }
+    };
+
+    activeListenersRef.current = { onMove, onEnd };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('pointerup', onEnd);
+    window.addEventListener('pointercancel', onEnd);
+  }, []);
+
+  return (
+    <div
+      ref={trackRef}
+      className="relative h-12 w-full rounded-full border border-white/15 bg-white/[0.07] overflow-hidden touch-none select-none"
+      role="presentation"
+    >
+      <p className="pointer-events-none absolute inset-0 flex items-center justify-center text-center text-[11px] font-medium text-white/35 px-14">
+        Glisser pour arrêter l&apos;alarme
+      </p>
+      <button
+        type="button"
+        aria-label="Glisser vers la droite pour arrêter l’alarme du minuteur"
+        className={`absolute top-1 left-1 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white shadow-lg z-10 touch-none cursor-grab active:cursor-grabbing ${
+          dragging ? '' : 'transition-[transform] duration-200 ease-out'
+        }`}
+        style={{ transform: `translateX(${offset}px)` }}
+        onPointerDown={onPointerDown}
+      >
+        <ChevronRight size={22} strokeWidth={2.5} className="pointer-events-none opacity-95" />
+      </button>
+    </div>
+  );
+}
+
 function detectTimerFromStep(text) {
   if (!text) return null;
   const m = text.match(/(\d+)\s*(?:[-\u2013\u00e0]\s*\d+\s*)?(secondes?|sec\b|minutes?|mins?\b|mn\b|heures?|h\b)/i);
@@ -109,9 +250,38 @@ function getCookingSubject(stepText) {
 }
 
 function CookingTimerIsland({ timer, expanded, setExpanded, onStop, onAdd, onRemove }) {
+  const alarmAudioRef = useRef(null);
+
   useEffect(() => {
     if (timer?.done) setExpanded(true);
   }, [timer?.done, setExpanded]);
+
+  useEffect(() => {
+    if (!timer?.done) {
+      if (alarmAudioRef.current) {
+        alarmAudioRef.current.pause();
+        alarmAudioRef.current.currentTime = 0;
+        alarmAudioRef.current = null;
+      }
+      return undefined;
+    }
+    const audio = new Audio(TIMER_ALERT_SOUND_SRC);
+    audio.loop = true;
+    audio.volume = 0.88;
+    alarmAudioRef.current = audio;
+    const play = audio.play();
+    if (play !== undefined) {
+      play.catch(() => {
+        /* autoplay bloqué : l’utilisateur a toujours le retour visuel + vibration */
+      });
+    }
+    return () => {
+      audio.pause();
+      audio.src = '';
+      audio.load();
+      if (alarmAudioRef.current === audio) alarmAudioRef.current = null;
+    };
+  }, [timer?.done]);
 
   if (!timer) return null;
 
@@ -256,14 +426,16 @@ function CookingTimerIsland({ timer, expanded, setExpanded, onStop, onAdd, onRem
                 </button>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={() => { onStop(); setExpanded(false); }}
-                className="w-full py-2.5 rounded-xl text-red-400 text-sm font-semibold transition-colors hover:text-red-300"
-                style={{ background: 'rgba(239,68,68,0.12)' }}
-              >
-                Fermer le minuteur
-              </button>
+              <TimerSlideToDismiss
+                onDismiss={() => {
+                  if (alarmAudioRef.current) {
+                    alarmAudioRef.current.pause();
+                    alarmAudioRef.current = null;
+                  }
+                  onStop();
+                  setExpanded(false);
+                }}
+              />
             )}
           </div>
         </div>
@@ -323,9 +495,11 @@ function StepWithQuantities({ stepText, ingredients }) {
 }
 
 export default function RecipeDetail({ favorites, toggleFavorite }) {
-  const { slug } = useParams();
-  const { recipes, loading, error, getRecipe } = useData();
-  const { user } = useAuth();
+  const { slug, planningId: urlPlanningId } = useParams();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const { recipes, articles, loading, error, getRecipe } = useData();
+  const { user, householdMembers: authHousehold, savedPlannings } = useAuth();
   const recipe = recipes.find(
     (r) => getSlug(r.title) === slug || String(r.id) === slug
   );
@@ -378,6 +552,56 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
 
   const [commentRatingAgg, setCommentRatingAgg] = useState(null);
 
+  // Contexte planning : depuis l'URL (/planning/:id/recette/:slug) ou depuis location.state
+  const urlPlanningContext = useMemo(() => {
+    if (!urlPlanningId || !savedPlannings?.length) return null;
+    const found = savedPlannings.find((p) => {
+      if (p.id === urlPlanningId) return true;
+      const localKey = `local-${(p.weekStart || p.date || '').replace(/\//g, '-')}`;
+      return localKey === urlPlanningId;
+    });
+    if (!found) return null;
+    const day = searchParams.get('day');
+    const meal = searchParams.get('meal');
+    const key = day && meal ? `${day}-${meal}` : null;
+    const multiplier = key && found.mealMultipliers ? (found.mealMultipliers[key] ?? 1) : 1;
+    return { source: 'planning', planningId: urlPlanningId, day, mealType: meal, multiplier, weekStart: found.weekStart };
+  }, [urlPlanningId, savedPlannings, searchParams]);
+
+  const planningContext = urlPlanningContext || (location.state?.source === 'planning' ? location.state : null);
+  const planningMultiplier = useMemo(
+    () => normalizeMealMultiplier(planningContext?.multiplier),
+    [planningContext?.multiplier]
+  );
+  // Foyer : depuis AuthContext (connecté) ou depuis location.state (onboarding/preview)
+  const allHouseholdMembers = useMemo(
+    () => (authHousehold?.length > 0 ? authHousehold : planningContext?.household ?? []),
+    [authHousehold, planningContext?.household],
+  );
+
+  // Exclusions temporaires de membres pour cette recette
+  const [excludedMemberIds, setExcludedMemberIds] = useState(new Set());
+  const householdMembers = useMemo(
+    () => allHouseholdMembers.filter((m) => !excludedMemberIds.has(m.id)),
+    [allHouseholdMembers, excludedMemberIds],
+  );
+  const toggleMemberExclusion = useCallback((memberId) => {
+    setExcludedMemberIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(memberId)) next.delete(memberId);
+      else next.add(memberId);
+      return next;
+    });
+  }, []);
+
+  // Détection "c'est l'heure" : jour et tranche horaire correspondent au planning
+  const isCurrentMealTime = useMemo(() => {
+    if (!planningContext?.day || !planningContext?.mealType) return false;
+    const currentDay = getCurrentDayId();
+    const currentMeal = getMealTypeFromHour(new Date().getHours());
+    return planningContext.day === currentDay && planningContext.mealType === currentMeal;
+  }, [planningContext?.day, planningContext?.mealType]);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -403,6 +627,159 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
     return () => { cancelled = true; };
   }, [recipe?.id]);
 
+  // Tous les hooks doivent rester au-dessus des early returns : sinon au passage
+  // loading true → false (refresh direct sur /recettes/…), React signale « more hooks » et l’ErrorBoundary s’affiche.
+  useEffect(() => {
+    let cancelled = false;
+    async function loadFull() {
+      if (!recipe?.id) return;
+      // En prod, la liste charge un "summary" (steps = null) → on charge le détail ici.
+      if (recipe.steps == null) {
+        try {
+          const full = await getRecipe?.(recipe.id);
+          if (!cancelled && full) {
+            setFullRecipe(full);
+            const baseServings = full.servings || 1;
+            setServings(Math.max(1, Math.round(baseServings * planningMultiplier)));
+          }
+        } catch {
+          // on garde le summary; l'UI reste fonctionnelle
+        }
+      } else {
+        // Si on a déjà un full (ex. dev/local), on synchronise les servings.
+        const baseServings = recipe.servings || 1;
+        setServings(Math.max(1, Math.round(baseServings * planningMultiplier)));
+      }
+    }
+    loadFull();
+    return () => { cancelled = true; };
+  }, [recipe?.id, recipe?.steps, recipe?.servings, getRecipe, planningMultiplier]);
+
+  const steps = effectiveRecipe?.steps ?? [];
+  const ingredients = effectiveRecipe?.ingredients ?? [];
+  const tags = effectiveRecipe?.tags ?? [];
+  const objective = effectiveRecipe?.objective ?? [];
+  const recipeNotes = effectiveRecipe?.notes ?? recipe?.notes ?? '';
+
+  const recipeTitle = effectiveRecipe?.title || recipe?.title || '';
+  const recipeSlug = recipeTitle ? getSlug(recipeTitle) : slug;
+  const recipeUrl = recipeSlug ? canonicalUrl(`/recettes/${recipeSlug}`) : '';
+  const recipeDesc = recipeTitle && steps[0]
+    ? `${recipeTitle} — ${steps[0].slice(0, 120)}…`
+    : recipeTitle
+      ? `Recette végétarienne ${recipeTitle} : ${effectiveRecipe?.calories ?? recipe?.calories ?? ''} kcal, ${effectiveRecipe?.protein ?? recipe?.protein ?? ''}g de protéines. Facile et rapide.`
+      : '';
+
+  const metaReady = Boolean(recipe && recipeTitle && recipeUrl);
+
+  usePageMeta(
+    metaReady
+      ? {
+          title: `${recipeTitle} — Recette végétarienne protéinée`,
+          description: recipeDesc,
+          canonical: recipeUrl,
+          image: effectiveRecipe?.image || recipe?.image,
+          type: 'article',
+        }
+      : {}
+  );
+
+  useJsonLd(
+    metaReady
+      ? [
+          buildRecipeJsonLd(effectiveRecipe || recipe, recipeUrl, {
+            aggregateRating: commentRatingAgg || undefined,
+          }),
+          buildBreadcrumbJsonLd([
+            { name: 'Accueil', url: canonicalUrl('/') },
+            { name: 'Recettes', url: canonicalUrl('/recettes') },
+            { name: recipeTitle, url: recipeUrl },
+          ]),
+        ]
+      : null
+  );
+
+  const [shareStatus, setShareStatus] = useState(null); // null | 'copied' | 'shared'
+
+  const handleShare = useCallback(async () => {
+    const title = effectiveRecipe?.title || recipe?.title;
+    if (!title) return;
+    const url = window.location.href;
+    const text = `${title} — recette végétarienne protéinée sur et si mamie était végé ?`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text, url });
+        setShareStatus('shared');
+      } catch { /* annulé par l'utilisateur */ }
+    } else {
+      await navigator.clipboard.writeText(url);
+      setShareStatus('copied');
+    }
+    setTimeout(() => setShareStatus(null), 2500);
+  }, [effectiveRecipe?.title, recipe?.title]);
+
+  const relatedArticles = useMemo(() => {
+    const list = Array.isArray(articles) ? articles : [];
+    if (list.length === 0) return [];
+
+    const objectiveSeed = Array.isArray(objective) && objective.length ? String(objective[0]) : '';
+    const kwByObjective = {
+      masse: ['prise de masse', 'muscle', 'hypertrophie', 'protéine', 'protéines', 'récupération'],
+      seche: ['sèche', 'déficit', 'perte de gras', 'composition corporelle', 'protéine', 'satiété'],
+      endurance: ['endurance', 'carburant', 'glucides', 'glycogène', 'hydratation'],
+      sante: ['santé', 'équilibre', 'micronutriments', 'fibres', 'habitudes'],
+    };
+    const base = kwByObjective[objectiveSeed] || ['protéine', 'protéines', 'macros', 'glucides', 'lipides'];
+    const needle = base.map((s) => s.toLowerCase());
+
+    const scored = list
+      .filter((a) => a?.id && a?.title && (a?.category === 'Nutrition' || a?.category === 'Organisation'))
+      .map((a) => {
+        const hay = `${a.title || ''} ${a.excerpt || ''}`.toLowerCase();
+        let score = 0;
+        needle.forEach((k) => { if (hay.includes(k)) score += 2; });
+        if (a.category === 'Nutrition') score += 1;
+        return { a, score };
+      })
+      .sort((x, y) => y.score - x.score);
+
+    const picked = scored.filter((x) => x.score > 0).slice(0, 3).map((x) => x.a);
+    if (picked.length >= 2) return picked;
+
+    // fallback: 3 derniers articles Nutrition
+    return list.filter((a) => a?.category === 'Nutrition').slice(0, 3);
+  }, [articles, objective]);
+
+  const isPlanningMode = Boolean(planningContext);
+  const hasHousehold = isPlanningMode && householdMembers && householdMembers.length > 0;
+
+  // Mode vitrine : ratio classique slider. Mode planning avec foyer : ratio foyer.
+  const ratio = hasHousehold
+    ? ingredientScale(householdMembers, (effectiveRecipe?.servings || recipe?.servings) || 1)
+    : servings / ((effectiveRecipe?.servings || recipe?.servings) || 1);
+
+  // Macros de l'owner en mode planning
+  const planningOwnerMacros = useMemo(() => {
+    if (!hasHousehold) return null;
+    return ownerMacros(effectiveRecipe ?? recipe, householdMembers);
+  }, [hasHousehold, effectiveRecipe, recipe, householdMembers]);
+
+  // Séparation placard (basiques) / reste (à préparer) pour le mode cuisine
+  const { pantryList, restList } = useMemo(() => {
+    const pantry = [];
+    const rest = [];
+    ingredients.forEach((ing, i) => {
+      const parsed = parseIngredient(ing);
+      const name = parsed.name || ing;
+      if (isCommonPantry(name)) {
+        pantry.push({ index: i, text: scaleIngredient(ing, ratio) });
+      } else {
+        rest.push({ index: i, text: scaleIngredient(ing, ratio) });
+      }
+    });
+    return { pantryList: pantry, restList: rest };
+  }, [ingredients, ratio]);
+
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -426,103 +803,12 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
     );
   }
 
-  useEffect(() => {
-    let cancelled = false;
-    async function loadFull() {
-      if (!recipe?.id) return;
-      // En prod, la liste charge un "summary" (steps = null) → on charge le détail ici.
-      if (recipe.steps == null) {
-        try {
-          const full = await getRecipe?.(recipe.id);
-          if (!cancelled && full) {
-            setFullRecipe(full);
-            setServings(full.servings || 1);
-          }
-        } catch {
-          // on garde le summary; l'UI reste fonctionnelle
-        }
-      } else {
-        // Si on a déjà un full (ex. dev/local), on synchronise les servings.
-        setServings(recipe.servings || 1);
-      }
-    }
-    loadFull();
-    return () => { cancelled = true; };
-  }, [recipe?.id, recipe?.steps, recipe?.servings, getRecipe]);
-
-  const steps = effectiveRecipe?.steps ?? [];
-  const ingredients = effectiveRecipe?.ingredients ?? [];
-  const tags = effectiveRecipe?.tags ?? [];
-  const objective = effectiveRecipe?.objective ?? [];
-
-  const recipeTitle = effectiveRecipe?.title || recipe.title;
-  const recipeSlug = getSlug(recipeTitle);
-  const recipeUrl = canonicalUrl(`/recettes/${recipeSlug}`);
-  const recipeDesc = steps[0]
-    ? `${recipeTitle} — ${steps[0].slice(0, 120)}…`
-    : `Recette végétarienne ${recipeTitle} : ${effectiveRecipe?.calories || recipe.calories} kcal, ${effectiveRecipe?.protein || recipe.protein}g de protéines. Facile et rapide.`;
-
-  usePageMeta({
-    title: `${recipeTitle} — Recette végétarienne protéinée`,
-    description: recipeDesc,
-    canonical: recipeUrl,
-    image: effectiveRecipe?.image || recipe.image,
-    type: 'article',
-  });
-
-  useJsonLd([
-    buildRecipeJsonLd(effectiveRecipe || recipe, recipeUrl, {
-      aggregateRating: commentRatingAgg || undefined,
-    }),
-    buildBreadcrumbJsonLd([
-      { name: 'Accueil', url: canonicalUrl('/') },
-      { name: 'Recettes', url: canonicalUrl('/recettes') },
-      { name: recipeTitle, url: recipeUrl },
-    ]),
-  ]);
-
   const isFavorite = favorites?.includes(effectiveRecipe?.id ?? recipe.id) ?? false;
-  const ratio = servings / ((effectiveRecipe?.servings || recipe.servings) || 1);
-
-  const [shareStatus, setShareStatus] = useState(null); // null | 'copied' | 'shared'
-
-  const handleShare = useCallback(async () => {
-    const url = window.location.href;
-    const title = effectiveRecipe?.title || recipe.title;
-    const text = `${title} — recette végétarienne protéinée sur et si mamie était végé ?`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, text, url });
-        setShareStatus('shared');
-      } catch { /* annulé par l'utilisateur */ }
-    } else {
-      await navigator.clipboard.writeText(url);
-      setShareStatus('copied');
-    }
-    setTimeout(() => setShareStatus(null), 2500);
-  }, [effectiveRecipe?.title, recipe.title]);
-
   const similar = (recipes ?? []).filter(
     (r) => r.id !== (effectiveRecipe?.id ?? recipe.id) && (r.objective ?? []).some((o) => objective.includes(o))
   ).slice(0, 3);
 
   const totalSteps = 1 + steps.length;
-
-  // Séparation placard (basiques) / reste (à préparer) pour le mode cuisine
-  const { pantryList, restList } = useMemo(() => {
-    const pantry = [];
-    const rest = [];
-    ingredients.forEach((ing, i) => {
-      const parsed = parseIngredient(ing);
-      const name = parsed.name || ing;
-      if (isCommonPantry(name)) {
-        pantry.push({ index: i, text: scaleIngredient(ing, ratio) });
-      } else {
-        rest.push({ index: i, text: scaleIngredient(ing, ratio) });
-      }
-    });
-    return { pantryList: pantry, restList: rest };
-  }, [ingredients, ratio]);
 
   if (cookingMode) {
     const stepIndex = typeof activeStep === 'number' ? activeStep : 0;
@@ -764,39 +1050,52 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
         <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-sm text-text-light mb-8 flex-wrap">
           <Link to="/" className="hover:text-text transition-colors">Accueil</Link>
           <span className="text-text-light/40">/</span>
-          <Link to="/recettes" className="hover:text-text transition-colors">Recettes</Link>
-          {(effectiveRecipe?.category || recipe.category) && (
+          {planningContext ? (
             <>
-              <span className="text-text-light/40">/</span>
-              <Link
-                to={`/recettes?categorie=${effectiveRecipe?.category || recipe.category}`}
-                className="hover:text-text transition-colors"
-              >
-                {categoryLabel(effectiveRecipe?.category || recipe.category)}
-              </Link>
+              <Link to="/planning?mine=1" className="hover:text-text transition-colors">Mon planning</Link>
+            </>
+          ) : (
+            <>
+              <Link to="/recettes" className="hover:text-text transition-colors">Recettes</Link>
+              {(effectiveRecipe?.category || recipe.category) && (
+                <>
+                  <span className="text-text-light/40">/</span>
+                  <Link
+                    to={`/recettes?categorie=${effectiveRecipe?.category || recipe.category}`}
+                    className="hover:text-text transition-colors"
+                  >
+                    {categoryLabel(effectiveRecipe?.category || recipe.category)}
+                  </Link>
+                </>
+              )}
             </>
           )}
           <span className="text-text-light/40">/</span>
           <span className="text-text truncate max-w-[200px]">{effectiveRecipe?.title || recipe.title}</span>
         </nav>
 
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row gap-10">
-          <div className="lg:w-1/2">
-            <div className="aspect-[16/10] rounded-sm overflow-hidden bg-bg-warm flex items-center justify-center">
+        {/* Header : image à gauche, infos à droite */}
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
+          {/* Image */}
+          <div className="lg:w-[42%] flex-shrink-0">
+            <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-bg-warm flex items-center justify-center">
               <img
                 src={getSafeImageSrc(effectiveRecipe?.image || recipe.image)}
                 alt={effectiveRecipe?.title || recipe.title}
                 onError={handleMediaImageError}
-                className="w-full h-full object-contain scale-60"
-                style={{ objectPosition: 'center' }}
+                className={
+                  isRecipeImageMissing(effectiveRecipe?.image || recipe.image)
+                    ? 'max-h-44 w-full object-contain recipe-image-placeholder'
+                    : 'w-full h-full object-contain'
+                }
                 decoding="async"
                 fetchPriority="high"
               />
             </div>
           </div>
 
-          <div className="lg:w-1/2">
+          {/* Infos */}
+          <div className="flex-1 flex flex-col justify-center">
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               {tags.slice(0, 3).map(tag => (
                 <Link key={tag} to={`/recettes?tag=${encodeURIComponent(tag)}`} className="text-[13px] font-medium px-2.5 py-0.5 rounded-sm border border-border text-text-light hover:border-primary hover:text-primary transition-colors">
@@ -813,45 +1112,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
 
             <div className="flex items-center gap-4 mt-4 text-sm text-text-light">
               <span className="flex items-center gap-1.5"><Clock size={15} /> {effectiveRecipe?.time ?? recipe.time} min</span>
-              <span className="flex items-center gap-1.5"><Flame size={15} /> {Math.round((effectiveRecipe?.calories ?? recipe.calories) * ratio)} kcal</span>
               <span className="flex items-center gap-1.5"><ChefHat size={15} /> {effectiveRecipe?.difficulty ?? recipe.difficulty}</span>
-            </div>
-
-            {/* Macros */}
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              <div className="bg-bg-warm rounded-sm p-3 text-center">
-                <p className="text-lg font-medium text-primary">{Math.round((effectiveRecipe?.protein ?? recipe.protein) * ratio)}g</p>
-                <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Protéines</p>
-              </div>
-              <div className="bg-bg-warm rounded-sm p-3 text-center">
-                <p className="text-lg font-medium text-text">{Math.round((effectiveRecipe?.carbs ?? recipe.carbs) * ratio)}g</p>
-                <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Glucides</p>
-              </div>
-              <div className="bg-bg-warm rounded-sm p-3 text-center">
-                <p className="text-lg font-medium text-text">{Math.round((effectiveRecipe?.fat ?? recipe.fat) * ratio)}g</p>
-                <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Lipides</p>
-              </div>
-            </div>
-
-            {/* Servings */}
-            <div className="mt-6 flex items-center gap-3">
-              <Users size={16} className="text-text-light flex-shrink-0" />
-              <span className="recipe-annotation">Pour {servings} personne{servings > 1 ? 's' : ''}</span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setServings(Math.max(1, servings - 1))}
-                  className="w-8 h-8 rounded-sm border border-border flex items-center justify-center text-sm hover:border-text transition-colors"
-                >
-                  -
-                </button>
-                <span className="text-sm font-medium w-6 text-center">{servings}</span>
-                <button
-                  onClick={() => setServings(servings + 1)}
-                  className="w-8 h-8 rounded-sm border border-border flex items-center justify-center text-sm hover:border-text transition-colors"
-                >
-                  +
-                </button>
-              </div>
             </div>
 
             {/* Actions */}
@@ -894,14 +1155,122 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                 )}
               </button>
             </div>
-            <p className="recipe-script-note mt-2 text-sm">Suis les étapes comme sur un carnet</p>
           </div>
+        </div>
+
+        {/* Bandeau "C'est l'heure !" */}
+        {isPlanningMode && isCurrentMealTime && (
+          <div className="mt-8 rounded-xl border border-secondary/30 bg-secondary/5 px-5 py-4">
+            <p className="text-secondary font-medium text-sm">
+              C&apos;est l&apos;heure ! Cuisinez bien et bon appetit !
+            </p>
+          </div>
+        )}
+
+        {/* Macros */}
+        <div className={isPlanningMode && isCurrentMealTime ? 'mt-6' : 'mt-10'}>
+          {hasHousehold && planningOwnerMacros ? (
+            <>
+              <p className="text-[11px] uppercase tracking-[0.15em] text-text-light font-accent">Tes macros pour ce plat</p>
+              <div className="mt-1.5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                  <p className="text-lg font-medium text-primary">{planningOwnerMacros.protein}g</p>
+                  <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Protéines</p>
+                </div>
+                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                  <p className="text-lg font-medium text-text">{planningOwnerMacros.carbs}g</p>
+                  <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Glucides</p>
+                </div>
+                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                  <p className="text-lg font-medium text-text">{planningOwnerMacros.fat}g</p>
+                  <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Lipides</p>
+                </div>
+                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                  <p className="text-lg font-medium text-text">{planningOwnerMacros.calories}</p>
+                  <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">kcal</p>
+                </div>
+              </div>
+
+              {/* Toggle membres du foyer pour cette recette */}
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-text-light mr-1">Mangent ce repas :</span>
+                {allHouseholdMembers.map((m) => {
+                  const excluded = excludedMemberIds.has(m.id);
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => !m.is_owner && toggleMemberExclusion(m.id)}
+                      disabled={m.is_owner}
+                      className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                        excluded
+                          ? 'border-border text-text-light/40 line-through bg-white'
+                          : 'border-secondary/40 bg-secondary/8 text-secondary'
+                      } ${m.is_owner ? 'cursor-default' : 'cursor-pointer hover:border-secondary'}`}
+                      title={m.is_owner ? 'Toi (toujours inclus)' : excluded ? `Réajouter ${m.name}` : `Retirer ${m.name} pour ce repas`}
+                    >
+                      {m.name}{m.is_owner ? ' (toi)' : ''}
+                    </button>
+                  );
+                })}
+              </div>
+              {excludedMemberIds.size > 0 && (
+                <p className="mt-2 text-xs text-text-light/60 italic">
+                  Quantites ajustees pour {householdMembers.length} personne{householdMembers.length > 1 ? 's' : ''}
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="text-[11px] uppercase tracking-[0.15em] text-text-light font-accent">Par portion</p>
+              <div className="mt-1.5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                  <p className="text-lg font-medium text-primary">{effectiveRecipe?.protein ?? recipe.protein}g</p>
+                  <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Protéines</p>
+                </div>
+                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                  <p className="text-lg font-medium text-text">{effectiveRecipe?.carbs ?? recipe.carbs}g</p>
+                  <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Glucides</p>
+                </div>
+                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                  <p className="text-lg font-medium text-text">{effectiveRecipe?.fat ?? recipe.fat}g</p>
+                  <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Lipides</p>
+                </div>
+                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                  <p className="text-lg font-medium text-text">{effectiveRecipe?.calories ?? recipe.calories}</p>
+                  <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">kcal</p>
+                </div>
+              </div>
+
+              {/* Slider portions — mode vitrine uniquement */}
+              <div className="mt-6 flex items-center gap-3">
+                <Users size={16} className="text-text-light flex-shrink-0" />
+                <span className="recipe-annotation">Portions</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setServings(Math.max(1, servings - 1))}
+                    className="w-8 h-8 rounded-sm border border-border flex items-center justify-center text-sm hover:border-text transition-colors"
+                  >
+                    -
+                  </button>
+                  <span className="text-sm font-medium w-6 text-center">{servings}</span>
+                  <button
+                    onClick={() => setServings(servings + 1)}
+                    className="w-8 h-8 rounded-sm border border-border flex items-center justify-center text-sm hover:border-text transition-colors"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Ingredients & Steps */}
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-5 gap-10">
           <div className="lg:col-span-2">
             <h2 className="recipe-section-title">Ingrédients</h2>
+            <p className="text-xs text-text-light mb-3">Quantités pour {servings} personne{servings > 1 ? 's' : ''}</p>
             <div className="deco-wave mb-4" />
             <ul className="space-y-2.5">
               {ingredients.map((ingredient, i) => (
@@ -926,8 +1295,56 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                 </li>
               ))}
             </ol>
+            {recipeNotes ? (
+              <div className="mt-8 rounded-xl border border-border bg-bg-warm/40 p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-primary mb-2">Conseils & infos</p>
+                <p className="text-sm text-text-light leading-relaxed whitespace-pre-wrap">{recipeNotes}</p>
+              </div>
+            ) : null}
           </div>
         </div>
+
+        {/* Pour aller plus loin (blog) */}
+        {relatedArticles.length > 0 && (
+          <div className="mt-16">
+            <p className="recipe-section-title">Pour aller plus loin</p>
+            <div className="deco-wave mb-4" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {relatedArticles.map((a) => (
+                <Link
+                  key={a.id}
+                  to={`/blog/${a.id}/${getSlug(a.title)}`}
+                  className="group rounded-2xl border border-border bg-white overflow-hidden hover:shadow-md hover:border-primary/20 transition-all duration-300"
+                >
+                  <div className="aspect-[16/10] bg-bg-warm overflow-hidden">
+                    <img
+                      src={getSafeImageSrc(a.image)}
+                      alt={a.title}
+                      onError={handleMediaImageError}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <p className="text-xs text-primary font-medium">{a.category}</p>
+                    <p className="mt-1 text-sm font-medium text-text group-hover:text-primary transition-colors leading-snug line-clamp-2">
+                      {a.title}
+                    </p>
+                    {a.excerpt && (
+                      <p className="mt-1.5 text-xs text-text-light line-clamp-2">
+                        {a.excerpt}
+                      </p>
+                    )}
+                    {a.readTime && (
+                      <p className="mt-2 text-xs text-text-light font-accent">
+                        {a.readTime} min de lecture
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Commentaires */}
         <RecipeComments recipeId={recipe.id} user={user} />

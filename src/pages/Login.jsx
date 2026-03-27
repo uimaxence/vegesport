@@ -25,6 +25,7 @@ export default function Login() {
   const location = useLocation();
   const from = (location.state && location.state.from) || '/profil';
   const planningIntent = location.state && location.state.planningIntent;
+  const sessionExpired = new URLSearchParams(location.search).get('expired') === '1';
 
   useEffect(() => {
     if (user) {
@@ -134,6 +135,12 @@ export default function Login() {
             {isLogin ? 'Content de te revoir' : 'Rejoins la communauté'}
           </p>
         </div>
+
+        {sessionExpired && !error && (
+          <p className="mb-4 text-sm text-amber-700 bg-amber-50 rounded-sm px-3 py-2">
+            Ta session a expiré après inactivité. Reconnecte-toi pour continuer.
+          </p>
+        )}
 
         {error && (
           <p className="mb-4 text-sm text-red-600 bg-red-50 rounded-sm px-3 py-2">{error}</p>

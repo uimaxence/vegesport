@@ -1,14 +1,13 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Navigate, Link } from 'react-router-dom';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Heart, Calendar, Award, LogOut, ChevronDown, ChevronUp, Check, Pencil, Flame, Beef, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { objectives } from '../data/recipes';
-import { days, mealTypes } from '../data/plannings';
+import { days, mealTypes, defaultPlannings } from '../data/plannings';
 import RecipeCard from '../components/RecipeCard';
-import RepasDuMoment from '../components/dashboard/RepasDuMoment';
-import SuiviApportsChart from '../components/dashboard/SuiviApportsChart';
+import HouseholdEditor from '../components/HouseholdEditor';
 import { getPlanningForCurrentWeek } from '../utils/dashboardPlanning';
 
 const MEALS_DONE_KEY = 'vegeprot_meals_done';
@@ -29,7 +28,9 @@ function loadMealsDoneFromStorage(userId) {
 function saveMealsDoneToStorage(userId, data) {
   try {
     localStorage.setItem(getMealsDoneStorageKey(userId), JSON.stringify(data));
-  } catch (_) {}
+  } catch {
+    /* ignore quota / private mode */
+  }
 }
 
 export default function Profile({ user, favorites, savedPlannings }) {
@@ -38,7 +39,10 @@ export default function Profile({ user, favorites, savedPlannings }) {
     description: 'Tes recettes favorites, plannings sauvegardés et badges et si mamie était végé ?.',
     noindex: true,
   });
-  const { signOut } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { signOut, savePlanning, savePlanningPreferences } = useAuth();
+  const claimHandledRef = useRef(false);
 
   const handleSignOut = () => {
     signOut(); // nettoyage synchrone (localStorage + state), pas d’await pour ne pas bloquer
@@ -55,6 +59,32 @@ export default function Profile({ user, favorites, savedPlannings }) {
     if (!user?.id) return;
     setMealsDone(loadMealsDoneFromStorage(user.id));
   }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id || !savePlanning || !savePlanningPreferences) return;
+    const intent = location.state?.planningIntent;
+    if (!intent || intent.type !== 'claim_planning' || claimHandledRef.current) return;
+    claimHandledRef.current = true;
+    const pref = intent.preferences || {};
+    const restoredPlanning =
+      intent.planning ||
+      defaultPlannings[pref.objective || 'masse']?.meals ||
+      defaultPlannings.masse.meals;
+    const restoredMultipliers = intent.mealMultipliers || {};
+    (async () => {
+      try {
+        await savePlanningPreferences(pref);
+        await savePlanning({
+          date: new Date().toLocaleDateString('fr-FR'),
+          objective: pref.objective || intent.objective || 'masse',
+          meals: restoredPlanning,
+          mealMultipliers: restoredMultipliers,
+        });
+      } finally {
+        navigate('/profil', { replace: true, state: {} });
+      }
+    })();
+  }, [user?.id, location.state, navigate, savePlanning, savePlanningPreferences]);
 
   const persistMealsDone = (next) => {
     setMealsDone(next);
@@ -100,8 +130,8 @@ export default function Profile({ user, favorites, savedPlannings }) {
     <div className="px-6 lg:px-8 py-12">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-12">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-12">
+          <div className="flex items-center gap-4 min-w-0">
             {user.avatar ? (
               <img src={user.avatar} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" referrerPolicy="no-referrer" />
             ) : (
@@ -109,15 +139,15 @@ export default function Profile({ user, favorites, savedPlannings }) {
                 {user.name?.charAt(0)?.toUpperCase()}
               </div>
             )}
-            <div>
+            <div className="min-w-0">
               <p className="text-xs uppercase tracking-[0.2em] text-primary mb-1">Mon profil</p>
               <h1 className="font-display text-3xl sm:text-4xl text-text">
                 Salut, {user.name}
               </h1>
-              <p className="text-sm text-text-light mt-1">{user.email}</p>
+              <p className="text-sm text-text-light mt-1 break-all">{user.email}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             <Link
               to="/donnees-personnelles"
               className="flex items-center gap-1.5 text-sm text-text-light hover:text-primary transition-colors"
@@ -136,52 +166,28 @@ export default function Profile({ user, favorites, savedPlannings }) {
           </div>
         </div>
 
-        {/* Dashboard semaine en cours */}
-        {currentPlanning && (() => {
-          const currentPlanningId = currentPlanning.id ?? `local-${currentPlanning.date}`;
-          const mealsDoneMap = mealsDone[currentPlanningId] || {};
-          return (
-            <div className="mb-12">
-              <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-4 flex items-center gap-2">
-                <Calendar size={13} />
-                Semaine en cours
-              </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-                <div className="lg:col-span-2">
-                  <RepasDuMoment
-                    planning={currentPlanning}
-                    getRecipe={getRecipe}
-                    mealsDoneMap={mealsDoneMap}
-                    onToggleDone={(day, mealTypeId) => toggleMealDone(currentPlanningId, day, mealTypeId)}
-                  />
-                </div>
-                <div className="lg:col-span-3">
-                  <SuiviApportsChart
-                    planning={currentPlanning}
-                    getRecipe={getRecipe}
-                    portions={2}
-                    mealsDoneMap={mealsDoneMap}
-                  />
-                </div>
-              </div>
-            </div>
-          );
-        })()}
-
-        {!currentPlanning && (
-          <div className="mb-12 rounded-xl border border-dashed border-border bg-bg-warm/50 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        {/* Lien vers le planning */}
+        <div className="mb-12 rounded-xl border border-border bg-bg-warm/50 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Calendar size={18} className="text-primary shrink-0" />
             <div>
-              <p className="text-sm font-medium text-text">Aucun planning pour cette semaine</p>
-              <p className="text-xs text-text-light mt-0.5">Crée ton planning pour voir ici le repas du moment et le suivi de tes apports.</p>
+              <p className="text-sm font-medium text-text">
+                {currentPlanning ? 'Tu as un planning cette semaine' : 'Aucun planning pour cette semaine'}
+              </p>
+              <p className="text-xs text-text-light mt-0.5">
+                {currentPlanning
+                  ? 'Consulte ton planning, coche tes repas et suis tes apports.'
+                  : 'Crée ton planning pour suivre tes repas et tes apports.'}
+              </p>
             </div>
-            <Link
-              to="/planning"
-              className="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-medium rounded-sm hover:bg-primary-dark transition-colors"
-            >
-              Créer mon planning
-            </Link>
           </div>
-        )}
+          <Link
+            to="/planning?mine=1"
+            className="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-medium rounded-sm hover:bg-primary-dark transition-colors"
+          >
+            {currentPlanning ? 'Mon planning' : 'Créer mon planning'}
+          </Link>
+        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
@@ -245,6 +251,14 @@ export default function Profile({ user, favorites, savedPlannings }) {
           )}
         </div>
 
+        {/* Mon foyer */}
+        <div className="mb-12">
+          <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-4">
+            Mon foyer
+          </h2>
+          <HouseholdEditor showIntro />
+        </div>
+
         {/* Saved Plannings */}
         <div>
           <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-4">
@@ -301,7 +315,7 @@ export default function Profile({ user, favorites, savedPlannings }) {
                         </p>
                         <div className="flex flex-wrap items-center gap-2 mb-3">
                           <Link
-                            to={p.id ? `/planning?edit=${p.id}` : '/planning'}
+                            to={p.id ? `/planning?mine=1&edit=${p.id}` : '/planning?mine=1'}
                             state={p.id ? undefined : { loadPlanning: p }}
                             className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary-dark font-medium"
                           >
@@ -368,7 +382,7 @@ export default function Profile({ user, favorites, savedPlannings }) {
             <div className="bg-bg-warm rounded-sm p-6 text-center">
               <Calendar size={24} className="mx-auto text-text-light/30 mb-2" />
               <p className="text-sm text-text-light">Aucun planning sauvegardé.</p>
-              <Link to="/planning" className="text-xs text-primary hover:text-primary-dark mt-1 inline-block">
+              <Link to="/planning?mine=1" className="text-xs text-primary hover:text-primary-dark mt-1 inline-block">
                 Créer un planning
               </Link>
             </div>

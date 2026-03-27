@@ -123,6 +123,7 @@ function mapRecipeRow(row) {
     image: row.image,
     ingredients: row.ingredients || [],
     steps: row.steps || [],
+    notes: row.notes ?? null,
   };
 }
 
@@ -213,6 +214,20 @@ export async function fetchRecipeById(id) {
   const list = await getLocalRecipes();
   const found = list.find((r) => String(r.id) === String(id));
   return found ? { ...found } : null;
+}
+
+/**
+ * Retourne la map nom→rayon depuis la table ingredients.
+ * Utilisé par la liste de courses pour catégoriser sans regex.
+ */
+export async function fetchIngredientRayons() {
+  if (!isSupabaseConfigured()) return [];
+  try {
+    const data = await restGet('ingredients?select=name,rayon&order=name.asc');
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
 }
 
 export async function fetchArticles() {

@@ -1,18 +1,19 @@
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { getSlug } from '../lib/slug';
-import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
+import { getSafeImageSrc, handleMediaImageError, isRecipeImageMissing } from '../lib/imageFallback';
 
 export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout = 'grid' }) {
+  const noPhoto = isRecipeImageMissing(recipe.image);
   if (layout === 'compact') {
     return (
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="group flex items-center gap-4 py-3 rounded-xl hover:bg-black/[0.03] transition-colors -mx-1 px-1">
-        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-black/5 flex items-center justify-center">
+        <div className={`w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center ${noPhoto ? 'bg-bg-warm' : 'bg-black/5'}`}>
           <img
             src={getSafeImageSrc(recipe.image)}
             alt={recipe.title}
             onError={handleMediaImageError}
-            className="w-full h-full object-contain scale-60 group-hover:scale-60 transition-transform duration-500"
+            className={`w-full h-full object-contain transition-transform duration-500 ${noPhoto ? 'scale-[0.42] recipe-image-placeholder' : 'scale-60 group-hover:scale-60'}`}
             loading="lazy"
             decoding="async"
             width="64"
@@ -34,12 +35,12 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
   return (
     <div className="group overflow-hidden recipe-card-frame relative rounded-xl">
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="block">
-        <div className="aspect-[16/10] relative bg-[rgb(0,0,0,0.04)] overflow-hidden rounded-t-xl flex items-center justify-center">
+        <div className={`aspect-[16/10] relative overflow-hidden rounded-t-xl flex items-center justify-center ${noPhoto ? 'bg-bg-warm' : 'bg-[rgb(0,0,0,0.04)]'}`}>
           <img
             src={getSafeImageSrc(recipe.image)}
             alt={recipe.title}
             onError={handleMediaImageError}
-            className="w-full h-full object-contain scale-60 group-hover:scale-60 transition-transform duration-500"
+            className={`w-full h-full object-contain transition-transform duration-500 ${noPhoto ? 'scale-[0.48] recipe-image-placeholder' : 'scale-60 group-hover:scale-60'}`}
             loading="lazy"
             decoding="async"
             width="800"

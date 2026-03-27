@@ -65,6 +65,12 @@
   }
 }
 
+/* Sans photo : fond noir effacé par mix-blend-screen sur bg-warm, traits poussés vers --color-primary */
+.recipe-image-placeholder {
+  mix-blend-mode: screen;
+  filter: saturate(1.55) hue-rotate(4deg) contrast(1.06) brightness(1.02);
+}
+
 /* Titre de section style carnet : Space Grotesk pour contraste avec les titres Contrail */
 .recipe-section-title {
   font-family: var(--font-accent);

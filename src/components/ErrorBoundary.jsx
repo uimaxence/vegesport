@@ -1,5 +1,4 @@
 import { Component } from 'react';
-import { Link } from 'react-router-dom';
 
 export default class ErrorBoundary extends Component {
   state = { hasError: false, error: null };
@@ -28,12 +27,18 @@ export default class ErrorBoundary extends Component {
             >
               Recharger la page
             </button>
-            <Link
-              to="/"
+            <a
+              href="/"
               className="px-5 py-2.5 border border-border text-sm font-medium rounded-lg hover:border-text transition-colors"
             >
               Accueil
-            </Link>
+            </a>
+            <a
+              href="/connexion"
+              className="px-5 py-2.5 border border-border text-sm font-medium rounded-lg hover:border-text transition-colors"
+            >
+              Connexion
+            </a>
           </div>
         </div>
       );

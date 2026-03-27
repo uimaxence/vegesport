@@ -8,14 +8,19 @@ export default function Navbar({ user }) {
   const location = useLocation();
   const showAdmin = isAdminUser(user);
 
+  const planningPath = user ? '/planning?mine=1' : '/planning';
+
   const links = [
     { path: '/', label: 'Accueil' },
     { path: '/recettes', label: 'Recettes' },
-    { path: '/planning', label: 'Planning' },
+    { path: planningPath, label: user ? 'Mon planning' : 'Planning' },
     { path: '/blog', label: 'Blog' },
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    const [pathnameOnly] = path.split('?');
+    return location.pathname === pathnameOnly;
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-bg/80 backdrop-blur-md border-b border-border">

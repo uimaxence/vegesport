@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, UtensilsCrossed, ChevronRight, Check } from 'lucide-react';
+import { Clock, UtensilsCrossed, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import { getSlug } from '../../lib/slug';
 import { getMealTypeFromHour, getCurrentDayId, mealTypes } from '../../utils/dashboardPlanning';
+import { days } from '../../data/plannings';
 
 const MEAL_LABELS = {
   'petit-dejeuner': 'Petit-déjeuner',
@@ -23,30 +25,41 @@ const DAY_LABELS = {
 };
 
 /**
+ * planningId : string — ID du planning (pour les liens contextualisés)
  * mealsDoneMap : { "lundi-dejeuner": true, ... } — facultatif
- * onToggleDone(day, mealTypeId) — facultatif, affiche les cases à cocher
+ * onToggleDone(day, mealTypeId) — facultatif, affiche les cases à cocher (jour courant uniquement)
  */
-export default function RepasDuMoment({ planning, getRecipe, mealsDoneMap, onToggleDone }) {
+export default function RepasDuMoment({ planning, getRecipe, planningId, mealsDoneMap, onToggleDone }) {
   const hour = new Date().getHours();
   const currentMealTypeId = getMealTypeFromHour(hour);
   const currentDay = getCurrentDayId();
-  const dayMeals = planning?.meals?.[currentDay] || {};
-  const hasTracking = Boolean(mealsDoneMap && onToggleDone);
+  const currentDayIndex = days.indexOf(currentDay);
 
-  const todayMeals = mealTypes.map((mt) => {
+  const [dayOffset, setDayOffset] = useState(0);
+  const viewedDayIndex = currentDayIndex + dayOffset;
+  const viewedDay = days[viewedDayIndex] ?? currentDay;
+  const isToday = dayOffset === 0;
+
+  const canPrev = viewedDayIndex > 0;
+  const canNext = viewedDayIndex < days.length - 1;
+
+  const dayMeals = planning?.meals?.[viewedDay] || {};
+  const hasTracking = isToday && Boolean(mealsDoneMap && onToggleDone);
+
+  const viewedMeals = mealTypes.map((mt) => {
     const recipeId = dayMeals[mt.id];
     const recipe = recipeId ? getRecipe(recipeId) : null;
-    const isCurrent = mt.id === currentMealTypeId;
-    const doneKey = `${currentDay}-${mt.id}`;
+    const isCurrent = isToday && mt.id === currentMealTypeId;
+    const doneKey = `${viewedDay}-${mt.id}`;
     const isDone = hasTracking ? Boolean(mealsDoneMap[doneKey]) : false;
     return { ...mt, recipe, isCurrent, isDone, doneKey };
   });
 
-  const hasMeals = todayMeals.some((m) => m.recipe);
+  const hasMeals = viewedMeals.some((m) => m.recipe);
 
-  // Calcul des apports réalisés aujourd'hui
+  // Calcul des apports réalisés (aujourd'hui seulement)
   const todayDoneStats = hasTracking
-    ? todayMeals.reduce(
+    ? viewedMeals.reduce(
         (acc, m) => {
           if (m.isDone && m.recipe) {
             acc.protein += m.recipe.protein ?? 0;
@@ -59,22 +72,51 @@ export default function RepasDuMoment({ planning, getRecipe, mealsDoneMap, onTog
       )
     : null;
 
+  const getRecipeLink = (recipe, mealTypeId) => {
+    if (planningId) {
+      const params = new URLSearchParams({ day: viewedDay, meal: mealTypeId });
+      return `/planning/${planningId}/recette/${getSlug(recipe.title)}?${params}`;
+    }
+    return `/recettes/${getSlug(recipe.title)}`;
+  };
+
   return (
     <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
-      {/* Header */}
+      {/* Header avec navigation */}
       <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setDayOffset((d) => d - 1)}
+          disabled={!canPrev}
+          className="p-1 rounded-md text-text-light hover:text-primary hover:bg-primary/5 disabled:opacity-20 disabled:pointer-events-none transition-colors"
+        >
+          <ChevronLeft size={16} />
+        </button>
         <div className="flex items-center gap-2">
           <Clock size={15} className="text-primary" />
           <span className="text-xs font-medium uppercase tracking-wider text-primary">
-            Aujourd'hui — {DAY_LABELS[currentDay] || currentDay}
+            {isToday ? 'Aujourd\'hui' : DAY_LABELS[viewedDay] || viewedDay}
+            {isToday && ` — ${DAY_LABELS[currentDay]}`}
           </span>
         </div>
-        {currentMealTypeId && (
-          <span className="text-[15px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+        <button
+          type="button"
+          onClick={() => setDayOffset((d) => d + 1)}
+          disabled={!canNext}
+          className="p-1 rounded-md text-text-light hover:text-primary hover:bg-primary/5 disabled:opacity-20 disabled:pointer-events-none transition-colors"
+        >
+          <ChevronRight size={16} />
+        </button>
+      </div>
+
+      {/* Badge repas en cours (aujourd'hui seulement) */}
+      {isToday && currentMealTypeId && (
+        <div className="px-5 py-1.5 border-b border-border bg-primary/3 flex justify-center">
+          <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
             {MEAL_LABELS[currentMealTypeId]}
           </span>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Compteur de réalisé */}
       {todayDoneStats && todayDoneStats.count > 0 && (
@@ -87,14 +129,14 @@ export default function RepasDuMoment({ planning, getRecipe, mealsDoneMap, onTog
       {!hasMeals ? (
         <div className="px-5 py-8 text-center">
           <UtensilsCrossed size={28} className="text-text-light/40 mx-auto mb-3" />
-          <p className="text-sm text-text-light">Aucun repas planifié aujourd'hui.</p>
+          <p className="text-sm text-text-light">Aucun repas planifié {isToday ? 'aujourd\'hui' : DAY_LABELS[viewedDay]?.toLowerCase()}.</p>
           <Link to="/planning" className="text-xs text-primary mt-2 inline-block hover:underline">
             Modifier le planning →
           </Link>
         </div>
       ) : (
         <ul className="divide-y divide-border">
-          {todayMeals.map(({ id, recipe, isCurrent, isDone, doneKey }) => (
+          {viewedMeals.map(({ id, recipe, isCurrent, isDone }) => (
             <li
               key={id}
               className={`relative transition-colors ${
@@ -114,7 +156,7 @@ export default function RepasDuMoment({ planning, getRecipe, mealsDoneMap, onTog
               )}
 
               <div className="flex items-center gap-3 px-5 py-3">
-                {/* Case à cocher (si tracking actif et recette présente) */}
+                {/* Case à cocher (jour courant uniquement) */}
                 {hasTracking && recipe && (
                   <button
                     type="button"
@@ -132,7 +174,7 @@ export default function RepasDuMoment({ planning, getRecipe, mealsDoneMap, onTog
 
                 {recipe ? (
                   <Link
-                    to={`/recettes/${getSlug(recipe.title)}`}
+                    to={getRecipeLink(recipe, id)}
                     className="flex items-center gap-3 flex-1 min-w-0 group"
                   >
                     <div className="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-bg-warm flex items-center justify-center">
@@ -151,7 +193,7 @@ export default function RepasDuMoment({ planning, getRecipe, mealsDoneMap, onTog
                       <p className={`text-sm leading-snug truncate ${isDone ? 'text-text-light line-through' : isCurrent ? 'text-text font-medium' : 'text-text-light'}`}>
                         {recipe.title}
                       </p>
-                      <p className="text-[15px] text-text-light/70 mt-0.5">
+                      <p className="text-[11px] text-text-light/70 mt-0.5">
                         {recipe.protein}g prot · {recipe.calories} kcal
                       </p>
                     </div>

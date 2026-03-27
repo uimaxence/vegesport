@@ -4,14 +4,14 @@ import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { canonicalUrl } from '../lib/seo';
-import { categories, objectives, regimes, tags } from '../data/recipes';
+import { categories, regimes, tags } from '../data/recipes';
 import RecipeCard from '../components/RecipeCard';
 import RecipesSkeleton from '../components/skeleton/RecipesSkeleton';
 
 export default function Recipes({ favorites, toggleFavorite }) {
   usePageMeta({
     title: 'Recettes végétariennes protéinées pour sportifs',
-    description: 'Découvrez toutes nos recettes végétariennes et végétaliennes riches en protéines. Filtrez par objectif sportif, régime alimentaire et temps de préparation.',
+    description: 'Découvrez toutes nos recettes végétariennes et végétaliennes riches en protéines. Filtrez par catégorie, régime alimentaire, tags et temps de préparation.',
     canonical: canonicalUrl('/recettes'),
   });
   const { recipes, loading, error } = useData();
@@ -20,7 +20,6 @@ export default function Recipes({ favorites, toggleFavorite }) {
 
   const searchQuery = searchParams.get('search') || '';
   const activeCategory = searchParams.get('categorie') || 'tous';
-  const activeObjective = searchParams.get('objectif') || '';
   const activeRegime = searchParams.get('regime') || '';
   const activeTag = searchParams.get('tag') || '';
   const activeTime = searchParams.get('temps') || '';
@@ -39,7 +38,7 @@ export default function Recipes({ favorites, toggleFavorite }) {
     setSearchParams({});
   };
 
-  const hasActiveFilters = activeCategory !== 'tous' || activeObjective || activeRegime || activeTag || activeTime || searchQuery;
+  const hasActiveFilters = activeCategory !== 'tous' || activeRegime || activeTag || activeTime || searchQuery;
 
   const filteredRecipes = useMemo(() => {
     return recipes.filter((recipe) => {
@@ -53,14 +52,13 @@ export default function Recipes({ favorites, toggleFavorite }) {
         if (!matchesSearch) return false;
       }
       if (activeCategory !== 'tous' && recipe.category !== activeCategory) return false;
-      if (activeObjective && !recipe.objective.includes(activeObjective)) return false;
       if (activeRegime && !recipe.regime.includes(activeRegime)) return false;
       if (activeTag && !recipe.tags.includes(activeTag)) return false;
       if (activeTime === '15' && recipe.time > 15) return false;
       if (activeTime === '30' && recipe.time > 30) return false;
       return true;
     });
-  }, [recipes, searchQuery, activeCategory, activeObjective, activeRegime, activeTag, activeTime]);
+  }, [recipes, searchQuery, activeCategory, activeRegime, activeTag, activeTime]);
 
   if (loading) return <RecipesSkeleton />;
   if (error) {
@@ -113,22 +111,6 @@ export default function Recipes({ favorites, toggleFavorite }) {
                     </button>
                   );
                 })}
-              </div>
-
-              {/* Objectives */}
-              <div className="mb-8 p-1 rounded-[10px] bg-black/[0.04]">
-                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-2 px-1">Objectif</p>
-                {objectives.map(obj => (
-                  <button
-                    key={obj.id}
-                    onClick={() => updateFilter('objectif', activeObjective === obj.id ? '' : obj.id)}
-                    className={`block w-full text-left py-2 px-2.5 rounded-lg text-sm transition-colors ${
-                      activeObjective === obj.id ? 'bg-white text-text font-medium shadow-sm' : 'text-text-light hover:text-text'
-                    }`}
-                  >
-                    {obj.label}
-                  </button>
-                ))}
               </div>
 
               {/* Regime */}

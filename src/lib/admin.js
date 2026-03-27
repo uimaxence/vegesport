@@ -147,6 +147,7 @@ function recipeToRow(payload) {
     image: payload.image ?? null,
     ingredients: payload.ingredients ?? [],
     steps: Array.isArray(payload.steps) ? payload.steps : [],
+    notes: payload.notes ?? null,
   };
 }
 
@@ -238,6 +239,93 @@ export async function updateRecipe(id, payload) {
 export async function deleteRecipe(id) {
   if (!isSupabaseConfigured() || !supabase) throw new Error('Supabase non configuré');
   const { error } = await supabase.from('recipes').delete().eq('id', id);
+  if (error) throw error;
+}
+
+/* ── Articles ─────────────────────────────────────────── */
+
+/** Liste des articles pour l'admin (lecture directe REST). */
+export async function fetchAdminArticles() {
+  if (!isSupabaseConfigured()) return [];
+  const data = await restGet('blog_articles?select=id,title,category,date&order=date.desc');
+  return Array.isArray(data) ? data : [];
+}
+
+function normalizeBlocks(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string') {
+    try { return JSON.parse(raw || '[]'); } catch { return []; }
+  }
+  return [];
+}
+
+function extractFaqAndSources(blocks) {
+  const faq = [];
+  const sources = [];
+  for (const b of blocks) {
+    const type = String(b?.type || '').toLowerCase();
+    if (type === 'faq' && Array.isArray(b?.items)) {
+      for (const item of b.items) {
+        const q = item?.question ?? item?.name;
+        const a = item?.answer ?? item?.acceptedAnswer?.text ?? item?.acceptedAnswer;
+        if (q && a) faq.push({ question: q, answer: a });
+      }
+    }
+    if (type === 'sources_list' && Array.isArray(b?.items)) {
+      for (const item of b.items) {
+        const label = item?.label ?? item?.name;
+        const url = item?.url ?? item?.href;
+        if (label || url) sources.push({ label: label || url, url });
+      }
+    }
+    if (type === 'source') {
+      const label = b?.label ?? b?.name;
+      const url = b?.url ?? b?.href;
+      if (label || url) sources.push({ label: label || url, url });
+    }
+  }
+  return { faq, sources };
+}
+
+/** Crée ou met à jour un article depuis un objet JSON. Retourne l'id. */
+export async function createArticleFromJson(input) {
+  if (!isSupabaseConfigured() || !supabase) throw new Error('Supabase non configuré');
+
+  const contentJson = normalizeBlocks(input.content_json ?? input.contentJson);
+  const { faq, sources } = extractFaqAndSources(contentJson);
+
+  const row = {
+    title: input.title,
+    excerpt: input.excerpt ?? null,
+    meta_title: input.meta_title ?? input.metaTitle ?? input.title,
+    meta_description: input.meta_description ?? input.metaDescription ?? input.excerpt ?? '',
+    category: input.category,
+    date: input.date,
+    read_time: Number(input.read_time ?? input.readTime ?? 5),
+    image: input.image ?? null,
+    author: input.author ?? null,
+    content: input.content ?? '',
+    content_json: contentJson,
+    faq_json: Array.isArray(input.faq_json ?? input.faqJson) ? (input.faq_json ?? input.faqJson) : faq,
+    sources_json: Array.isArray(input.sources_json ?? input.sourcesJson) ? (input.sources_json ?? input.sourcesJson) : sources,
+    schema_type: input.schema_type ?? input.schemaType ?? 'Article',
+  };
+
+  if (input.id != null) {
+    row.id = input.id;
+    const { error } = await supabase.from('blog_articles').upsert(row, { onConflict: 'id' });
+    if (error) throw error;
+    return row.id;
+  }
+  const { data, error } = await supabase.from('blog_articles').insert(row).select('id').single();
+  if (error) throw error;
+  return data.id;
+}
+
+/** Supprime un article. */
+export async function deleteArticle(id) {
+  if (!isSupabaseConfigured() || !supabase) throw new Error('Supabase non configuré');
+  const { error } = await supabase.from('blog_articles').delete().eq('id', id);
   if (error) throw error;
 }
 
