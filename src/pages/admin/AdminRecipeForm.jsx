@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Calculator } from 'lucide-react';
 import {
   fetchRecipeForEdit,
   fetchIngredients,
@@ -8,6 +8,7 @@ import {
   updateRecipe,
   uploadRecipeImage,
 } from '../../lib/admin';
+import { calculateRecipeMacros, macrosPerServing } from '../../lib/nutrition';
 import { categories, objectives, regimes, tags } from '../../data/recipes';
 
 const RAYONS = [
@@ -29,6 +30,63 @@ const SEASONS = [
 ];
 
 const DIFFICULTIES = ['Facile', 'Moyen'];
+
+const UNITS = [
+  { value: 'g', label: 'g' },
+  { value: 'kg', label: 'kg' },
+  { value: 'ml', label: 'ml' },
+  { value: 'cl', label: 'cl' },
+  { value: 'L', label: 'L' },
+  { value: 'c.à.s', label: 'c.à.s' },
+  { value: 'c.à.c', label: 'c.à.c' },
+  { value: 'pièce', label: 'pièce' },
+  { value: 'pincée', label: 'pincée' },
+  { value: 'sachet', label: 'sachet' },
+  { value: 'tranche', label: 'tranche' },
+];
+
+/** Bouton « Calculer depuis les ingrédients » — calcule les macros auto. */
+function AutoMacroButton({ recipeIngredients, ingredientsList, servings, onApply }) {
+  const computed = useMemo(() => {
+    // Construire le tableau au format attendu par calculateRecipeMacros
+    const riForCalc = (recipeIngredients || [])
+      .filter((row) => row.ingredientId && row.quantity !== '')
+      .map((row) => {
+        const ing = (ingredientsList || []).find((i) => String(i.id) === String(row.ingredientId));
+        return {
+          quantity: Number(row.quantity) || null,
+          unit: row.unit || null,
+          ingredients: ing || null,
+        };
+      });
+    if (riForCalc.length === 0) return null;
+    const totals = calculateRecipeMacros(riForCalc);
+    if (totals.coverage === 0) return null;
+    return { totals, perServing: macrosPerServing(totals, Number(servings) || 1) };
+  }, [recipeIngredients, ingredientsList, servings]);
+
+  if (!computed) return null;
+
+  const { totals, perServing } = computed;
+
+  return (
+    <button
+      type="button"
+      onClick={() => onApply(perServing)}
+      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-secondary/10 text-secondary hover:bg-secondary/20 transition-colors"
+      title={totals.complete
+        ? 'Tous les ingrédients ont des macros — calcul fiable'
+        : `${Math.round(totals.coverage * 100)}% des ingrédients ont des macros — calcul partiel`
+      }
+    >
+      <Calculator size={14} />
+      Calculer
+      {!totals.complete && (
+        <span className="text-[10px] opacity-70">({Math.round(totals.coverage * 100)}%)</span>
+      )}
+    </button>
+  );
+}
 
 function IngredientAutocomplete({ ingredients, value, onChange, onAdd }) {
   const [open, setOpen] = useState(false);
@@ -140,7 +198,7 @@ export default function AdminRecipeForm() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null); // URL existante ou object URL
   const [steps, setSteps] = useState(['']);
-  const [recipeIngredients, setRecipeIngredients] = useState([{ ingredientId: '', name: '', rayon: RAYONS[0], quantityText: '' }]);
+  const [recipeIngredients, setRecipeIngredients] = useState([{ ingredientId: '', name: '', rayon: RAYONS[0], quantity: '', unit: 'g', preparation: '' }]);
 
   useEffect(() => {
     fetchIngredients().then(setIngredientsList).catch(() => setIngredientsList([]));
@@ -178,9 +236,11 @@ export default function AdminRecipeForm() {
                 ingredientId: x.ingredientId ?? x.ingredient_id ?? '',
                 name: x.name ?? '',
                 rayon: x.rayon ?? RAYONS[0],
-                quantityText: x.quantityText ?? x.quantity_text ?? '',
+                quantity: x.quantity ?? '',
+                unit: x.unit || 'g',
+                preparation: x.preparation || '',
               }))
-            : [{ ingredientId: '', name: '', rayon: RAYONS[0], quantityText: '' }];
+            : [{ ingredientId: '', name: '', rayon: RAYONS[0], quantity: '', unit: 'g', preparation: '' }];
           setRecipeIngredients(ri);
         })
         .catch((e) => setError(e?.message || 'Erreur chargement'))
@@ -199,7 +259,7 @@ export default function AdminRecipeForm() {
   const setStep = (i, v) => setSteps((prev) => prev.map((s, idx) => (idx === i ? v : s)));
 
   const addIngredientRow = () => {
-    setRecipeIngredients((prev) => [...prev, { ingredientId: '', name: '', rayon: RAYONS[0], quantityText: '' }]);
+    setRecipeIngredients((prev) => [...prev, { ingredientId: '', name: '', rayon: RAYONS[0], quantity: '', unit: 'g', preparation: '' }]);
   };
   const removeIngredientRow = (i) => {
     setRecipeIngredients((prev) => prev.filter((_, idx) => idx !== i));
@@ -218,10 +278,15 @@ export default function AdminRecipeForm() {
         return hasIng;
       })
       .map((row) => {
+        const base = {
+          quantity: row.quantity !== '' ? Number(row.quantity) : null,
+          unit: row.unit || null,
+          preparation: row.preparation?.trim() || null,
+        };
         if (row.ingredientId) {
-          return { ingredientId: row.ingredientId, quantityText: row.quantityText };
+          return { ...base, ingredientId: row.ingredientId };
         }
-        return { name: row.name.trim(), rayon: row.rayon, quantityText: row.quantityText };
+        return { ...base, name: row.name.trim(), rayon: row.rayon };
       });
 
     return {
@@ -371,46 +436,62 @@ export default function AdminRecipeForm() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-text mb-1">Calories</label>
-              <input
-                type="number"
-                min="0"
-                value={calories}
-                onChange={(e) => setCalories(e.target.value)}
-                className="w-full px-3 py-2 border border-black/10 rounded-lg"
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-sm font-medium text-text">Macros par portion</span>
+              <AutoMacroButton
+                recipeIngredients={recipeIngredients}
+                ingredientsList={ingredientsList}
+                servings={servings}
+                onApply={(m) => {
+                  setCalories(m.calories);
+                  setProtein(m.protein);
+                  setCarbs(m.carbs);
+                  setFat(m.fat);
+                }}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-text mb-1">Protéines (g)</label>
-              <input
-                type="number"
-                min="0"
-                value={protein}
-                onChange={(e) => setProtein(e.target.value)}
-                className="w-full px-3 py-2 border border-black/10 rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-text mb-1">Glucides (g)</label>
-              <input
-                type="number"
-                min="0"
-                value={carbs}
-                onChange={(e) => setCarbs(e.target.value)}
-                className="w-full px-3 py-2 border border-black/10 rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-text mb-1">Lipides (g)</label>
-              <input
-                type="number"
-                min="0"
-                value={fat}
-                onChange={(e) => setFat(e.target.value)}
-                className="w-full px-3 py-2 border border-black/10 rounded-lg"
-              />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Calories</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={calories}
+                  onChange={(e) => setCalories(e.target.value)}
+                  className="w-full px-3 py-2 border border-black/10 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Protéines (g)</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={protein}
+                  onChange={(e) => setProtein(e.target.value)}
+                  className="w-full px-3 py-2 border border-black/10 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Glucides (g)</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={carbs}
+                  onChange={(e) => setCarbs(e.target.value)}
+                  className="w-full px-3 py-2 border border-black/10 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Lipides (g)</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={fat}
+                  onChange={(e) => setFat(e.target.value)}
+                  className="w-full px-3 py-2 border border-black/10 rounded-lg"
+                />
+              </div>
             </div>
           </div>
 
@@ -582,7 +663,7 @@ export default function AdminRecipeForm() {
           <div>
             <label className="block text-sm font-medium text-text mb-2">Ingrédients (avec quantités)</label>
             <p className="text-xs text-text-light mb-2">
-              Choisis un ingrédient existant ou saisis un nouveau nom + rayon.
+              Choisis un ingrédient existant ou saisis un nouveau nom + rayon. La quantité, l'unité et la préparation sont séparés.
             </p>
             <div className="space-y-3">
               {recipeIngredients.map((row, i) => (
@@ -602,6 +683,7 @@ export default function AdminRecipeForm() {
                                     ingredientId: String(next.ingredientId),
                                     name: ing?.name ?? '',
                                     rayon: ing?.rayon ?? RAYONS[0],
+                                    unit: ing?.unit_default || r.unit || 'g',
                                   }
                                 : r
                             )
@@ -645,13 +727,33 @@ export default function AdminRecipeForm() {
                       </div>
                     )}
                   </div>
-                  <input
-                    type="text"
-                    value={row.quantityText}
-                    onChange={(e) => setIngredientRow(i, 'quantityText', e.target.value)}
-                    placeholder="80g, 1 c.à.s..."
-                    className="w-24 px-2 py-1.5 border border-black/10 rounded text-sm"
-                  />
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      step="any"
+                      min="0"
+                      value={row.quantity}
+                      onChange={(e) => setIngredientRow(i, 'quantity', e.target.value)}
+                      placeholder="Qté"
+                      className="w-16 px-2 py-1.5 border border-black/10 rounded text-sm"
+                    />
+                    <select
+                      value={row.unit}
+                      onChange={(e) => setIngredientRow(i, 'unit', e.target.value)}
+                      className="px-1.5 py-1.5 border border-black/10 rounded text-sm"
+                    >
+                      {UNITS.map((u) => (
+                        <option key={u.value} value={u.value}>{u.label}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      value={row.preparation}
+                      onChange={(e) => setIngredientRow(i, 'preparation', e.target.value)}
+                      placeholder="émincé, râpé…"
+                      className="w-24 px-2 py-1.5 border border-black/10 rounded text-sm"
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={() => removeIngredientRow(i)}

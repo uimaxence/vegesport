@@ -7,7 +7,7 @@ import { canonicalUrl, buildWebSiteJsonLd } from '../lib/seo';
 import RecipeCard from '../components/RecipeCard';
 import { getSlug } from '../lib/slug';
 import vuePlanning from '../assets/vue planning.png';
-import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
+import { getSafeImageSrc, handleMediaImageError, getOptimizedImageUrl } from '../lib/imageFallback';
 
 function HeroRecipeCard({ recipe }) {
   return (
@@ -17,10 +17,14 @@ function HeroRecipeCard({ recipe }) {
     >
       <div className="aspect-[3/4] overflow-hidden bg-bg-warm flex items-center justify-center">
         <img
-          src={getSafeImageSrc(recipe.image)}
+          src={getOptimizedImageUrl(getSafeImageSrc(recipe.image), 200)}
           alt={recipe.title}
           onError={handleMediaImageError}
           className="w-full h-full object-contain scale-60 group-hover:scale-60 transition-transform duration-500"
+          loading="lazy"
+          decoding="async"
+          width="200"
+          height="267"
         />
       </div>
       <div className="p-2.5">
@@ -76,14 +80,14 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <p className="text-text-light">Chargement…</p>
       </div>
     );
   }
   if (error) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center px-6">
+      <div className="min-h-screen flex items-center justify-center px-6">
         <p className="text-red-600">Erreur : {error}</p>
       </div>
     );
@@ -294,10 +298,14 @@ export default function Home() {
               <Link key={article.id} to={`/blog/${article.id}/${getSlug(article.title)}`} className="group">
                 <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
                   <img
-                    src={getSafeImageSrc(article.image)}
+                    src={getOptimizedImageUrl(getSafeImageSrc(article.image), 400)}
                     alt={article.title}
                     onError={handleMediaImageError}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    loading="lazy"
+                    decoding="async"
+                    width="400"
+                    height="267"
                   />
                 </div>
                 <div className="mt-3">

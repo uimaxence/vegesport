@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
             <Link to="/" className="inline-block">
-              <img src="/logo.svg" alt="et si mamie était végé ?" className="h-10 w-auto" />
+              <img src="/logo.svg" alt="et si mamie était végé ?" className="h-10 w-auto" width="119" height="40" />
             </Link>
             <p className="mt-3 text-sm text-text-light leading-relaxed">
               Recettes végétariennes et végétaliennes riches en protéines, conçues pour les sportifs.

@@ -9,6 +9,29 @@
   font-display: swap;
 }
 
+/* Satoshi — self-hosted (supprime le render-blocking cdnfonts.com) */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/typo/Satoshi-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/typo/Satoshi-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/typo/Satoshi-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-primary: #E8450E;
   --color-primary-light: #FF6B3D;
@@ -86,6 +109,7 @@
 .recipe-annotation {
   font-family: var(--font-script), cursive;
   font-size: 1rem;
+  line-height: 1.4;
   color: var(--color-text-light);
   font-weight: 400;
 }

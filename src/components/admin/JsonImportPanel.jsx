@@ -7,10 +7,6 @@ const RECIPE_SCHEMA = `{
   "title": "Nom de la recette",
   "category": "petit-dejeuner | dejeuner | diner | snack | dessert",
   "time": 15,
-  "calories": 400,
-  "protein": 25,
-  "carbs": 50,
-  "fat": 10,
   "servings": 2,
   "difficulty": "Facile | Moyen | Difficile",
   "tags": ["#RicheEnProtéines", "#PostEntraînement", "#Budget", "#RicheEnFer", "#PréparationRepas"],
@@ -20,9 +16,17 @@ const RECIPE_SCHEMA = `{
   "mainIngredient": "Ingrédient principal",
   "steps": ["Étape 1…", "Étape 2…"],
   "recipeIngredients": [
-    { "name": "Flocons d'avoine", "quantityText": "80g", "rayon": "Épicerie" }
+    { "name": "Flocons d'avoine", "quantity": 80, "unit": "g", "rayon": "Épicerie" },
+    { "name": "Banane", "quantity": 1, "unit": "pièce", "rayon": "Fruits et légumes", "preparation": "en rondelles" }
   ]
 }`;
+
+const RAYONS = [
+  'Fruits et légumes', 'Épicerie', 'Pâtes riz et céréales', 'Boissons',
+  'Frais et protéines végétales', 'Surgelés', 'Condiments et épices', 'Graines et oléagineux',
+];
+
+const UNITS = ['g', 'kg', 'ml', 'cl', 'L', 'c.à.s', 'c.à.c', 'pièce', 'pincée', 'sachet', 'tranche'];
 
 const ARTICLE_SCHEMA = `{
   "title": "Titre de l'article",
@@ -57,7 +61,7 @@ function validateRecipe(data) {
   if (data.category && !RECIPE_CATEGORIES.has(data.category)) {
     errors.push(`category invalide : "${data.category}" (attendu : ${[...RECIPE_CATEGORIES].join(', ')})`);
   }
-  for (const f of ['time', 'calories', 'protein', 'carbs', 'fat', 'servings']) {
+  for (const f of ['time', 'servings']) {
     if (data[f] != null && (typeof data[f] !== 'number' || isNaN(data[f]))) {
       errors.push(`${f} doit être un nombre`);
     }
@@ -124,12 +128,35 @@ export default function JsonImportPanel({ type, onImport, onClose }) {
     }
   }, [json, validate, onImport]);
 
-  const copyReformatPrompt = useCallback(() => {
-    const label = isRecipe ? 'une recette végétarienne' : 'un article de blog';
-    const rayons = isRecipe
-      ? '\nRayons possibles pour recipeIngredients.rayon : Fruits et légumes, Épicerie, Boulangerie, Produits laitiers, Surgelés, Boissons, Conserves, Condiments, Boucherie/Poissonnerie\n'
-      : '';
-    const prompt = `Reformate ce JSON pour qu'il corresponde exactement au format attendu pour importer ${label} sur mamie-vege.fr.\n\nFORMAT ATTENDU :\n${schema}\n${rayons}\nJSON À REFORMATER :\n${json}\n\nRéponds uniquement avec le JSON reformaté, sans explication.`;
+  const copyPrompt = useCallback(() => {
+    let prompt;
+    if (isRecipe) {
+      const rules = [
+        `FORMAT JSON ATTENDU :\n${schema}`,
+        `RAYONS possibles (exactement un parmi) : ${RAYONS.join(', ')}`,
+        `UNITÉS possibles : ${UNITS.join(', ')}`,
+        `RÈGLES IMPORTANTES :`,
+        `- "name" de chaque ingrédient = nom GÉNÉRIQUE sans qualificatif (ex: "Épinards" et non "Épinards frais", "Gingembre" et non "Gingembre frais râpé")`,
+        `- Les qualificatifs (frais, cuit, râpé, en dés…) vont dans "preparation"`,
+        `- "quantity" est un NOMBRE (pas une string), "unit" est séparé`,
+        `- Les macros (calories, protein, carbs, fat) ne doivent PAS être dans le JSON, elles sont calculées automatiquement`,
+        `- category doit être exactement : petit-dejeuner, dejeuner, diner, snack ou dessert`,
+        `- Les steps doivent être détaillées et utiliser les noms d'ingrédients tels quels`,
+        `- Le site est végétarien/végétalien axé sport et protéines`,
+      ].join('\n');
+
+      if (json.trim()) {
+        prompt = `Reformate cette recette en JSON pour l'importer sur mon site de recettes végétariennes protéinées.\n\n${rules}\n\nRECETTE À FORMATER :\n${json}\n\nRéponds UNIQUEMENT avec le JSON valide, sans explication ni commentaire.`;
+      } else {
+        prompt = `Génère une recette végétarienne riche en protéines au format JSON pour l'importer sur mon site.\n\n${rules}\n\nRéponds UNIQUEMENT avec le JSON valide, sans explication ni commentaire.`;
+      }
+    } else {
+      if (json.trim()) {
+        prompt = `Reformate ce JSON pour qu'il corresponde exactement au format attendu pour importer un article de blog sur mamie-vege.fr.\n\nFORMAT ATTENDU :\n${schema}\n\nJSON À REFORMATER :\n${json}\n\nRéponds UNIQUEMENT avec le JSON reformaté, sans explication.`;
+      } else {
+        prompt = `Génère un article de blog au format JSON pour le site mamie-vege.fr.\n\nFORMAT ATTENDU :\n${schema}\n\nRéponds UNIQUEMENT avec le JSON valide, sans explication.`;
+      }
+    }
     navigator.clipboard.writeText(prompt);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -154,8 +181,21 @@ export default function JsonImportPanel({ type, onImport, onClose }) {
         className="w-full rounded-lg border border-border bg-black/[0.02] p-3 font-mono text-sm text-text placeholder:text-text-light/50 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-y"
       />
 
+      <button
+        type="button"
+        onClick={copyPrompt}
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+      >
+        {copied ? <Check size={14} /> : <Copy size={14} />}
+        {copied
+          ? 'Prompt copié !'
+          : json.trim()
+            ? 'Copier le prompt pour reformater ce JSON'
+            : 'Copier le prompt pour générer le JSON'}
+      </button>
+
       {errors.length > 0 && (
-        <div className="rounded-lg bg-red-50 border border-red-200 p-4 space-y-3">
+        <div className="rounded-lg bg-red-50 border border-red-200 p-3">
           <div className="flex items-start gap-2">
             <AlertTriangle size={18} className="text-red-500 mt-0.5 flex-shrink-0" />
             <div className="space-y-1">
@@ -164,16 +204,6 @@ export default function JsonImportPanel({ type, onImport, onClose }) {
               ))}
             </div>
           </div>
-          {json.trim() && (
-            <button
-              type="button"
-              onClick={copyReformatPrompt}
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
-            >
-              {copied ? <Check size={16} /> : <Copy size={16} />}
-              {copied ? 'Prompt copié !' : 'Copier le prompt pour reformater'}
-            </button>
-          )}
         </div>
       )}
 

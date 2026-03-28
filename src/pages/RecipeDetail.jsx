@@ -9,9 +9,10 @@ import { getSlug } from '../lib/slug';
 import { canonicalUrl, buildRecipeJsonLd, buildBreadcrumbJsonLd, categoryLabel } from '../lib/seo';
 import RecipeCard from '../components/RecipeCard';
 import RecipeComments from '../components/RecipeComments';
-import { getSafeImageSrc, handleMediaImageError, isRecipeImageMissing } from '../lib/imageFallback';
+import { getSafeImageSrc, handleMediaImageError, isRecipeImageMissing, getOptimizedImageUrl } from '../lib/imageFallback';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { ownerMacros, ingredientScale } from '../lib/household';
+import { calculateRecipeMacros, macrosPerServing } from '../lib/nutrition';
 import { getMealTypeFromHour, getCurrentDayId } from '../utils/dashboardPlanning';
 
 const ALLOWED_MEAL_MULTIPLIERS = new Set([0.5, 1, 1.5, 2]);
@@ -52,7 +53,7 @@ function scaleIngredient(ing, ratio) {
   const num = parseFloat(match[1].replace(',', '.'));
   const unit = match[2].trim();
   const scaled = num * ratio;
-  const formatted = scaled % 1 === 0 ? String(Math.round(scaled)) : scaled.toFixed(1).replace('.', ',');
+  const formatted = String(Math.round(scaled));
   const newQty = unit ? `${formatted} ${unit}` : formatted;
   return (newQty + ' ' + parsed.name).trim();
 }
@@ -70,6 +71,26 @@ function isCommonPantry(ingredientName) {
     'haricot', 'noix', 'amande', 'cacahuète', 'cacao', 'chocolat', 'coriandre'
   ];
   return common.some(term => lower.includes(term));
+}
+
+/** Unités sans espace après le nombre (80g, 200ml). */
+const NO_SPACE_UNITS = new Set(['g', 'kg', 'ml', 'cl', 'L']);
+
+/** Formate un ingrédient structuré pour l'affichage (avec quantité scalée). */
+function formatStructuredIngredient(ri, ratio) {
+  const name = ri.ingredients?.name ?? '';
+  let prefix = '';
+  if (ri.quantity != null) {
+    const scaled = ri.quantity * ratio;
+    const qStr = String(Math.round(scaled));
+    if (ri.unit && ri.unit !== 'pièce') {
+      prefix = NO_SPACE_UNITS.has(ri.unit) ? `${qStr}${ri.unit}` : `${qStr} ${ri.unit}`;
+    } else {
+      prefix = qStr;
+    }
+  }
+  const prep = ri.preparation ? ` (${ri.preparation})` : '';
+  return prefix ? `${prefix} ${name}${prep}`.trim() : `${name}${prep}`.trim();
 }
 
 // ─── Timer ───────────────────────────────────────────────────────────────────
@@ -661,13 +682,28 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
   const objective = effectiveRecipe?.objective ?? [];
   const recipeNotes = effectiveRecipe?.notes ?? recipe?.notes ?? '';
 
+  // Macros dynamiques calculées depuis recipe_ingredients × ingredients (valeurs /100g)
+  const computedMacros = useMemo(() => {
+    const ris = effectiveRecipe?.recipeIngredients;
+    if (!Array.isArray(ris) || ris.length === 0) {
+      return {
+        calories: effectiveRecipe?.calories ?? recipe?.calories ?? 0,
+        protein: effectiveRecipe?.protein ?? recipe?.protein ?? 0,
+        carbs: effectiveRecipe?.carbs ?? recipe?.carbs ?? 0,
+        fat: effectiveRecipe?.fat ?? recipe?.fat ?? 0,
+      };
+    }
+    const totals = calculateRecipeMacros(ris);
+    return macrosPerServing(totals, effectiveRecipe?.servings || 1);
+  }, [effectiveRecipe, recipe]);
+
   const recipeTitle = effectiveRecipe?.title || recipe?.title || '';
   const recipeSlug = recipeTitle ? getSlug(recipeTitle) : slug;
   const recipeUrl = recipeSlug ? canonicalUrl(`/recettes/${recipeSlug}`) : '';
   const recipeDesc = recipeTitle && steps[0]
     ? `${recipeTitle} — ${steps[0].slice(0, 120)}…`
     : recipeTitle
-      ? `Recette végétarienne ${recipeTitle} : ${effectiveRecipe?.calories ?? recipe?.calories ?? ''} kcal, ${effectiveRecipe?.protein ?? recipe?.protein ?? ''}g de protéines. Facile et rapide.`
+      ? `Recette végétarienne ${recipeTitle} : ${computedMacros.calories} kcal, ${computedMacros.protein}g de protéines. Facile et rapide.`
       : '';
 
   const metaReady = Boolean(recipe && recipeTitle && recipeUrl);
@@ -687,7 +723,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
   useJsonLd(
     metaReady
       ? [
-          buildRecipeJsonLd(effectiveRecipe || recipe, recipeUrl, {
+          buildRecipeJsonLd({ ...(effectiveRecipe || recipe), ...computedMacros }, recipeUrl, {
             aggregateRating: commentRatingAgg || undefined,
           }),
           buildBreadcrumbJsonLd([
@@ -758,38 +794,55 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
     ? ingredientScale(householdMembers, (effectiveRecipe?.servings || recipe?.servings) || 1)
     : servings / ((effectiveRecipe?.servings || recipe?.servings) || 1);
 
-  // Macros de l'owner en mode planning
+  // Macros de l'owner en mode planning (basées sur les macros dynamiques)
   const planningOwnerMacros = useMemo(() => {
     if (!hasHousehold) return null;
-    return ownerMacros(effectiveRecipe ?? recipe, householdMembers);
-  }, [hasHousehold, effectiveRecipe, recipe, householdMembers]);
+    return ownerMacros({ ...(effectiveRecipe ?? recipe), ...computedMacros }, householdMembers);
+  }, [hasHousehold, effectiveRecipe, recipe, householdMembers, computedMacros]);
 
   // Séparation placard (basiques) / reste (à préparer) pour le mode cuisine
+  const structuredIngs = effectiveRecipe?.recipeIngredients;
+  const hasStructured = Array.isArray(structuredIngs) && structuredIngs.length > 0;
+
   const { pantryList, restList } = useMemo(() => {
     const pantry = [];
     const rest = [];
-    ingredients.forEach((ing, i) => {
-      const parsed = parseIngredient(ing);
-      const name = parsed.name || ing;
-      if (isCommonPantry(name)) {
-        pantry.push({ index: i, text: scaleIngredient(ing, ratio) });
-      } else {
-        rest.push({ index: i, text: scaleIngredient(ing, ratio) });
-      }
-    });
+
+    if (hasStructured) {
+      structuredIngs.forEach((ri, i) => {
+        const name = ri.ingredients?.name ?? '';
+        const text = formatStructuredIngredient(ri, ratio);
+        if (isCommonPantry(name)) {
+          pantry.push({ index: i, text });
+        } else {
+          rest.push({ index: i, text });
+        }
+      });
+    } else {
+      ingredients.forEach((ing, i) => {
+        const parsed = parseIngredient(ing);
+        const name = parsed.name || ing;
+        if (isCommonPantry(name)) {
+          pantry.push({ index: i, text: scaleIngredient(ing, ratio) });
+        } else {
+          rest.push({ index: i, text: scaleIngredient(ing, ratio) });
+        }
+      });
+    }
+
     return { pantryList: pantry, restList: rest };
-  }, [ingredients, ratio]);
+  }, [hasStructured, structuredIngs, ingredients, ratio]);
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <p className="text-text-light">Chargement…</p>
       </div>
     );
   }
   if (error) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center px-6">
+      <div className="min-h-screen flex items-center justify-center px-6">
         <p className="text-red-600">Erreur : {error}</p>
       </div>
     );
@@ -818,13 +871,14 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
     const instructionIndex = stepIndex - 1;
     const currentStepText = isIngredientsStep ? '' : (steps[instructionIndex] ?? steps[0]);
 
-    const checked = checkedIngredients.length === ingredients.length
+    const ingredientCount = hasStructured ? structuredIngs.length : ingredients.length;
+    const checked = checkedIngredients.length === ingredientCount
       ? checkedIngredients
-      : ingredients.map(() => false);
+      : Array(ingredientCount).fill(false);
 
     const toggleCheck = (i) => {
       setCheckedIngredients(prev => {
-        const next = prev.length === ingredients.length ? [...prev] : ingredients.map(() => false);
+        const next = prev.length === ingredientCount ? [...prev] : Array(ingredientCount).fill(false);
         next[i] = !next[i];
         return next;
       });
@@ -1080,7 +1134,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           <div className="lg:w-[42%] flex-shrink-0">
             <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-bg-warm flex items-center justify-center">
               <img
-                src={getSafeImageSrc(effectiveRecipe?.image || recipe.image)}
+                src={getOptimizedImageUrl(getSafeImageSrc(effectiveRecipe?.image || recipe.image), 600)}
                 alt={effectiveRecipe?.title || recipe.title}
                 onError={handleMediaImageError}
                 className={
@@ -1088,6 +1142,8 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                     ? 'max-h-44 w-full object-contain recipe-image-placeholder'
                     : 'w-full h-full object-contain'
                 }
+                width="600"
+                height="450"
                 decoding="async"
                 fetchPriority="high"
               />
@@ -1192,31 +1248,39 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
               </div>
 
               {/* Toggle membres du foyer pour cette recette */}
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <span className="text-xs text-text-light mr-1">Mangent ce repas :</span>
-                {allHouseholdMembers.map((m) => {
-                  const excluded = excludedMemberIds.has(m.id);
-                  return (
-                    <button
-                      key={m.id}
-                      type="button"
-                      onClick={() => !m.is_owner && toggleMemberExclusion(m.id)}
-                      disabled={m.is_owner}
-                      className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
-                        excluded
-                          ? 'border-border text-text-light/40 line-through bg-white'
-                          : 'border-secondary/40 bg-secondary/8 text-secondary'
-                      } ${m.is_owner ? 'cursor-default' : 'cursor-pointer hover:border-secondary'}`}
-                      title={m.is_owner ? 'Toi (toujours inclus)' : excluded ? `Réajouter ${m.name}` : `Retirer ${m.name} pour ce repas`}
-                    >
-                      {m.name}{m.is_owner ? ' (toi)' : ''}
-                    </button>
-                  );
-                })}
+              <div className="mt-4">
+                <p className="text-xs text-text-light mb-2">Qui mange ce repas ? Clique sur un membre pour l'exclure.</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {allHouseholdMembers.map((m) => {
+                    const excluded = excludedMemberIds.has(m.id);
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => !m.is_owner && toggleMemberExclusion(m.id)}
+                        disabled={m.is_owner}
+                        className={`text-xs px-3 py-1.5 rounded-full border transition-all flex items-center gap-1.5 ${
+                          excluded
+                            ? 'border-border text-text-light/40 line-through bg-white'
+                            : 'border-secondary/40 bg-secondary/8 text-secondary'
+                        } ${m.is_owner ? 'cursor-default' : 'cursor-pointer hover:border-secondary'}`}
+                      >
+                        <span className={`inline-block w-3.5 h-3.5 rounded-full border text-[9px] leading-[14px] text-center flex-shrink-0 ${
+                          excluded
+                            ? 'border-text-light/30 text-text-light/30'
+                            : 'border-secondary/50 bg-secondary/15 text-secondary'
+                        }`}>
+                          {excluded ? '✕' : '✓'}
+                        </span>
+                        {m.name}{m.is_owner ? ' (toi)' : ''}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               {excludedMemberIds.size > 0 && (
                 <p className="mt-2 text-xs text-text-light/60 italic">
-                  Quantites ajustees pour {householdMembers.length} personne{householdMembers.length > 1 ? 's' : ''}
+                  Quantités ajustées pour {householdMembers.length} personne{householdMembers.length > 1 ? 's' : ''} sur {allHouseholdMembers.length}
                 </p>
               )}
             </>
@@ -1225,19 +1289,19 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
               <p className="text-[11px] uppercase tracking-[0.15em] text-text-light font-accent">Par portion</p>
               <div className="mt-1.5 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="bg-bg-warm rounded-sm p-3 text-center">
-                  <p className="text-lg font-medium text-primary">{effectiveRecipe?.protein ?? recipe.protein}g</p>
+                  <p className="text-lg font-medium text-primary">{computedMacros.protein}g</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Protéines</p>
                 </div>
                 <div className="bg-bg-warm rounded-sm p-3 text-center">
-                  <p className="text-lg font-medium text-text">{effectiveRecipe?.carbs ?? recipe.carbs}g</p>
+                  <p className="text-lg font-medium text-text">{computedMacros.carbs}g</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Glucides</p>
                 </div>
                 <div className="bg-bg-warm rounded-sm p-3 text-center">
-                  <p className="text-lg font-medium text-text">{effectiveRecipe?.fat ?? recipe.fat}g</p>
+                  <p className="text-lg font-medium text-text">{computedMacros.fat}g</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Lipides</p>
                 </div>
                 <div className="bg-bg-warm rounded-sm p-3 text-center">
-                  <p className="text-lg font-medium text-text">{effectiveRecipe?.calories ?? recipe.calories}</p>
+                  <p className="text-lg font-medium text-text">{computedMacros.calories}</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">kcal</p>
                 </div>
               </div>

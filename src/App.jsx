@@ -31,7 +31,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageFallback() {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center px-6">
+    <div className="min-h-screen flex items-center justify-center px-6">
       <p className="text-text-light">Chargement…</p>
     </div>
   );

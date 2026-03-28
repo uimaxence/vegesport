@@ -205,8 +205,19 @@ export async function fetchRecipeById(id) {
   }
   if (isSupabaseConfigured()) {
     try {
-      const data = await restGet(`recipes?id=eq.${id}&select=*&limit=1`);
-      if (Array.isArray(data) && data[0]) return mapRecipeRow(data[0]);
+      const riSelect = [
+        'quantity', 'unit', 'preparation', 'display_order', 'quantity_text',
+        'ingredients(id,name,rayon,calories_per_100,protein_per_100,carbs_per_100,fat_per_100)',
+      ].join(',');
+      const [recipeData, riData] = await Promise.all([
+        restGet(`recipes?id=eq.${id}&select=*&limit=1`),
+        restGet(`recipe_ingredients?recipe_id=eq.${id}&select=${riSelect}&order=display_order.asc`),
+      ]);
+      if (Array.isArray(recipeData) && recipeData[0]) {
+        const recipe = mapRecipeRow(recipeData[0]);
+        recipe.recipeIngredients = Array.isArray(riData) ? riData : [];
+        return recipe;
+      }
     } catch (e) {
       console.warn('fetchRecipeById: fallback local', e?.message);
     }

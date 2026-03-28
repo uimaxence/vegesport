@@ -71,7 +71,7 @@ export async function fetchAdminRecipes({ page = 0, pageSize = 50 } = {}) {
 /** Liste tous les ingrédients (lecture directe REST). */
 export async function fetchIngredients() {
   if (!isSupabaseConfigured()) return [];
-  const data = await restGet('ingredients?select=id,name,rayon,created_at&order=name.asc');
+  const data = await restGet('ingredients?select=id,name,rayon,unit_default,category,is_verified,calories_per_100,protein_per_100,carbs_per_100,fat_per_100,created_at&order=name.asc');
   return Array.isArray(data) ? data : [];
 }
 
@@ -109,6 +109,74 @@ export async function getIngredientIdByName(name) {
     .limit(1)
     .single();
   return data?.id ?? null;
+}
+
+/**
+ * Enrichit un ingrédient via l'API Open Food Facts.
+ * Cherche le nom, prend le premier résultat pertinent, met à jour les macros.
+ * @returns {{ calories_per_100, protein_per_100, carbs_per_100, fat_per_100, off_id }}
+ */
+export async function enrichIngredientFromOFF(ingredientId) {
+  if (!isSupabaseConfigured() || !supabase) throw new Error('Supabase non configuré');
+
+  const { data: ing } = await supabase
+    .from('ingredients')
+    .select('name')
+    .eq('id', ingredientId)
+    .single();
+  if (!ing) throw new Error('Ingrédient introuvable');
+
+  const params = new URLSearchParams({
+    search_terms: ing.name,
+    search_simple: '1',
+    action: 'process',
+    json: '1',
+    page_size: '5',
+    fields: 'product_name,code,nutriments',
+  });
+  const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?${params}`);
+  if (!res.ok) throw new Error(`Erreur API Open Food Facts (HTTP ${res.status})`);
+  const data = await res.json();
+
+  // Prend le premier produit avec des nutriments exploitables
+  const product = (data.products || []).find(
+    (p) => p.nutriments && (p.nutriments['energy-kcal_100g'] != null || p.nutriments['energy-kcal'] != null)
+  );
+  if (!product) throw new Error(`Aucun résultat nutritionnel pour « ${ing.name} »`);
+
+  const n = product.nutriments;
+  const update = {
+    calories_per_100: Math.round(n['energy-kcal_100g'] ?? n['energy-kcal'] ?? 0),
+    protein_per_100: Math.round((n['proteins_100g'] ?? 0) * 10) / 10,
+    carbs_per_100: Math.round((n['carbohydrates_100g'] ?? 0) * 10) / 10,
+    fat_per_100: Math.round((n['fat_100g'] ?? 0) * 10) / 10,
+    off_id: product.code || null,
+    is_verified: true,
+  };
+
+  const { error } = await supabase
+    .from('ingredients')
+    .update(update)
+    .eq('id', ingredientId);
+  if (error) throw error;
+
+  return update;
+}
+
+/** Met à jour manuellement les macros d'un ingrédient. */
+export async function updateIngredientMacros(ingredientId, macros) {
+  if (!isSupabaseConfigured() || !supabase) throw new Error('Supabase non configuré');
+  const { error } = await supabase
+    .from('ingredients')
+    .update({
+      calories_per_100: macros.calories_per_100 ?? null,
+      protein_per_100: macros.protein_per_100 ?? null,
+      carbs_per_100: macros.carbs_per_100 ?? null,
+      fat_per_100: macros.fat_per_100 ?? null,
+      is_verified: true,
+    })
+    .eq('id', ingredientId);
+  if (error) throw error;
 }
 
 /** Upload une image dans le bucket recipes. Retourne l'URL publique. */
@@ -151,10 +219,21 @@ function recipeToRow(payload) {
   };
 }
 
+/** Unités sans espace après le nombre (80g, 200ml). */
+const NO_SPACE_UNITS = new Set(['g', 'kg', 'ml', 'cl', 'L']);
+
+/** Construit la chaîne quantity_text à partir des champs structurés (pour le JSONB legacy). */
+function buildQuantityText(quantity, unit) {
+  if (quantity == null) return '';
+  const qStr = quantity % 1 === 0 ? String(Math.round(quantity)) : String(quantity);
+  if (!unit || unit === 'pièce') return qStr;
+  return NO_SPACE_UNITS.has(unit) ? `${qStr}${unit}` : `${qStr} ${unit}`;
+}
+
 async function resolveRecipeIngredients(entries) {
   const resolved = [];
-  for (const entry of entries || []) {
-    const qty = (entry.quantityText ?? entry.quantity_text ?? '').trim();
+  for (let i = 0; i < (entries || []).length; i++) {
+    const entry = entries[i];
     let ingredientId = entry.ingredientId ?? entry.ingredient_id;
     if (ingredientId == null && (entry.name || entry.ingredientName)) {
       const name = (entry.name ?? entry.ingredientName ?? '').trim();
@@ -163,7 +242,18 @@ async function resolveRecipeIngredients(entries) {
       ingredientId = id;
     }
     if (ingredientId != null) {
-      resolved.push({ ingredient_id: ingredientId, quantity_text: qty });
+      const quantity = entry.quantity != null && entry.quantity !== '' ? Number(entry.quantity) : null;
+      const unit = (entry.unit ?? '').trim() || null;
+      const preparation = (entry.preparation ?? '').trim() || null;
+      const quantityText = buildQuantityText(quantity, unit);
+      resolved.push({
+        ingredient_id: ingredientId,
+        quantity,
+        unit,
+        preparation,
+        display_order: i,
+        quantity_text: quantityText,
+      });
     }
   }
   return resolved;
@@ -173,13 +263,20 @@ async function syncRecipeIngredientsJsonb(recipeId) {
   if (!supabase) return;
   const { data: rows } = await supabase
     .from('recipe_ingredients')
-    .select('quantity_text, ingredients(name)')
-    .eq('recipe_id', recipeId);
+    .select('quantity, unit, preparation, quantity_text, ingredients(name)')
+    .eq('recipe_id', recipeId)
+    .order('display_order');
 
   const arr = (rows || []).map((r) => {
     const name = r.ingredients?.name ?? '';
-    const qty = (r.quantity_text || '').trim();
-    return qty ? `${qty} ${name}`.trim() : name;
+    let prefix = '';
+    if (r.quantity != null) {
+      prefix = buildQuantityText(r.quantity, r.unit);
+    } else if (r.quantity_text) {
+      prefix = r.quantity_text.trim();
+    }
+    const prep = r.preparation ? ` ${r.preparation}` : '';
+    return prefix ? `${prefix} ${name}${prep}`.trim() : `${name}${prep}`.trim();
   }).filter(Boolean);
 
   await supabase.from('recipes').update({ ingredients: arr }).eq('id', recipeId);
@@ -335,7 +432,7 @@ export async function fetchRecipeForEdit(id) {
 
   const [recipeArr, riArr] = await Promise.all([
     restGet(`recipes?id=eq.${id}&select=*&limit=1`),
-    restGet(`recipe_ingredients?recipe_id=eq.${id}&select=ingredient_id,quantity_text,ingredients(id,name,rayon)`),
+    restGet(`recipe_ingredients?recipe_id=eq.${id}&select=ingredient_id,quantity,unit,preparation,display_order,quantity_text,ingredients(id,name,rayon,unit_default)&order=display_order.asc`),
   ]);
 
   const recipe = Array.isArray(recipeArr) ? recipeArr[0] : null;
@@ -344,8 +441,9 @@ export async function fetchRecipeForEdit(id) {
   const recipeIngredients = (Array.isArray(riArr) ? riArr : []).map((r) => ({
     ingredientId: r.ingredient_id,
     ingredient_id: r.ingredient_id,
-    quantityText: r.quantity_text,
-    quantity_text: r.quantity_text,
+    quantity: r.quantity ?? '',
+    unit: r.unit || r.ingredients?.unit_default || 'g',
+    preparation: r.preparation || '',
     name: r.ingredients?.name,
     rayon: r.ingredients?.rayon,
   }));
