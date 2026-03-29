@@ -129,7 +129,7 @@ export default function Login() {
       <div className="max-w-sm mx-auto">
         <div className="text-center mb-10">
           <Link to="/" aria-label="et si mamie était végé ?">
-            <img src="/logo.svg" alt="et si mamie était végé ?" className="h-12 w-auto mx-auto" />
+            <img src="/logo.svg" alt="et si mamie était végé ?" className="h-12 w-auto mx-auto" width="143" height="48" />
           </Link>
           <p className="mt-2 text-sm text-text-light">
             {isLogin ? 'Content de te revoir' : 'Rejoins la communauté'}

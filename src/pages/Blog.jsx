@@ -101,7 +101,9 @@ export default function Blog() {
               <div className="grid grid-cols-1 lg:grid-cols-2">
                 <div className="aspect-[3/2] lg:aspect-auto lg:min-h-[320px] overflow-hidden bg-bg-warm relative">
                   <img
-                    src={getOptimizedImageUrl(getSafeImageSrc(featured.image), 600)}
+                    src={getOptimizedImageUrl(getSafeImageSrc(featured.image), 400)}
+                    srcSet={`${getOptimizedImageUrl(getSafeImageSrc(featured.image), 400)} 400w, ${getOptimizedImageUrl(getSafeImageSrc(featured.image), 600)} 600w`}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                     alt={featured.title}
                     onError={handleMediaImageError}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -149,7 +151,9 @@ export default function Blog() {
               >
                 <div className="aspect-[3/2] overflow-hidden bg-bg-warm relative">
                   <img
-                    src={getOptimizedImageUrl(getSafeImageSrc(article.image), 400)}
+                    src={getOptimizedImageUrl(getSafeImageSrc(article.image), 300)}
+                    srcSet={`${getOptimizedImageUrl(getSafeImageSrc(article.image), 300)} 300w, ${getOptimizedImageUrl(getSafeImageSrc(article.image), 400)} 400w`}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     alt={article.title}
                     onError={handleMediaImageError}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"

@@ -5,7 +5,7 @@ export const FALLBACK_MEDIA_IMAGE = '/images/mamie-fallback.png';
  * Remplace /object/ par /render/image/ et ajoute width + quality.
  * Si l'URL n'est pas Supabase, retourne l'originale.
  */
-export function getOptimizedImageUrl(src, width, quality = 75) {
+export function getOptimizedImageUrl(src, width, quality = 60) {
   if (!src || !src.includes('/storage/v1/object/public/')) return src;
   return src.replace(
     '/storage/v1/object/public/',

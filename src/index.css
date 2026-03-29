@@ -3,30 +3,34 @@
 /* Police principale : titres et textes (fichier local public/typo/) */
 @font-face {
   font-family: 'Contrail One';
-  src: url('/typo/ContrailOne-Regular.ttf') format('truetype');
+  src: url('/typo/ContrailOne-Regular.woff2') format('woff2'),
+       url('/typo/ContrailOne-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-/* Satoshi — self-hosted (supprime le render-blocking cdnfonts.com) */
+/* Satoshi — self-hosted WOFF2 (supprime le render-blocking cdnfonts.com) */
 @font-face {
   font-family: 'Satoshi';
-  src: url('/typo/Satoshi-Regular.otf') format('opentype');
+  src: url('/typo/Satoshi-Regular.woff2') format('woff2'),
+       url('/typo/Satoshi-Regular.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Satoshi';
-  src: url('/typo/Satoshi-Medium.otf') format('opentype');
+  src: url('/typo/Satoshi-Medium.woff2') format('woff2'),
+       url('/typo/Satoshi-Medium.otf') format('opentype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Satoshi';
-  src: url('/typo/Satoshi-Bold.otf') format('opentype');
+  src: url('/typo/Satoshi-Bold.woff2') format('woff2'),
+       url('/typo/Satoshi-Bold.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;

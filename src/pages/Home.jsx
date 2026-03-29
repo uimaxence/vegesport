@@ -6,7 +6,7 @@ import { useJsonLd } from '../hooks/useJsonLd';
 import { canonicalUrl, buildWebSiteJsonLd } from '../lib/seo';
 import RecipeCard from '../components/RecipeCard';
 import { getSlug } from '../lib/slug';
-import vuePlanning from '../assets/vue planning.png';
+import vuePlanning from '../assets/vue-planning.webp';
 import { getSafeImageSrc, handleMediaImageError, getOptimizedImageUrl } from '../lib/imageFallback';
 
 function HeroRecipeCard({ recipe }) {
@@ -273,6 +273,10 @@ export default function Home() {
               src={vuePlanning}
               alt="Vue du planning hebdomadaire"
               className="w-full block"
+              width="1200"
+              height="545"
+              loading="lazy"
+              decoding="async"
             />
           </div>
           {/* Dégradé de fin de section */}
@@ -298,7 +302,9 @@ export default function Home() {
               <Link key={article.id} to={`/blog/${article.id}/${getSlug(article.title)}`} className="group">
                 <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
                   <img
-                    src={getOptimizedImageUrl(getSafeImageSrc(article.image), 400)}
+                    src={getOptimizedImageUrl(getSafeImageSrc(article.image), 300)}
+                    srcSet={`${getOptimizedImageUrl(getSafeImageSrc(article.image), 300)} 300w, ${getOptimizedImageUrl(getSafeImageSrc(article.image), 400)} 400w`}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     alt={article.title}
                     onError={handleMediaImageError}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"

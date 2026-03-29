@@ -1134,7 +1134,9 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           <div className="lg:w-[42%] flex-shrink-0">
             <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-bg-warm flex items-center justify-center">
               <img
-                src={getOptimizedImageUrl(getSafeImageSrc(effectiveRecipe?.image || recipe.image), 600)}
+                src={getOptimizedImageUrl(getSafeImageSrc(effectiveRecipe?.image || recipe.image), 400)}
+                srcSet={`${getOptimizedImageUrl(getSafeImageSrc(effectiveRecipe?.image || recipe.image), 400)} 400w, ${getOptimizedImageUrl(getSafeImageSrc(effectiveRecipe?.image || recipe.image), 600)} 600w`}
+                sizes="(max-width: 1024px) 100vw, 42vw"
                 alt={effectiveRecipe?.title || recipe.title}
                 onError={handleMediaImageError}
                 className={

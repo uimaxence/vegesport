@@ -37,7 +37,9 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="block">
         <div className={`aspect-[16/10] relative overflow-hidden rounded-t-xl flex items-center justify-center ${noPhoto ? 'bg-bg-warm' : 'bg-[rgb(0,0,0,0.04)]'}`}>
           <img
-            src={getOptimizedImageUrl(getSafeImageSrc(recipe.image), 400)}
+            src={getOptimizedImageUrl(getSafeImageSrc(recipe.image), 300)}
+            srcSet={`${getOptimizedImageUrl(getSafeImageSrc(recipe.image), 300)} 300w, ${getOptimizedImageUrl(getSafeImageSrc(recipe.image), 400)} 400w`}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             alt={recipe.title}
             onError={handleMediaImageError}
             className={`w-full h-full object-contain transition-transform duration-500 ${noPhoto ? 'scale-[0.48] recipe-image-placeholder' : 'scale-60 group-hover:scale-60'}`}
