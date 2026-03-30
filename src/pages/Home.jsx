@@ -13,31 +13,31 @@ function HeroRecipeCard({ recipe }) {
   return (
     <Link
       to={`/recettes/${getSlug(recipe.title)}`}
-      className="group flex-shrink-0 w-[200px] snap-start block bg-white rounded-xl overflow-hidden shadow-sm border border-border hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+      className="group flex-shrink-0 w-[220px] snap-start block rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-1.5 relative"
     >
-      <div className="aspect-[3/4] overflow-hidden bg-bg-warm flex items-center justify-center">
+      <div className="aspect-[3/4] overflow-hidden">
         <img
-          src={getOptimizedImageUrl(getSafeImageSrc(recipe.image), 200)}
+          src={getOptimizedImageUrl(getSafeImageSrc(recipe.image), 400)}
           alt={recipe.title}
           onError={handleMediaImageError}
-          className="w-full h-full object-contain scale-60 group-hover:scale-60 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           loading="lazy"
           decoding="async"
-          width="200"
-          height="267"
+          width="400"
+          height="533"
         />
       </div>
-      <div className="p-2.5">
-        <h3 className="font-display text-xs text-text leading-snug line-clamp-2">
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4 pt-12">
+        <h3 className="font-display text-sm text-white leading-snug line-clamp-2">
           {recipe.title}
         </h3>
-        <div className="mt-1.5 flex items-center gap-2 text-[10px] text-text-light font-accent">
-          <span className="flex items-center gap-0.5">
-            <Clock size={9} />
+        <div className="mt-1.5 flex items-center gap-3 text-[11px] text-white/75 font-accent">
+          <span className="flex items-center gap-1">
+            <Clock size={10} />
             {recipe.time} min
           </span>
-          <span className="flex items-center gap-0.5">
-            <Flame size={9} className="text-primary" />
+          <span className="flex items-center gap-1">
+            <Flame size={10} className="text-primary-light" />
             {recipe.calories} kcal
           </span>
         </div>
@@ -96,53 +96,46 @@ export default function Home() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative pt-20 pb-12 lg:pt-28 lg:pb-16 overflow-hidden px-6 lg:px-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-bg-warm via-bg to-primary/5 animate-[hero-gradient_8s_ease-in-out_infinite]" />
-        <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-[hero-float_6s_ease-in-out_infinite]" />
-        <div className="absolute bottom-1/4 left-0 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-[hero-float_7s_ease-in-out_infinite_0.5s]" />
+      <section className="relative pt-24 pb-16 lg:pt-32 lg:pb-24 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-bg-warm via-bg to-bg" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/[0.06] rounded-full blur-[100px] animate-[hero-float_6s_ease-in-out_infinite]" />
+        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-secondary/[0.06] rounded-full blur-[80px] animate-[hero-float_7s_ease-in-out_infinite_0.5s]" />
 
-        {/* Titre centré — padding symétrique */}
-        <div className="relative px-10 lg:px-24">
-          <div className="max-w-7xl mx-auto text-center mb-12 lg:mb-16">
-            <p className="font-accent text-xs uppercase tracking-[0.2em] text-primary mb-5 animate-[hero-text-in_0.6s_ease-out]">
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
+          {/* Top: text content centered */}
+          <div className="max-w-3xl mx-auto text-center mb-14 lg:mb-20">
+            <p className="font-accent text-xs uppercase tracking-[0.25em] text-primary mb-6 animate-[hero-text-in_0.6s_ease-out]">
               Nutrition végétale pour sportifs
             </p>
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl text-text leading-[1.1] tracking-tight animate-[hero-text-in_0.6s_ease-out_0.1s_both]">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-text leading-[1.08] tracking-tight animate-[hero-text-in_0.6s_ease-out_0.1s_both]">
               Tes repas végétariens protéinés,{' '}
               <span className="font-accent italic text-primary">planifiés en 2 clics</span>
             </h1>
-          </div>
-        </div>
-
-        {/* Bas : padding gauche uniquement pour que les cartes débordent à droite */}
-        <div className="relative flex flex-col lg:flex-row items-start gap-10 lg:gap-16 pl-10 lg:pl-24">
-          {/* Gauche : description + boutons — prend plus de place */}
-          <div className="flex-shrink-0 w-full lg:w-[440px] pr-10 lg:pr-0 animate-[hero-text-in_0.6s_ease-out_0.2s_both]">
-            <p className="text-base text-text-light leading-relaxed">
-              Recettes végétariennes et végétaliennes optimisées pour la performance sportive.
-              Planning hebdomadaire personnalisé, liste de courses automatique et suivi des macronutriments.
+            <p className="mt-6 text-base lg:text-lg text-text-light leading-relaxed max-w-xl mx-auto animate-[hero-text-in_0.6s_ease-out_0.2s_both]">
+              Recettes optimisées pour la performance sportive. Planning personnalisé, liste de courses automatique et suivi des macros.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row lg:flex-col gap-3">
+            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center animate-[hero-text-in_0.6s_ease-out_0.3s_both]">
               <Link
                 to="/planning"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white text-sm font-medium rounded-sm hover:bg-primary-dark transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
               >
                 Créer mon planning
                 <ArrowRight size={16} />
               </Link>
               <Link
                 to="/recettes"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-border text-sm font-medium rounded-sm text-text hover:border-text transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white border border-border text-sm font-medium rounded-full text-text hover:border-text transition-colors shadow-sm"
               >
                 Découvrir les recettes
               </Link>
             </div>
           </div>
 
-          {/* Droite : carousel — scroll horizontal mobile, s'étend jusqu'au bord desktop */}
-          <div className="flex-1 min-w-0 w-full lg:overflow-hidden animate-[hero-text-in_0.6s_ease-out_0.35s_both] -mx-6 px-6 lg:mx-0 lg:px-0">
+          {/* Bottom: recipe cards carousel */}
+          <div className="animate-[hero-text-in_0.6s_ease-out_0.4s_both]">
             <div
-              className="flex gap-4 overflow-x-auto pb-3 pr-6 lg:pr-0 snap-x snap-mandatory"
+              className="flex gap-5 overflow-x-auto pb-4 -mx-6 px-6 lg:mx-0 lg:px-0 snap-x snap-mandatory lg:justify-center"
               style={{
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
@@ -154,9 +147,9 @@ export default function Home() {
               ))}
               <Link
                 to="/recettes"
-                className="flex-shrink-0 w-[200px] snap-start flex flex-col items-center justify-center gap-2 bg-white rounded-xl border-2 border-dashed border-border hover:border-primary hover:bg-primary/5 transition-all duration-300 min-h-[calc(200px*4/3+52px)]"
+                className="flex-shrink-0 w-[220px] snap-start flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-border hover:border-primary hover:bg-primary/5 transition-all duration-300 aspect-[3/4]"
               >
-                <span className="font-display text-sm text-text text-center px-3">Voir toutes les recettes</span>
+                <span className="font-display text-sm text-text text-center px-4">Voir toutes les recettes</span>
                 <ArrowRight size={20} className="text-primary" />
               </Link>
             </div>

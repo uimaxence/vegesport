@@ -187,13 +187,27 @@ export async function uploadRecipeImage(recipeId, file) {
   const ext = file.name.split('.').pop()?.toLowerCase() || 'webp';
   const path = `${recipeId}.${ext}`;
 
+  // Supprimer l'ancien fichier s'il existe (ignore l'erreur si inexistant)
+  await supabase.storage.from('recipes').remove([path]);
+
   const { error } = await supabase.storage
     .from('recipes')
-    .upload(path, file, { upsert: true });
-  if (error) throw error;
+    .upload(path, file, {
+      contentType: file.type || 'image/webp',
+      cacheControl: '3600',
+      upsert: true,
+    });
+  if (error) throw new Error(`Upload image échoué : ${error.message}`);
 
   const { data: urlData } = supabase.storage.from('recipes').getPublicUrl(path);
   return urlData?.publicUrl ?? null;
+}
+
+/** Met à jour uniquement le champ image d'une recette. */
+export async function updateRecipeImageUrl(recipeId, imageUrl) {
+  if (!isSupabaseConfigured() || !supabase) throw new Error('Supabase non configuré');
+  const { error } = await supabase.from('recipes').update({ image: imageUrl }).eq('id', recipeId);
+  if (error) throw new Error(`Sauvegarde URL image échouée : ${error.message}`);
 }
 
 function recipeToRow(payload) {

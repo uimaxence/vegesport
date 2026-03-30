@@ -8,12 +8,12 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
   if (layout === 'compact') {
     return (
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="group flex items-center gap-4 py-3 rounded-xl hover:bg-black/[0.03] transition-colors -mx-1 px-1">
-        <div className={`w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center ${noPhoto ? 'bg-bg-warm' : 'bg-black/5'}`}>
+        <div className={`w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 ${noPhoto ? 'bg-bg-warm flex items-center justify-center' : ''}`}>
           <img
             src={getOptimizedImageUrl(getSafeImageSrc(recipe.image), 80)}
             alt={recipe.title}
             onError={handleMediaImageError}
-            className={`w-full h-full object-contain transition-transform duration-500 ${noPhoto ? 'scale-[0.42] recipe-image-placeholder' : 'scale-60 group-hover:scale-60'}`}
+            className={`w-full h-full transition-transform duration-500 ${noPhoto ? 'object-contain scale-[0.42] recipe-image-placeholder' : 'object-cover'}`}
             loading="lazy"
             decoding="async"
             width="64"
@@ -35,14 +35,14 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
   return (
     <div className="group overflow-hidden recipe-card-frame relative rounded-xl">
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="block">
-        <div className={`aspect-[16/10] relative overflow-hidden rounded-t-xl flex items-center justify-center ${noPhoto ? 'bg-bg-warm' : 'bg-[rgb(0,0,0,0.04)]'}`}>
+        <div className={`aspect-[16/10] relative overflow-hidden rounded-t-xl ${noPhoto ? 'bg-bg-warm flex items-center justify-center' : ''}`}>
           <img
             src={getOptimizedImageUrl(getSafeImageSrc(recipe.image), 300)}
             srcSet={`${getOptimizedImageUrl(getSafeImageSrc(recipe.image), 300)} 300w, ${getOptimizedImageUrl(getSafeImageSrc(recipe.image), 400)} 400w`}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             alt={recipe.title}
             onError={handleMediaImageError}
-            className={`w-full h-full object-contain transition-transform duration-500 ${noPhoto ? 'scale-[0.48] recipe-image-placeholder' : 'scale-60 group-hover:scale-60'}`}
+            className={`w-full h-full transition-transform duration-500 ${noPhoto ? 'object-contain scale-[0.48] recipe-image-placeholder' : 'object-cover scale-75 group-hover:scale-80'}`}
             loading="lazy"
             decoding="async"
             width="400"

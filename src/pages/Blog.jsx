@@ -99,7 +99,7 @@ export default function Blog() {
           >
             <div className="rounded-2xl overflow-hidden border border-border bg-white shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-2">
-                <div className="aspect-[3/2] lg:aspect-auto lg:min-h-[320px] overflow-hidden bg-bg-warm relative">
+                <div className="aspect-[3/2] lg:aspect-auto lg:max-h-[360px] overflow-hidden bg-bg-warm relative">
                   <img
                     src={getOptimizedImageUrl(getSafeImageSrc(featured.image), 400)}
                     srcSet={`${getOptimizedImageUrl(getSafeImageSrc(featured.image), 400)} 400w, ${getOptimizedImageUrl(getSafeImageSrc(featured.image), 600)} 600w`}

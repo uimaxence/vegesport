@@ -7,6 +7,7 @@ import {
   createRecipe,
   updateRecipe,
   uploadRecipeImage,
+  updateRecipeImageUrl,
 } from '../../lib/admin';
 import { calculateRecipeMacros, macrosPerServing } from '../../lib/nutrition';
 import { categories, objectives, regimes, tags } from '../../data/recipes';
@@ -325,7 +326,7 @@ export default function AdminRecipeForm() {
         const newId = await createRecipe(newPayload);
         if (imageFile) {
           const url = await uploadRecipeImage(newId, imageFile);
-          await updateRecipe(newId, { ...payload, image: url });
+          await updateRecipeImageUrl(newId, url);
         }
         navigate('/admin');
       } else {
@@ -337,6 +338,7 @@ export default function AdminRecipeForm() {
         navigate('/admin');
       }
     } catch (err) {
+      console.error('[AdminRecipeForm] Erreur sauvegarde :', err);
       setError(err?.message || 'Erreur enregistrement');
     } finally {
       setSaving(false);
