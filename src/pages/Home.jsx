@@ -292,7 +292,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {latestArticles.map(article => (
-              <Link key={article.id} to={`/blog/${article.id}/${getSlug(article.title)}`} className="group">
+              <Link key={article.id} to={`/blog/${getSlug(article.title)}`} className="group">
                 <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
                   <img
                     src={getOptimizedImageUrl(getSafeImageSrc(article.image), 300)}

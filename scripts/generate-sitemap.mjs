@@ -111,8 +111,8 @@ const urls = [
     priority: '0.8',
     changefreq: 'monthly',
   })),
-  ...articleEntries.map(({ id, slug }) => ({
-    loc: `${baseUrl}/blog/${id}/${slug}`,
+  ...articleEntries.map(({ slug }) => ({
+    loc: `${baseUrl}/blog/${slug}`,
     priority: '0.7',
     changefreq: 'monthly',
   })),

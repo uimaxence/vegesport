@@ -18,6 +18,7 @@ const PlanningFunnel = lazy(() => import('./pages/PlanningFunnel'));
 const PlanningSetup = lazy(() => import('./pages/PlanningSetup'));
 const Blog = lazy(() => import('./pages/Blog'));
 const BlogArticle = lazy(() => import('./pages/BlogArticle'));
+const BlogLegacyRedirect = lazy(() => import('./components/BlogLegacyRedirect'));
 const Login = lazy(() => import('./pages/Login'));
 const AuthCallback = lazy(() => import('./pages/AuthCallback'));
 const Profile = lazy(() => import('./pages/Profile'));
@@ -62,7 +63,9 @@ function AppRoutes() {
             <Route path="/planning" element={<PlanningFunnel />} />
             <Route path="/planning/setup" element={<PlanningSetup />} />
             <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:id/:slug?" element={<BlogArticle />} />
+            <Route path="/blog/:slug" element={<BlogArticle />} />
+            {/* Legacy redirect: /blog/123/slug → /blog/slug */}
+            <Route path="/blog/:id/:slug" element={<BlogLegacyRedirect />} />
             <Route path="/connexion" element={<Login />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/profil" element={

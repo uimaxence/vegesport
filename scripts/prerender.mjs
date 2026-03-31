@@ -325,8 +325,8 @@ for (const r of recipes) {
 /* ── Pages articles blog ─────────────────────────────── */
 for (const a of articles) {
   const slug = getSlug(a.title);
-  if (!slug || a.id == null) continue;
-  const path = `/blog/${a.id}/${slug}`;
+  if (!slug) continue;
+  const path = `/blog/${slug}`;
   const url = `${SITE_URL}${path}`;
 
   writePage(

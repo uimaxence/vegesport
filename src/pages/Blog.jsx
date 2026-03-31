@@ -94,7 +94,7 @@ export default function Blog() {
         {/* Featured */}
         {activeCategory === 'tous' && featured && (
           <Link
-            to={`/blog/${featured.id}/${getSlug(featured.title)}`}
+            to={`/blog/${getSlug(featured.title)}`}
             className="block group mb-14"
           >
             <div className="rounded-2xl overflow-hidden border border-border bg-white shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300">
@@ -146,7 +146,7 @@ export default function Blog() {
             {rest.map(article => (
               <Link
                 key={article.id}
-                to={`/blog/${article.id}/${getSlug(article.title)}`}
+                to={`/blog/${getSlug(article.title)}`}
                 className="group rounded-2xl overflow-hidden border border-border bg-white shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300 flex flex-col"
               >
                 <div className="aspect-[3/2] overflow-hidden bg-bg-warm relative">

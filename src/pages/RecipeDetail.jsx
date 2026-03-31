@@ -1379,7 +1379,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
               {relatedArticles.map((a) => (
                 <Link
                   key={a.id}
-                  to={`/blog/${a.id}/${getSlug(a.title)}`}
+                  to={`/blog/${getSlug(a.title)}`}
                   className="group rounded-2xl border border-border bg-white overflow-hidden hover:shadow-md hover:border-primary/20 transition-all duration-300"
                 >
                   <div className="aspect-[16/10] bg-bg-warm overflow-hidden">

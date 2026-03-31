@@ -16,22 +16,22 @@ import ArticleBlocks from '../components/article/ArticleBlocks';
 import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
 
 export default function BlogArticle() {
-  const { id, slug } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const { articles, recipes, loading, error } = useData();
-  const article = articles.find((a) => a.id === parseInt(id, 10));
+  const article = articles.find((a) => getSlug(a.title) === slug);
   const canonicalSlug = article ? getSlug(article.title) : '';
   const articleUrl = article && canonicalSlug
-    ? canonicalUrl(`/blog/${article.id}/${canonicalSlug}`)
+    ? canonicalUrl(`/blog/${canonicalSlug}`)
     : '';
 
-  // Rediriger vers l'URL canonique avec le slug si absent ou incorrect
+  // Rediriger vers l'URL canonique si le slug ne correspond pas exactement
   useEffect(() => {
     if (!article || !canonicalSlug) return;
     if (slug !== canonicalSlug) {
-      navigate(`/blog/${id}/${canonicalSlug}`, { replace: true });
+      navigate(`/blog/${canonicalSlug}`, { replace: true });
     }
-  }, [article, id, slug, canonicalSlug, navigate]);
+  }, [article, slug, canonicalSlug, navigate]);
 
   const metaReady = Boolean(article && articleUrl);
 
@@ -201,7 +201,7 @@ export default function BlogArticle() {
                   <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-4">Articles liés</h2>
                   <div className="space-y-4">
                     {otherArticles.map(a => (
-                      <Link key={a.id} to={`/blog/${a.id}/${getSlug(a.title)}`} className="group block">
+                      <Link key={a.id} to={`/blog/${getSlug(a.title)}`} className="group block">
                         <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
                           <img
                             src={getSafeImageSrc(a.image)}
