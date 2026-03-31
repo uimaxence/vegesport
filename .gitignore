@@ -20,6 +20,11 @@ dist-ssr
 # Supabase CLI artifacts
 supabase/.temp/
 
+# Content import (fichiers traités)
+content/recettes/done/
+content/articles/done/
+content/images/done/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

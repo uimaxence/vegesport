@@ -57,18 +57,13 @@ const staticRoutes = [
 let recipeSlugs = [];
 let articleEntries = [];
 
-try {
-  const { recipes } = await import('../src/data/recipes.js');
-  recipeSlugs = (recipes || []).map((r) => getSlug(r.title)).filter(Boolean);
-} catch { /* Supabase-only en prod */ }
+const supabaseUrl = String(process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
+const anonKey = String(process.env.VITE_SUPABASE_ANON_KEY || '');
 
-async function fetchArticlesFromSupabase() {
-  const supabaseUrl = String(process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
-  const anonKey = String(process.env.VITE_SUPABASE_ANON_KEY || '');
+async function fetchFromSupabase(table, select) {
   if (!supabaseUrl || !anonKey) return null;
-
   const res = await fetch(
-    `${supabaseUrl}/rest/v1/blog_articles?select=id,title&order=date.desc`,
+    `${supabaseUrl}/rest/v1/${table}?select=${select}&order=id.asc`,
     {
       headers: {
         apikey: anonKey,
@@ -76,27 +71,38 @@ async function fetchArticlesFromSupabase() {
       },
     }
   );
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status} ${res.statusText}`);
-  }
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
   const data = await res.json();
   return Array.isArray(data) ? data : [];
 }
 
+// Recettes : Supabase en priorité, fallback sur le fichier local
 try {
-  const data = await fetchArticlesFromSupabase();
-  if (Array.isArray(data)) {
-    articleEntries = data
-      .map((a) => ({
-        id: a.id,
-        slug: getSlug(a.title),
-      }))
-      .filter((a) => a.id != null && a.slug);
+  const data = await fetchFromSupabase('recipes', 'id,title');
+  if (data && data.length > 0) {
+    recipeSlugs = data.map((r) => getSlug(r.title)).filter(Boolean);
+    console.log(`  Recettes depuis Supabase : ${recipeSlugs.length}`);
   } else {
-    throw new Error('Supabase non configuré pour les articles du sitemap');
+    throw new Error('Aucune recette en base');
   }
 } catch (e) {
-  console.error('Impossible de charger les articles depuis Supabase pour le sitemap:', e?.message || e);
+  console.warn(`  ⚠ Supabase recettes indisponible (${e?.message}), fallback local…`);
+  try {
+    const { recipes } = await import('../src/data/recipes.js');
+    recipeSlugs = (recipes || []).map((r) => getSlug(r.title)).filter(Boolean);
+    console.log(`  Recettes depuis fichier local : ${recipeSlugs.length}`);
+  } catch { /* pas de données */ }
+}
+
+// Articles : Supabase uniquement
+try {
+  const data = await fetchFromSupabase('blog_articles', 'id,title');
+  articleEntries = (data || [])
+    .map((a) => ({ id: a.id, slug: getSlug(a.title) }))
+    .filter((a) => a.id != null && a.slug);
+  console.log(`  Articles depuis Supabase : ${articleEntries.length}`);
+} catch (e) {
+  console.error(`  ⚠ Supabase articles indisponible : ${e?.message}`);
   articleEntries = [];
 }
 

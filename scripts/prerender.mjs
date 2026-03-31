@@ -213,26 +213,46 @@ function articleJsonLd(a, url) {
 }
 
 /* ── Data sources ────────────────────────────────────── */
-let recipes = [];
-try {
-  recipes = (await import('../src/data/recipes.js')).recipes || [];
-} catch (e) {
-  console.warn('⚠ Recettes non chargées:', e.message);
+const supaUrl = String(process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
+const anonKey = String(process.env.VITE_SUPABASE_ANON_KEY || '');
+
+async function fetchFromSupabase(table, select) {
+  if (!supaUrl || !anonKey) return null;
+  const res = await fetch(
+    `${supaUrl}/rest/v1/${table}?select=${select}&order=id.asc`,
+    { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
+  );
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
 }
 
-let articles = [];
+// Recettes : Supabase en priorité, fallback fichier local
+let recipes = [];
 try {
-  const supaUrl = String(process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
-  const anonKey = String(process.env.VITE_SUPABASE_ANON_KEY || '');
-  if (supaUrl && anonKey) {
-    const res = await fetch(
-      `${supaUrl}/rest/v1/blog_articles?select=id,title,excerpt,meta_title,meta_description,image,date,author&order=date.desc`,
-      { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
-    );
-    if (res.ok) articles = await res.json();
+  const data = await fetchFromSupabase('recipes', 'id,title,category,time,calories,protein,carbs,fat,servings,tags,regime,season,image,ingredients,steps,created_at');
+  if (data && data.length > 0) {
+    recipes = data;
+    console.log(`  Recettes depuis Supabase : ${recipes.length}`);
+  } else {
+    throw new Error('Aucune recette en base');
   }
 } catch (e) {
-  console.warn('⚠ Articles non chargés:', e.message);
+  console.warn(`  ⚠ Supabase recettes indisponible (${e?.message}), fallback local…`);
+  try {
+    recipes = (await import('../src/data/recipes.js')).recipes || [];
+    console.log(`  Recettes depuis fichier local : ${recipes.length}`);
+  } catch { /* pas de données */ }
+}
+
+// Articles : Supabase uniquement
+let articles = [];
+try {
+  const data = await fetchFromSupabase('blog_articles', 'id,title,excerpt,meta_title,meta_description,image,date,author');
+  articles = data || [];
+  console.log(`  Articles depuis Supabase : ${articles.length}`);
+} catch (e) {
+  console.warn(`  ⚠ Articles non chargés : ${e?.message}`);
 }
 
 /* ── Pages statiques ─────────────────────────────────── */
