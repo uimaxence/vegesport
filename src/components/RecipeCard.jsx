@@ -35,7 +35,7 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
   return (
     <div className="group overflow-hidden recipe-card-frame relative rounded-xl">
       <Link to={`/recettes/${getSlug(recipe.title)}`} className="block">
-        <div className={`aspect-[16/10] relative overflow-hidden rounded-t-xl flex items-center justify-center ${noPhoto ? 'bg-bg-warm' : 'bg-bg-warm p-4'}`}>
+        <div className={`aspect-[4/3] sm:aspect-[16/10] relative overflow-hidden rounded-t-xl flex items-center justify-center ${noPhoto ? 'bg-bg-warm' : 'bg-bg-warm p-5 sm:p-4'}`}>
           <img
             src={getOptimizedImageUrl(getSafeImageSrc(recipe.image), 300)}
             srcSet={`${getOptimizedImageUrl(getSafeImageSrc(recipe.image), 300)} 300w, ${getOptimizedImageUrl(getSafeImageSrc(recipe.image), 400)} 400w`}

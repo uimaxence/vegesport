@@ -216,7 +216,7 @@ export default function PlanningFunnel() {
     canonical: canonicalUrl('/planning'),
   });
 
-  const { user, savePlanning, savedPlannings } = useAuth();
+  const { user, savePlanning, savedPlannings, loading: authLoading } = useAuth();
   const { recipes } = useData();
   const location = useLocation();
   const navigate = useNavigate();
@@ -277,21 +277,30 @@ export default function PlanningFunnel() {
     if (location.state?.setupPreview) setShowPlanningEditor(true);
   }, [location.state?.setupPreview]);
 
+  // Attendre le chargement des plannings avant de décider quoi afficher
+  if (mineMode && user && authLoading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   if (mineMode && user && currentPlanning && !showEditor) {
     return (
       <div className="px-6 lg:px-8 py-12">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xs uppercase tracking-[0.2em] text-primary flex items-center gap-2">
-              <Calendar size={13} />
+          <div className="flex items-center justify-between mb-6 gap-4">
+            <h1 className="text-xs uppercase tracking-[0.2em] text-primary inline-flex items-center gap-2 whitespace-nowrap">
+              <Calendar size={13} className="flex-shrink-0" />
               Semaine en cours
             </h1>
             <button
               type="button"
               onClick={() => setShowEditor(true)}
-              className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary-dark font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-primary hover:text-primary-dark font-medium transition-colors whitespace-nowrap"
             >
-              <Pencil size={14} />
+              <Pencil size={13} className="flex-shrink-0" />
               Modifier le planning
             </button>
           </div>

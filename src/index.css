@@ -206,6 +206,14 @@
   }
 }
 
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
 @keyframes hero-gradient {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.85; }

@@ -264,7 +264,7 @@ export default function SuiviApportsChart({ planning, getRecipe, portions = 2, m
           <p className="text-[15px] text-text-light mb-2 uppercase tracking-wider">
             Aujourd'hui{hasDoneTracking ? ' — réalisé / planifié' : ' — planifié'}
           </p>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {seriesData.map((s) => {
               const planVal = todayPlanned[s.id] ?? 0;
               const doneVal = hasDoneTracking ? (todayDone?.[s.id] ?? 0) : null;
