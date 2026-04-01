@@ -260,6 +260,8 @@ export default function PlanningFunnel() {
   const [showPlanningEditor, setShowPlanningEditor] = useState(() => {
     if (location.state?.setupPreview) return true;
     // Restaurer le planning guest depuis la session (après refresh)
+    // Ne pas restaurer pour un user connecté (il a ses plannings en BDD)
+    if (user) return false;
     try {
       const raw = sessionStorage.getItem('planning_preview_v1');
       if (raw) {
@@ -327,7 +329,31 @@ export default function PlanningFunnel() {
       </div>
     );
   }
-  if ((mineMode && user) || showEditor) {
+  // User connecté en mineMode mais sans planning → rediriger vers la création
+  if (mineMode && user && !currentPlanning && !showEditor) {
+    return (
+      <div className="px-6 lg:px-8 py-12">
+        <div className="max-w-md mx-auto text-center">
+          <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary mb-5">
+            <Calendar size={24} />
+          </span>
+          <h1 className="font-display text-2xl text-text mb-2">Pas encore de planning</h1>
+          <p className="text-sm text-text-light mb-6">
+            Crée ton premier planning personnalisé en quelques minutes.
+          </p>
+          <Link
+            to="/planning/setup"
+            onClick={handleCreateClick}
+            className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+          >
+            Créer mon planning
+            <ArrowRight size={16} />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+  if (showEditor) {
     return <Planning user={user} savePlanning={savePlanning} />;
   }
   if (showPlanningEditor) {
