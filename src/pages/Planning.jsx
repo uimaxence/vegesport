@@ -1725,8 +1725,7 @@ export default function Planning({ user, savePlanning }) {
                               <img
                                 src={recipe.image}
                                 alt={recipe.title}
-                                className="w-full h-full object-contain scale-60"
-                                style={{ objectPosition: 'center' }}
+                                className="w-full h-full object-cover"
                               />
                             </div>
                           </div>
@@ -1987,8 +1986,7 @@ export default function Planning({ user, savePlanning }) {
                               <img
                                 src={recipe.image}
                                 alt={recipe.title}
-                                className="w-full h-full object-contain scale-60"
-                                style={{ objectPosition: 'center' }}
+                                className="w-full h-full object-cover"
                               />
                             </div>
                           </div>
@@ -2189,12 +2187,11 @@ export default function Planning({ user, savePlanning }) {
                 </button>
               </div>
               <div className="overflow-y-auto flex-1 p-4">
-                <div className="aspect-[16/10] rounded-lg overflow-hidden bg-black/[0.04] mb-4 flex items-center justify-center">
+                <div className="aspect-[16/9] rounded-lg overflow-hidden bg-black/[0.04] mb-4">
                   <img
                     src={previewRecipe.image}
                     alt={previewRecipe.title}
-                    className="w-full h-full object-cover scale-100"
-                    style={{ objectPosition: 'center' }}
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <h3 className="font-display text-2xl text-text">{previewRecipe.title}</h3>
