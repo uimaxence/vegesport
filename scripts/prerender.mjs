@@ -230,7 +230,7 @@ async function fetchFromSupabase(table, select) {
 // Recettes : Supabase en priorité, fallback fichier local
 let recipes = [];
 try {
-  const data = await fetchFromSupabase('recipes', 'id,title,category,time,calories,protein,carbs,fat,servings,tags,regime,season,image,ingredients,steps,created_at');
+  const data = await fetchFromSupabase('recipes', 'id,title,category,time,calories,protein,carbs,fat,servings,tags,regime,season,objective,image,ingredients,steps,created_at');
   if (data && data.length > 0) {
     recipes = data;
     console.log(`  Recettes depuis Supabase : ${recipes.length}`);
@@ -248,15 +248,106 @@ try {
 // Articles : Supabase uniquement
 let articles = [];
 try {
-  const data = await fetchFromSupabase('blog_articles', 'id,title,excerpt,meta_title,meta_description,image,date,author');
+  const data = await fetchFromSupabase('blog_articles', 'id,title,excerpt,meta_title,meta_description,image,date,author,category,content_json');
   articles = data || [];
   console.log(`  Articles depuis Supabase : ${articles.length}`);
 } catch (e) {
   console.warn(`  ⚠ Articles non chargés : ${e?.message}`);
 }
 
+/* ── Maillage interne : helpers ──────────────────────── */
+const recipeById = new Map(recipes.map((r) => [r.id, r]));
+
+/** Rend les blocs content_json en HTML avec liens internes */
+function renderContentBlocks(blocks) {
+  if (!Array.isArray(blocks) || !blocks.length) return '';
+  return blocks
+    .map((b) => {
+      switch (b.type) {
+        case 'paragraph':
+          return `<p>${esc(b.text)}</p>`;
+        case 'heading':
+          return `<h${b.level || 2}>${esc(b.text)}</h${b.level || 2}>`;
+        case 'list':
+          return `<ul>${(b.items || []).map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`;
+        case 'recipes': {
+          const links = (b.recipeIds || [])
+            .map((id) => recipeById.get(id))
+            .filter(Boolean)
+            .map((r) => `<li><a href="/recettes/${getSlug(r.title)}">${esc(r.title)} — ${r.calories} kcal, ${r.protein}g protéines</a></li>`);
+          return links.length ? `<ul>${links.join('')}</ul>` : '';
+        }
+        case 'faq':
+          return (b.items || [])
+            .map((q) => `<h3>${esc(q.question)}</h3><p>${esc(q.answer)}</p>`)
+            .join('');
+        case 'table': {
+          const hd = (b.headers || []).map((h) => `<th>${esc(h)}</th>`).join('');
+          const rows = (b.rows || [])
+            .map((row) => `<tr>${row.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`)
+            .join('');
+          return `<table>${hd ? `<thead><tr>${hd}</tr></thead>` : ''}<tbody>${rows}</tbody></table>`;
+        }
+        case 'source':
+          return b.url ? `<p><a href="${esc(b.url)}" rel="noopener">${esc(b.label || b.url)}</a></p>` : '';
+        case 'sources_list':
+          return `<ul>${(b.items || []).map((s) => `<li><a href="${esc(s.url)}" rel="noopener">${esc(s.label || s.url)}</a></li>`).join('')}</ul>`;
+        case 'cta_planning':
+          return `<p><a href="/planning">Créer mon planning repas végétarien</a></p>`;
+        default:
+          return '';
+      }
+    })
+    .join('');
+}
+
+/** Recettes similaires (même catégorie ou mêmes objectifs, max N) */
+function getSimilarRecipes(recipe, limit = 3) {
+  const obj = recipe.objective || [];
+  return recipes
+    .filter((r) => r.id !== recipe.id)
+    .map((r) => {
+      let score = 0;
+      if (r.category === recipe.category) score += 2;
+      if (obj.length && r.objective?.some((o) => obj.includes(o))) score += 1;
+      return { r, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((x) => x.r);
+}
+
+/** Index inversé : recipeId → articles qui la mentionnent */
+const articlesByRecipeId = new Map();
+for (const a of articles) {
+  const blocks = a.content_json || [];
+  for (const b of blocks) {
+    if (b.type === 'recipes') {
+      for (const id of b.recipeIds || []) {
+        if (!articlesByRecipeId.has(id)) articlesByRecipeId.set(id, []);
+        articlesByRecipeId.get(id).push(a);
+      }
+    }
+  }
+}
+
+/** Liens HTML pour une liste de recettes */
+function recipeLinksHtml(list) {
+  return list.map((r) => `<li><a href="/recettes/${getSlug(r.title)}">${esc(r.title)}</a></li>`).join('');
+}
+
+/** Liens HTML pour une liste d'articles */
+function articleLinksHtml(list) {
+  return list.map((a) => `<li><a href="/blog/${getSlug(a.title)}">${esc(a.title)}</a></li>`).join('');
+}
+
 /* ── Pages statiques ─────────────────────────────────── */
 let count = 0;
+
+// Liens pour les pages listing
+const allRecipeLinks = recipes.filter((r) => getSlug(r.title)).map((r) => `<li><a href="/recettes/${getSlug(r.title)}">${esc(r.title)} — ${esc(CAT[r.category] || r.category)}, ${r.calories} kcal, ${r.protein}g protéines</a></li>`).join('');
+const allArticleLinks = articles.filter((a) => getSlug(a.title)).map((a) => `<li><a href="/blog/${getSlug(a.title)}">${esc(a.title)}</a></li>`).join('');
 
 const statics = [
   {
@@ -267,7 +358,7 @@ const statics = [
     keywords:
       'recettes végétariennes, protéines végétales, meal prep végétarien, nutrition végétale sportive, planning repas végétarien',
     jsonLd: webSiteJsonLd(),
-    bodyHtml: `<h1>et si mamie était végé ?</h1><p>Recettes végétariennes riches en protéines pour sportifs. Planning repas, liste de courses et conseils nutrition.</p>`,
+    bodyHtml: `<h1>et si mamie était végé ?</h1><p>Recettes végétariennes riches en protéines pour sportifs. Planning repas, liste de courses et conseils nutrition.</p><nav><h2>Nos recettes végétariennes</h2><ul>${allRecipeLinks}</ul></nav><nav><h2>Nos articles</h2><ul>${allArticleLinks}</ul></nav><p><a href="/planning">Créer mon planning repas</a></p>`,
   },
   {
     path: '/recettes',
@@ -275,7 +366,7 @@ const statics = [
     description:
       'Découvrez toutes nos recettes végétariennes et végétaliennes riches en protéines. Filtrez par catégorie, régime alimentaire, tags et temps de préparation.',
     keywords: 'recettes végétariennes, protéines végétales, recettes sportifs, filtrer recettes',
-    bodyHtml: `<h1>Recettes végétariennes protéinées</h1><p>Toutes nos recettes végétariennes riches en protéines pour sportifs.</p>`,
+    bodyHtml: `<h1>Recettes végétariennes protéinées</h1><p>Toutes nos recettes végétariennes riches en protéines pour sportifs.</p><ul>${allRecipeLinks}</ul>`,
   },
   {
     path: '/planning',
@@ -283,7 +374,7 @@ const statics = [
     description:
       'Crée ton planning végétarien sportif en 2 minutes. Ajuste les portions, suis tes macros, génère ta liste de courses et exporte vers ton calendrier.',
     keywords: 'planning repas végétarien, meal prep, liste de courses, macros végétarien',
-    bodyHtml: `<h1>Planning repas végétarien sportif</h1><p>Crée ton planning personnalisé en 2 minutes. Portions, macros, liste de courses.</p>`,
+    bodyHtml: `<h1>Planning repas végétarien sportif</h1><p>Crée ton planning personnalisé en 2 minutes. Portions, macros, liste de courses.</p><nav><h2>Découvrir nos recettes</h2><ul>${allRecipeLinks}</ul></nav>`,
   },
   {
     path: '/blog',
@@ -291,7 +382,7 @@ const statics = [
     description:
       'Conseils nutrition sportive végétale, guides meal prep végétarien, témoignages et comparatifs pour sportifs végétariens et végétaliens.',
     keywords: 'blog nutrition végétale, sportif végétarien, meal prep, protéines végétales',
-    bodyHtml: `<h1>Blog nutrition végétale</h1><p>Conseils, guides et témoignages pour sportifs végétariens et végétaliens.</p>`,
+    bodyHtml: `<h1>Blog nutrition végétale</h1><p>Conseils, guides et témoignages pour sportifs végétariens et végétaliens.</p><ul>${allArticleLinks}</ul>`,
   },
   {
     path: '/mentions-legales',
@@ -320,6 +411,20 @@ for (const r of recipes) {
   const ingHtml = (r.ingredients || []).map((i) => `<li>${esc(i)}</li>`).join('');
   const stepsHtml = (r.steps || []).map((s) => `<li>${esc(s)}</li>`).join('');
 
+  // Maillage interne : recettes similaires + articles liés
+  const similar = getSimilarRecipes(r, 3);
+  const relatedArticles = articlesByRecipeId.get(r.id) || [];
+  // Aussi ajouter des articles de la même catégorie si pas assez
+  const otherArticles = relatedArticles.length < 3
+    ? articles.filter((a) => !relatedArticles.includes(a)).slice(0, 3 - relatedArticles.length)
+    : [];
+  const allRelArticles = [...relatedArticles, ...otherArticles];
+
+  let relHtml = '';
+  if (similar.length) relHtml += `<nav><h2>Recettes végétariennes similaires</h2><ul>${recipeLinksHtml(similar)}</ul></nav>`;
+  if (allRelArticles.length) relHtml += `<nav><h2>Articles liés</h2><ul>${articleLinksHtml(allRelArticles)}</ul></nav>`;
+  relHtml += `<p><a href="/recettes">Toutes nos recettes végétariennes</a></p>`;
+
   writePage(
     path,
     render({
@@ -336,7 +441,7 @@ for (const r of recipes) {
           { name: r.title, url },
         ]),
       ],
-      bodyHtml: `<article><h1>${esc(r.title)}</h1><p>${esc(cat)} · ${r.time} min · ${r.calories} kcal · ${r.protein}g protéines</p><h2>Ingrédients</h2><ul>${ingHtml}</ul><h2>Instructions</h2><ol>${stepsHtml}</ol></article>`,
+      bodyHtml: `<article><h1>${esc(r.title)}</h1><p>${esc(cat)} · ${r.time} min · ${r.calories} kcal · ${r.protein}g protéines</p><h2>Ingrédients</h2><ul>${ingHtml}</ul><h2>Instructions</h2><ol>${stepsHtml}</ol></article>${relHtml}`,
     }),
   );
   count++;
@@ -348,6 +453,15 @@ for (const a of articles) {
   if (!slug) continue;
   const path = `/blog/${slug}`;
   const url = `${SITE_URL}${path}`;
+
+  // Contenu complet des blocs
+  const contentHtml = renderContentBlocks(a.content_json);
+
+  // Maillage interne : autres articles
+  const otherArt = articles.filter((o) => o.id !== a.id).slice(0, 3);
+  let relArtHtml = '';
+  if (otherArt.length) relArtHtml += `<nav><h2>Articles liés</h2><ul>${articleLinksHtml(otherArt)}</ul></nav>`;
+  relArtHtml += `<p><a href="/blog">Tous nos articles</a></p>`;
 
   writePage(
     path,
@@ -365,7 +479,7 @@ for (const a of articles) {
           { name: a.title, url },
         ]),
       ],
-      bodyHtml: `<article><h1>${esc(a.title)}</h1>${a.excerpt ? `<p>${esc(a.excerpt)}</p>` : ''}</article>`,
+      bodyHtml: `<article><h1>${esc(a.title)}</h1>${a.excerpt ? `<p>${esc(a.excerpt)}</p>` : ''}${contentHtml}</article>${relArtHtml}`,
     }),
   );
   count++;
