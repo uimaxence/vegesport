@@ -176,7 +176,7 @@ export default function Planning({ user, savePlanning }) {
   const [googleCalendarError, setGoogleCalendarError] = useState('');
   const [dupPanel, setDupPanel] = useState({ day: null, mealType: null, selectedDays: [] });
   const [skippedDays, setSkippedDays] = useState({});
-  const [expandedDay, setExpandedDay] = useState(null);
+  const [expandedDay, setExpandedDay] = useState(() => days[0]);
   const [mealNotes, setMealNotes] = useState({});
   const [editingNote, setEditingNote] = useState(null);
   const [mealMultipliers, setMealMultipliers] = useState(
@@ -407,7 +407,7 @@ export default function Planning({ user, savePlanning }) {
 
       setPlanning(newPlanning);
 
-      // Auto-calcul des portions pour atteindre ~100% de l'objectif protéines
+      // Auto-calcul : ajuster portions + multipliers pour atteindre l'objectif protéines
       const activeTypes = mealTypes.slice(0, mealsPerDay);
       let rawTotalProtein = 0;
       let rawCountedDays = 0;
@@ -420,10 +420,32 @@ export default function Planning({ user, savePlanning }) {
         if (dayProt > 0) { rawCountedDays++; rawTotalProtein += dayProt; }
       });
       if (rawCountedDays > 0 && DAILY_TARGETS?.protein) {
-        const avg = rawTotalProtein / rawCountedDays;
-        const optimal = Math.max(1, Math.min(4, Math.round(DAILY_TARGETS.protein / avg)));
-        setPortions(optimal);
-        setMealMultipliers({});
+        const avgProtPerDay = rawTotalProtein / rawCountedDays;
+        // Ratio idéal pour atteindre la cible
+        const idealRatio = DAILY_TARGETS.protein / avgProtPerDay;
+        // Portions (entier 1-4)
+        const bestPortions = Math.max(1, Math.min(4, Math.round(idealRatio)));
+        setPortions(bestPortions);
+        // Fine-tune avec mealMultiplier uniforme
+        const remainingRatio = idealRatio / bestPortions;
+        // Trouver le multiplier le plus proche parmi les options disponibles
+        const availableMults = MEAL_SIZE_OPTIONS.map(o => o.mult);
+        const bestMult = availableMults.reduce((best, m) =>
+          Math.abs(m - remainingRatio) < Math.abs(best - remainingRatio) ? m : best
+        );
+        if (bestMult !== 1) {
+          const newMultipliers = {};
+          days.forEach(day => {
+            activeTypes.forEach(mt => {
+              if (newPlanning[day]?.[mt.id]) {
+                newMultipliers[`${day}-${mt.id}`] = bestMult;
+              }
+            });
+          });
+          setMealMultipliers(newMultipliers);
+        } else {
+          setMealMultipliers({});
+        }
       }
 
       setGenerated(true);
@@ -1025,8 +1047,27 @@ export default function Planning({ user, savePlanning }) {
     };
     const protPerKg = (proteinRefs[obj] ?? proteinRefs.masse)[niv] ?? 1.9;
     const targetProt = Math.round(protPerKg * kg);
-    const optimal = Math.max(1, Math.min(4, Math.round(targetProt / avg)));
-    setPortions(optimal);
+    const idealRatio = targetProt / avg;
+    const bestPortions = Math.max(1, Math.min(4, Math.round(idealRatio)));
+    setPortions(bestPortions);
+    // Fine-tune avec mealMultiplier uniforme
+    const remainingRatio = idealRatio / bestPortions;
+    const availableMults = MEAL_SIZE_OPTIONS.map(o => o.mult);
+    const bestMult = availableMults.reduce((best, m) =>
+      Math.abs(m - remainingRatio) < Math.abs(best - remainingRatio) ? m : best
+    );
+    if (bestMult !== 1) {
+      const activeTypes = mealTypes.slice(0, mealsPerDay);
+      const newMultipliers = {};
+      days.forEach(day => {
+        activeTypes.forEach(mt => {
+          if (setupPreviewInit.planning[day]?.[mt.id]) {
+            newMultipliers[`${day}-${mt.id}`] = bestMult;
+          }
+        });
+      });
+      setMealMultipliers(newMultipliers);
+    }
   }, [recipesList]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -1064,7 +1105,7 @@ export default function Planning({ user, savePlanning }) {
 
   /*
    * Références en g/kg et tendance calorique (vs maintien ~30 kcal/kg),
-   * d’après recommandations sportives (6dsportsnutrition, athleticlab, rippedbody, etc.)
+   * d'après recommandations sportives (6dsportsnutrition, athleticlab, rippedbody, etc.)
    */
   const DAILY_TARGETS = useMemo(() => {
     const kg = normalizedWeight;
@@ -1245,7 +1286,7 @@ export default function Planning({ user, savePlanning }) {
             <p>Liste copiée dans le presse-papier. Colle-la dans ton drive.</p>
           )}
           {actionFeedback === 'calendar' && (
-            <p>Planning exporté en .ics. Ouvre le fichier pour l’ajouter à Apple Calendar ou Outlook.</p>
+            <p>Planning exporté en .ics. Ouvre le fichier pour l'ajouter à Apple Calendar ou Outlook.</p>
           )}
           {actionFeedback === 'google_calendar' && (
             <p>{googleCalendarCount} repas ajoutés à ton Google Calendar.</p>
@@ -1519,22 +1560,22 @@ export default function Planning({ user, savePlanning }) {
 
         {onboardingStep === 'preview' && (
         <>
-        {/* Barre d’actions sticky (mobile, sous la nav) */}
-        <div className="lg:hidden sticky top-16 z-40 -mx-6 px-4 py-2.5 mb-4 border-b border-border bg-bg-warm/95 backdrop-blur-md">
-          <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-thin [scrollbar-width:thin]">
+        {/* Barre d'actions fixe en bas (mobile) */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-border px-4 py-3 safe-bottom">
+          <div className="flex items-center justify-between gap-2">
             <button
               type="button"
               onClick={generatePlanning}
               disabled={isGenerating}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[10px] border border-border bg-white text-text hover:bg-black/[0.04] shrink-0 disabled:opacity-75 disabled:cursor-not-allowed"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-[10px] border border-border bg-white text-text hover:bg-black/[0.04] disabled:opacity-75 disabled:cursor-not-allowed"
             >
               {isGenerating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-              {isGenerating ? '…' : generated ? 'Regénérer' : 'Générer'}
+              {isGenerating ? '\u2026' : generated ? 'Reg\u00e9n\u00e9rer' : 'G\u00e9n\u00e9rer'}
             </button>
             <button
               type="button"
               onClick={handleGroceryClick}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] shrink-0 border border-transparent"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-[10px] bg-black/[0.04] text-text hover:bg-black/[0.08] border border-transparent"
             >
               <ShoppingCart size={14} />
               {showGroceryList ? 'Masquer' : 'Courses'}
@@ -1542,51 +1583,15 @@ export default function Planning({ user, savePlanning }) {
             <button
               type="button"
               onClick={doSavePlanning}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] shrink-0 border border-transparent"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-[10px] bg-primary text-white hover:bg-primary-dark shadow-sm shadow-primary/20"
             >
               <Check size={14} />
               {editingPlanningId ? 'Enregistrer' : hasSavedPlanning ? 'Sauvé' : 'Sauvegarder'}
             </button>
-            <button
-              type="button"
-              onClick={handleDownloadClick}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] shrink-0 border border-transparent"
-            >
-              <Download size={14} />
-              Télécharger
-            </button>
-            {hasGoogleCalendarConfig() ? (
-              <>
-                <button
-                  type="button"
-                  onClick={handleAddToGoogleCalendar}
-                  disabled={addingToGoogle}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] shrink-0 border border-transparent disabled:opacity-60"
-                >
-                  {addingToGoogle ? <Loader2 size={14} className="animate-spin" /> : <Calendar size={14} />}
-                  Google
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAddToCalendar}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] shrink-0 border border-transparent"
-                >
-                  <Download size={14} />
-                  .ics
-                </button>
-              </>
-            ) : (
-              <button
-                type="button"
-                onClick={handleAddToCalendar}
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-black/[0.04] text-text text-sm font-medium rounded-[10px] hover:bg-black/[0.08] shrink-0 border border-transparent"
-              >
-                <Calendar size={14} />
-                Cal.
-              </button>
-            )}
           </div>
         </div>
+        {/* Spacer pour le contenu ne soit pas sous la barre fixe */}
+        <div className="lg:hidden h-16" />
 
         {/* Barre d'actions horizontale — desktop */}
         <div className="hidden lg:flex items-center justify-between gap-2 mb-6">
@@ -2497,7 +2502,7 @@ function EmptyMealSlot({ cellKey, day, mealType, mealNotes, editingNote, startEd
   );
 }
 
-/** Rayons supermarché : ordre d’affichage (parcours type en magasin). */
+/** Rayons supermarché : ordre d'affichage (parcours type en magasin). */
 const RAYON_ORDER = [
   'Fruits et légumes',
   'Épicerie',
@@ -2584,7 +2589,7 @@ function aggregateIngredientsByCategory(rawByCategory) {
       if (!k) return;
       if (!byName[k]) byName[k] = { displayName: displayLabel(displayName), isLiquid, totalMl: 0 };
       if (isLiquid) byName[k].totalMl += totalMl;
-      // Garder le libellé le plus court pour l’affichage
+      // Garder le libellé le plus court pour l'affichage
       if (displayName.length < byName[k].displayName.length) byName[k].displayName = displayLabel(displayName);
     }
 

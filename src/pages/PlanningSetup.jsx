@@ -401,7 +401,7 @@ export default function PlanningSetup() {
         <div className="max-w-6xl mx-auto">
 
           {/* ─── Top bar ─────────────────────────────────────────────── */}
-          <div className="flex items-center justify-between gap-4 mb-5">
+          <div className="flex items-center justify-between gap-4 mb-8">
             <Link
               to="/planning"
               className="inline-flex items-center gap-1.5 text-sm text-text-light hover:text-text transition-colors"
@@ -497,8 +497,8 @@ export default function PlanningSetup() {
                 {/* ── Step 2 : Ton foyer ─────────────────────────── */}
                 {step === 2 && (
                   <>
-                    <div className="mb-4">
-                      <h2 className="font-display text-xl sm:text-2xl text-text mb-1.5">
+                    <div className="mb-6">
+                      <h2 className="font-display text-xl sm:text-2xl text-text mb-2">
                         Tu cuisines pour d'autres personnes ?
                       </h2>
                       <p className="text-sm text-text-light leading-relaxed">
@@ -514,9 +514,9 @@ export default function PlanningSetup() {
                       /* ── Guest : formulaire local ── */
                       <>
                         {householdMembers.length > 0 && (
-                          <ul className="space-y-2 mb-4">
+                          <ul className="space-y-2.5 mb-5">
                             {householdMembers.map((m) => (
-                              <li key={m.id} className="flex items-center gap-3 rounded-xl border border-border bg-bg-warm px-4 py-2.5">
+                              <li key={m.id} className="flex items-center gap-3 rounded-xl border border-border bg-bg-warm px-4 py-3">
                                 <span className="text-sm font-medium text-text flex-1 truncate">{m.name}</span>
                                 <span className="text-xs text-text-light px-2 py-0.5 rounded-md bg-white border border-border capitalize">{m.appetite}</span>
                                 <button
@@ -531,7 +531,7 @@ export default function PlanningSetup() {
                           </ul>
                         )}
 
-                        <div className="rounded-xl border border-border bg-bg-warm/50 p-4 space-y-3">
+                        <div className="rounded-xl border border-border bg-bg-warm/50 p-5 space-y-4">
                           <p className="text-xs font-accent font-medium text-text flex items-center gap-1.5">
                             <Users size={13} className="text-text-light" />
                             Ajouter une personne
@@ -623,7 +623,7 @@ export default function PlanningSetup() {
                 )}
 
                 {/* ── Navigation ──────────────────────────────────── */}
-                <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 mt-5 pt-4 border-t border-border/60">
+                <div className="flex items-center justify-between gap-3 mt-5 pt-4 border-t border-border/60">
                   <button
                     type="button"
                     onClick={goPrev}

@@ -504,7 +504,7 @@ export default function PlanningFunnel() {
           </h2>
 
           <p className="mt-6 text-base text-white/55 leading-relaxed max-w-xl mx-auto">
-            Prise de masse, sèche ou endurance — peu importe ton objectif, on a les recettes.
+            Prise de masse, sèche ou endurance, peu importe ton objectif, on a les recettes.
             Crée ton planning en quelques clics et commence dès cette semaine.
           </p>
 
