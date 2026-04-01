@@ -1500,11 +1500,12 @@ export const recipes = [
 ];
 
 export const categories = [
-  { id: "tous", label: "Tous", count: 40 },
-  { id: "petit-dejeuner", label: "Petit-déjeuner", count: 7 },
-  { id: "dejeuner", label: "Déjeuner", count: 8 },
-  { id: "diner", label: "Dîner", count: 8 },
-  { id: "collation", label: "Collation", count: 7 }
+  { id: "tous", label: "Tous" },
+  { id: "petit-dejeuner", label: "Petit-déjeuner" },
+  { id: "dejeuner", label: "Déjeuner" },
+  { id: "diner", label: "Dîner" },
+  { id: "collation", label: "Collation" },
+  { id: "dessert", label: "Dessert" }
 ];
 
 export const objectives = [
@@ -1515,9 +1516,15 @@ export const objectives = [
 ];
 
 export const regimes = [
-  { id: "vegetarien", label: "Végétarien" },
   { id: "vegetalien", label: "Végétalien" },
   { id: "sans-gluten", label: "Sans gluten" }
+];
+
+export const seasons = [
+  { id: "printemps", label: "Printemps" },
+  { id: "ete", label: "Été" },
+  { id: "automne", label: "Automne" },
+  { id: "hiver", label: "Hiver" }
 ];
 
 export const tags = [

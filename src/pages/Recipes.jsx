@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { canonicalUrl } from '../lib/seo';
-import { categories, regimes, tags } from '../data/recipes';
+import { categories, regimes, seasons, tags } from '../data/recipes';
 import RecipeCard from '../components/RecipeCard';
 import RecipesSkeleton from '../components/skeleton/RecipesSkeleton';
 
@@ -23,6 +23,8 @@ export default function Recipes({ favorites, toggleFavorite }) {
   const activeRegime = searchParams.get('regime') || '';
   const activeTag = searchParams.get('tag') || '';
   const activeTime = searchParams.get('temps') || '';
+  const activeSeason = searchParams.get('saison') || '';
+  const activeFiltre = searchParams.get('filtre') || '';
 
   const updateFilter = (key, value) => {
     const newParams = new URLSearchParams(searchParams);
@@ -38,7 +40,7 @@ export default function Recipes({ favorites, toggleFavorite }) {
     setSearchParams({});
   };
 
-  const hasActiveFilters = activeCategory !== 'tous' || activeRegime || activeTag || activeTime || searchQuery;
+  const hasActiveFilters = activeCategory !== 'tous' || activeRegime || activeTag || activeTime || activeSeason || activeFiltre || searchQuery;
 
   const filteredRecipes = useMemo(() => {
     return recipes.filter((recipe) => {
@@ -56,9 +58,12 @@ export default function Recipes({ favorites, toggleFavorite }) {
       if (activeTag && !recipe.tags.includes(activeTag)) return false;
       if (activeTime === '15' && recipe.time > 15) return false;
       if (activeTime === '30' && recipe.time > 30) return false;
+      if (activeSeason && !recipe.season?.includes(activeSeason)) return false;
+      if (activeFiltre === 'proteines' && recipe.protein < 25) return false;
+      if (activeFiltre === 'leger' && recipe.calories >= 400) return false;
       return true;
     });
-  }, [recipes, searchQuery, activeCategory, activeRegime, activeTag, activeTime]);
+  }, [recipes, searchQuery, activeCategory, activeRegime, activeTag, activeTime, activeSeason, activeFiltre]);
 
   if (loading) return <RecipesSkeleton />;
   if (error) {
@@ -141,6 +146,38 @@ export default function Recipes({ favorites, toggleFavorite }) {
                     }`}
                   >
                     {t.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Season */}
+              <div className="mb-8 p-1 rounded-[10px] bg-black/[0.04]">
+                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-2 px-1">Saison</p>
+                {seasons.map(s => (
+                  <button
+                    key={s.id}
+                    onClick={() => updateFilter('saison', activeSeason === s.id ? '' : s.id)}
+                    className={`block w-full text-left py-2 px-2.5 rounded-lg text-sm transition-colors ${
+                      activeSeason === s.id ? 'bg-white text-text font-medium shadow-sm' : 'text-text-light hover:text-text'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Filtres macros */}
+              <div className="mb-8 p-1 rounded-[10px] bg-black/[0.04]">
+                <p className="text-xs font-medium uppercase tracking-wider text-text-light mb-2 px-1">Nutrition</p>
+                {[{ id: 'proteines', label: 'Riche en protéines (≥ 25g)' }, { id: 'leger', label: 'Léger (< 400 kcal)' }].map(f => (
+                  <button
+                    key={f.id}
+                    onClick={() => updateFilter('filtre', activeFiltre === f.id ? '' : f.id)}
+                    className={`block w-full text-left py-2 px-2.5 rounded-lg text-sm transition-colors ${
+                      activeFiltre === f.id ? 'bg-white text-text font-medium shadow-sm' : 'text-text-light hover:text-text'
+                    }`}
+                  >
+                    {f.label}
                   </button>
                 ))}
               </div>

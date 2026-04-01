@@ -47,13 +47,13 @@ function HeroRecipeCard({ recipe }) {
 }
 
 const categoryShowcase = [
-  { label: "Riches en protéines", objective: "masse" },
-  { label: "Énergie rapide", objective: "endurance" },
-  { label: "Récupération musculaire", objective: "masse" },
-  { label: "100 % végétal", objective: "sante" },
-  { label: "Sans cuisson", tag: "#SansCuisson" },
-  { label: "Léger et détox", objective: "seche" },
-  { label: "Encas sains", category: "collation" },
+  { label: "Riches en protéines", filter: r => r.protein >= 25, href: "/recettes?filtre=proteines" },
+  { label: "Prêt en 15 min", filter: r => r.time <= 15, href: "/recettes?temps=15" },
+  { label: "100 % végétal", filter: r => r.regime?.includes("vegetalien"), href: "/recettes?regime=vegetalien" },
+  { label: "Post-entraînement", filter: r => r.tags?.includes("#PostEntraînement"), href: "/recettes?tag=%23PostEntra%C3%AEnement" },
+  { label: "Sans cuisson", filter: r => r.tags?.includes("#SansCuisson"), href: "/recettes?tag=%23SansCuisson" },
+  { label: "Léger (< 400 kcal)", filter: r => r.calories < 400, href: "/recettes?filtre=leger" },
+  { label: "Collations", filter: r => r.category === "collation", href: "/recettes?categorie=collation" },
 ];
 
 export default function Home() {
@@ -68,10 +68,7 @@ export default function Home() {
   const { recipes, articles, loading, error } = useData();
 
   function getCategoryCount(cat) {
-    if (cat.objective) return recipes.filter(r => r.objective.includes(cat.objective)).length;
-    if (cat.tag) return recipes.filter(r => r.tags.includes(cat.tag)).length;
-    if (cat.category) return recipes.filter(r => r.category === cat.category).length;
-    return 0;
+    return recipes.filter(cat.filter).length;
   }
 
   const heroRecipes = recipes.slice(0, 4);
@@ -165,11 +162,7 @@ export default function Home() {
           <div className="space-y-3">
             {categoryShowcase.map((cat, i) => {
               const count = getCategoryCount(cat);
-              const href = cat.objective
-                ? `/recettes?objectif=${cat.objective}`
-                : cat.tag
-                  ? `/recettes?tag=${cat.tag}`
-                  : `/recettes?categorie=${cat.category}`;
+              const href = cat.href;
               return (
                 <Link
                   key={i}

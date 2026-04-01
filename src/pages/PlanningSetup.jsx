@@ -468,6 +468,7 @@ export default function PlanningSetup() {
                       <ObjectiveCards value={objective} onChange={setObjective} showValidation={showValidation} />
                       <FieldSelect label="Régime" value={regime} onChange={setRegime} required showValidation={showValidation}>
                         <option value="" disabled>Choisir…</option>
+                        <option value="vegetarien">Végétarien (toutes recettes)</option>
                         {regimes.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
                       </FieldSelect>
                       <FieldSelect label="Niveau sportif" value={niveau} onChange={setNiveau} required showValidation={showValidation}>
