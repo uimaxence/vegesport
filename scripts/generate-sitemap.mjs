@@ -54,7 +54,7 @@ const staticRoutes = [
   { path: '/mentions-legales', priority: '0.3', changefreq: 'yearly' },
 ];
 
-let recipeSlugs = [];
+let recipeEntries = [];
 let articleEntries = [];
 
 const supabaseUrl = String(process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
@@ -78,10 +78,10 @@ async function fetchFromSupabase(table, select) {
 
 // Recettes : Supabase en priorité, fallback sur le fichier local
 try {
-  const data = await fetchFromSupabase('recipes', 'id,title');
+  const data = await fetchFromSupabase('recipes', 'id,title,created_at');
   if (data && data.length > 0) {
-    recipeSlugs = data.map((r) => getSlug(r.title)).filter(Boolean);
-    console.log(`  Recettes depuis Supabase : ${recipeSlugs.length}`);
+    recipeEntries = data.map((r) => ({ slug: getSlug(r.title), lastmod: r.created_at?.slice(0, 10) })).filter((r) => r.slug);
+    console.log(`  Recettes depuis Supabase : ${recipeEntries.length}`);
   } else {
     throw new Error('Aucune recette en base');
   }
@@ -89,16 +89,16 @@ try {
   console.warn(`  ⚠ Supabase recettes indisponible (${e?.message}), fallback local…`);
   try {
     const { recipes } = await import('../src/data/recipes.js');
-    recipeSlugs = (recipes || []).map((r) => getSlug(r.title)).filter(Boolean);
-    console.log(`  Recettes depuis fichier local : ${recipeSlugs.length}`);
+    recipeEntries = (recipes || []).map((r) => ({ slug: getSlug(r.title), lastmod: r.created_at?.slice(0, 10) })).filter((r) => r.slug);
+    console.log(`  Recettes depuis fichier local : ${recipeEntries.length}`);
   } catch { /* pas de données */ }
 }
 
 // Articles : Supabase uniquement
 try {
-  const data = await fetchFromSupabase('blog_articles', 'id,title');
+  const data = await fetchFromSupabase('blog_articles', 'id,title,date,updated_at');
   articleEntries = (data || [])
-    .map((a) => ({ id: a.id, slug: getSlug(a.title) }))
+    .map((a) => ({ id: a.id, slug: getSlug(a.title), lastmod: (a.updated_at || a.date)?.slice(0, 10) }))
     .filter((a) => a.id != null && a.slug);
   console.log(`  Articles depuis Supabase : ${articleEntries.length}`);
 } catch (e) {
@@ -106,32 +106,36 @@ try {
   articleEntries = [];
 }
 
+const buildDate = new Date().toISOString().slice(0, 10);
+
 const urls = [
   ...staticRoutes.map((r) => ({
     loc: `${baseUrl}${r.path}`,
+    lastmod: buildDate,
     priority: r.priority,
     changefreq: r.changefreq,
   })),
-  ...recipeSlugs.map((slug) => ({
+  ...recipeEntries.map(({ slug, lastmod }) => ({
     loc: `${baseUrl}/recettes/${slug}`,
+    lastmod: lastmod || buildDate,
     priority: '0.8',
     changefreq: 'monthly',
   })),
-  ...articleEntries.map(({ slug }) => ({
+  ...articleEntries.map(({ slug, lastmod }) => ({
     loc: `${baseUrl}/blog/${slug}`,
+    lastmod: lastmod || buildDate,
     priority: '0.7',
     changefreq: 'monthly',
   })),
 ];
 
-const lastmod = new Date().toISOString().slice(0, 10);
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
   .map(
     (u) => `  <url>
     <loc>${u.loc}</loc>
-    <lastmod>${lastmod}</lastmod>
+    <lastmod>${u.lastmod}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
   </url>`
