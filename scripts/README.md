@@ -71,6 +71,24 @@ Enrichit les ingredients en base avec les donnees CIQUAL.
 node scripts/import-ciqual.mjs chemin/vers/ciqual.csv
 ```
 
+## Audit SEO automatique
+
+### `api/cron/audit-seo.mjs`
+Vercel Cron Function — s'execute chaque jour a 7h00 UTC.
+- Crawl le site (respect robots.txt, rate limiting, max 500 pages)
+- Analyse : meta, H1, canonical, OG, maillage interne, contenu, TTFB, images alt
+- Genere un rapport priorise via Claude API
+- Envoie le rapport par email via Brevo
+
+Variables requises dans Vercel Environment Variables :
+| Variable | Usage |
+|----------|-------|
+| `CRON_SECRET` | Genere par Vercel (Settings > Cron Jobs) |
+| `ANTHROPIC_API_KEY` | Cle API Claude (console.anthropic.com) |
+| `BREVO_API_KEY` | Cle API Brevo (app.brevo.com) |
+| `EMAIL_FROM` | Expediteur (verifie dans Brevo) |
+| `EMAIL_TO` | Destinataire du rapport |
+
 ## Structure des dossiers content/
 
 ```
@@ -91,3 +109,5 @@ content/
 | `VITE_SUPABASE_ANON_KEY` | Cle anonyme (sitemap, prerender) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Cle admin (import, upload images) |
 | `GEMINI_API_KEY` | Google Imagen (optionnel) |
+| `ANTHROPIC_API_KEY` | Claude API — audit SEO (optionnel) |
+| `BREVO_API_KEY` | Brevo email — audit SEO (optionnel) |
