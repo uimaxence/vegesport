@@ -370,21 +370,9 @@ export default function Recipes({ favorites, toggleFavorite }) {
 
           {/* Main */}
           <div className="flex-1">
-            <div className="flex items-center justify-between mb-8">
-              <div>
+            <div className="mb-8">
+              <div className="flex items-center justify-between">
                 <h1 className="font-display text-3xl sm:text-4xl text-text">Recettes végétariennes pour sportifs</h1>
-                <p className="text-sm text-text-light mt-1">{filteredRecipes.length} recette{filteredRecipes.length > 1 ? 's' : ''} disponible{filteredRecipes.length > 1 ? 's' : ''}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                {/* Bouton filtres mobile */}
-                <button
-                  onClick={() => setShowFilters(true)}
-                  className="lg:hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm text-text hover:border-text/30 transition-colors"
-                >
-                  <SlidersHorizontal size={14} />
-                  Filtres
-                  {hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
-                </button>
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}
@@ -394,6 +382,16 @@ export default function Recipes({ favorites, toggleFavorite }) {
                   </button>
                 )}
               </div>
+              <p className="text-sm text-text-light mt-1">{filteredRecipes.length} recette{filteredRecipes.length > 1 ? 's' : ''} disponible{filteredRecipes.length > 1 ? 's' : ''}</p>
+              {/* Bouton filtres mobile */}
+              <button
+                onClick={() => setShowFilters(true)}
+                className="lg:hidden inline-flex items-center gap-1.5 px-3 py-2 mt-3 rounded-lg border border-border text-sm text-text hover:border-text/30 transition-colors"
+              >
+                <SlidersHorizontal size={14} />
+                Filtres
+                {hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
+              </button>
             </div>
 
             {filteredRecipes.length > 0 ? (

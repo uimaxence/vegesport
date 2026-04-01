@@ -313,10 +313,8 @@ export function AuthProvider({ children }) {
         setHouseholdMembers(household);
         saveHouseholdToLS(userId, household);
       }
-      if (plans.length > 0) {
-        savePlanningsToLS(userId, plans);
-        setSavedPlannings(plans);
-      }
+      savePlanningsToLS(userId, plans);
+      setSavedPlannings(plans);
     }
 
     loadAllUserData()
