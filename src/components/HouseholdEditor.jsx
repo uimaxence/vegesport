@@ -80,7 +80,7 @@ export default function HouseholdEditor({ compact = false, showIntro = false }) 
   if (!user) return null;
 
   return (
-    <div className={compact ? '' : 'rounded-xl border border-border bg-white p-4 space-y-3'}>
+    <div className={compact ? 'space-y-3' : 'rounded-xl border border-border bg-white p-4 space-y-3'}>
       <div className="flex items-center gap-2 text-sm font-medium text-text">
         <Users size={16} className="text-text-light" />
         <span>Mon foyer</span>
@@ -148,32 +148,34 @@ export default function HouseholdEditor({ compact = false, showIntro = false }) 
         <p className="text-xs text-red-600">{error}</p>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <input
           type="text"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           placeholder="Ajouter un membre"
-          className="flex-1 min-w-0 text-sm border border-border rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="flex-1 min-w-0 text-sm border border-border rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
-        <select
-          value={newAppetite}
-          onChange={(e) => setNewAppetite(e.target.value)}
-          className="text-sm border border-border rounded-lg px-2 py-1.5 bg-white"
-        >
-          {APPETITE_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-        <button
-          type="button"
-          onClick={handleAdd}
-          disabled={busy || !newName.trim()}
-          className="p-1.5 rounded-lg bg-primary text-white hover:bg-primary-dark disabled:opacity-50"
-        >
-          <Plus size={16} />
-        </button>
+        <div className="flex items-center gap-2">
+          <select
+            value={newAppetite}
+            onChange={(e) => setNewAppetite(e.target.value)}
+            className="flex-1 sm:flex-none text-sm border border-border rounded-lg px-2 py-2 bg-white"
+          >
+            {APPETITE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={handleAdd}
+            disabled={busy || !newName.trim()}
+            className="p-2 rounded-lg bg-primary text-white hover:bg-primary-dark disabled:opacity-50"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );

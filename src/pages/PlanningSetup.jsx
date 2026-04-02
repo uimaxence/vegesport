@@ -510,7 +510,12 @@ export default function PlanningSetup() {
 
                     {user ? (
                       /* ── Connecté : foyer BDD via HouseholdEditor ── */
-                      <HouseholdEditor compact />
+                      <div className="rounded-xl border border-border bg-bg-warm/50 p-5 space-y-4">
+                        <HouseholdEditor compact />
+                        <p className="text-[11px] text-text-light">
+                          Petit = 70 % · Moyen = 100 % · Grand = 140 % des quantités d'ingrédients.
+                        </p>
+                      </div>
                     ) : (
                       /* ── Guest : formulaire local ── */
                       <>
@@ -537,7 +542,7 @@ export default function PlanningSetup() {
                             <Users size={13} className="text-text-light" />
                             Ajouter une personne
                           </p>
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-col sm:flex-row gap-2">
                             <input
                               type="text"
                               value={newMemberName}
@@ -546,23 +551,25 @@ export default function PlanningSetup() {
                               placeholder="Prénom"
                               className="flex-1 min-w-0 text-sm bg-white border border-border rounded-[10px] px-3 py-2.5 text-text focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
                             />
-                            <select
-                              value={newMemberAppetite}
-                              onChange={(e) => setNewMemberAppetite(e.target.value)}
-                              className="text-sm bg-white border border-border rounded-[10px] px-2 py-2.5 text-text"
-                            >
-                              {APPETITE_OPTIONS.map((o) => (
-                                <option key={o.value} value={o.value}>{o.label} mangeur</option>
-                              ))}
-                            </select>
-                            <button
-                              type="button"
-                              onClick={addMember}
-                              disabled={!newMemberName.trim()}
-                              className="p-2.5 rounded-[10px] bg-primary text-white hover:bg-primary-dark transition-colors disabled:opacity-40"
-                            >
-                              <Plus size={16} />
-                            </button>
+                            <div className="flex items-center gap-2">
+                              <select
+                                value={newMemberAppetite}
+                                onChange={(e) => setNewMemberAppetite(e.target.value)}
+                                className="flex-1 sm:flex-none text-sm bg-white border border-border rounded-[10px] px-2 py-2.5 text-text"
+                              >
+                                {APPETITE_OPTIONS.map((o) => (
+                                  <option key={o.value} value={o.value}>{o.label} mangeur</option>
+                                ))}
+                              </select>
+                              <button
+                                type="button"
+                                onClick={addMember}
+                                disabled={!newMemberName.trim()}
+                                className="p-2.5 rounded-[10px] bg-primary text-white hover:bg-primary-dark transition-colors disabled:opacity-40"
+                              >
+                                <Plus size={16} />
+                              </button>
+                            </div>
                           </div>
                           <p className="text-[11px] text-text-light">
                             Petit = 70 % · Moyen = 100 % · Grand = 140 % des quantités d'ingrédients.

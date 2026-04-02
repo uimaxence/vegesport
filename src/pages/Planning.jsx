@@ -1587,8 +1587,6 @@ export default function Planning({ user, savePlanning }) {
             </button>
           </div>
         </div>
-        {/* Spacer pour le contenu ne soit pas sous la barre fixe */}
-        <div className="lg:hidden h-16" />
 
         {/* Barre d'actions horizontale — desktop */}
         <div className="hidden lg:flex items-center justify-between gap-2 mb-6">
@@ -1918,6 +1916,7 @@ export default function Planning({ user, savePlanning }) {
                 })}
               </div>
             ))}
+        </div>
         </div>
 
         {/* ===== MOBILE Planning (accordion by day, visible < lg) ===== */}
@@ -2409,8 +2408,10 @@ export default function Planning({ user, savePlanning }) {
             )}
           </div>
         )}
-          </div>
         </div>
+
+        {/* Spacer pour le contenu ne soit pas sous la barre fixe */}
+        <div className="lg:hidden h-20" />
 
         </>
         )}
