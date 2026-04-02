@@ -1131,21 +1131,21 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
         {/* Header : image à gauche, infos à droite */}
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
           {/* Image */}
-          <div className="lg:w-[42%] flex-shrink-0">
-            <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-bg-warm flex items-center justify-center">
+          <div className="w-48 mx-auto lg:mx-0 lg:w-[30%] flex-shrink-0">
+            <div className="w-full aspect-square rounded-2xl overflow-hidden bg-bg-warm flex items-center justify-center">
               <img
-                src={getOptimizedImageUrl(getSafeImageSrc(effectiveRecipe?.image || recipe.image), 400)}
-                srcSet={`${getOptimizedImageUrl(getSafeImageSrc(effectiveRecipe?.image || recipe.image), 400)} 400w, ${getOptimizedImageUrl(getSafeImageSrc(effectiveRecipe?.image || recipe.image), 600)} 600w`}
-                sizes="(max-width: 1024px) 100vw, 42vw"
-                alt={effectiveRecipe?.title || recipe.title}
+                src={getOptimizedImageUrl(getSafeImageSrc(effectiveRecipe?.image || recipe.image), 300)}
+                srcSet={`${getOptimizedImageUrl(getSafeImageSrc(effectiveRecipe?.image || recipe.image), 300)} 300w, ${getOptimizedImageUrl(getSafeImageSrc(effectiveRecipe?.image || recipe.image), 400)} 400w`}
+                sizes="(max-width: 1024px) 60vw, 30vw"
+                alt={effectiveRecipe?.image_alt || effectiveRecipe?.title || recipe.title}
                 onError={handleMediaImageError}
                 className={
                   isRecipeImageMissing(effectiveRecipe?.image || recipe.image)
                     ? 'max-h-44 w-full object-contain recipe-image-placeholder'
                     : 'w-full h-full object-contain'
                 }
-                width="600"
-                height="450"
+                width="400"
+                height="400"
                 decoding="async"
                 fetchPriority="high"
               />
