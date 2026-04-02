@@ -711,8 +711,8 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
   usePageMeta(
     metaReady
       ? {
-          title: `${recipeTitle} — Recette végétarienne protéinée`,
-          description: recipeDesc,
+          title: effectiveRecipe?.meta_title || `${recipeTitle} — Recette végétarienne protéinée`,
+          description: effectiveRecipe?.meta_description || recipeDesc,
           canonical: recipeUrl,
           image: effectiveRecipe?.image || recipe?.image,
           type: 'article',
@@ -1164,9 +1164,13 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
             <h1 className="font-display text-3xl sm:text-4xl text-text leading-tight">
               {effectiveRecipe?.title || recipe.title}
             </h1>
-            <p className="recipe-script-note mt-2 text-base">
-              {(effectiveRecipe?.time ?? recipe.time) <= 15 ? 'Rapide à faire !' : (effectiveRecipe?.time ?? recipe.time) <= 30 ? 'Parfait pour le soir' : 'À prévoir à l\'avance'}
-            </p>
+            {effectiveRecipe?.intro ? (
+              <p className="mt-3 text-sm text-text-light leading-relaxed">{effectiveRecipe.intro}</p>
+            ) : (
+              <p className="recipe-script-note mt-2 text-base">
+                {(effectiveRecipe?.time ?? recipe.time) <= 15 ? 'Rapide à faire !' : (effectiveRecipe?.time ?? recipe.time) <= 30 ? 'Parfait pour le soir' : 'À prévoir à l\'avance'}
+              </p>
+            )}
 
             <div className="flex items-center gap-4 mt-4 text-sm text-text-light">
               <span className="flex items-center gap-1.5"><Clock size={15} /> {effectiveRecipe?.time ?? recipe.time} min</span>
@@ -1367,6 +1371,55 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                 <p className="text-sm text-text-light leading-relaxed whitespace-pre-wrap">{recipeNotes}</p>
               </div>
             ) : null}
+
+            {/* Sport timing */}
+            {effectiveRecipe?.sport_timing && (
+              <div className="mt-6 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-primary mb-2">Quand consommer</p>
+                <p className="text-sm text-text-light leading-relaxed">{effectiveRecipe.sport_timing}</p>
+              </div>
+            )}
+
+            {/* Conservation */}
+            {effectiveRecipe?.conservation && (
+              <div className="mt-4 rounded-xl border border-border bg-bg-warm/40 p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-primary mb-2">Conservation</p>
+                <p className="text-sm text-text-light leading-relaxed">{effectiveRecipe.conservation}</p>
+              </div>
+            )}
+
+            {/* Variantes */}
+            {effectiveRecipe?.variants?.length > 0 && (
+              <div className="mt-8">
+                <p className="text-xs font-medium uppercase tracking-wide text-primary mb-3">Variantes</p>
+                <div className="space-y-3">
+                  {effectiveRecipe.variants.map((v, i) => (
+                    <div key={i} className="rounded-xl border border-border bg-white p-4">
+                      <p className="text-sm font-medium text-text">{v.title}</p>
+                      <p className="mt-1 text-sm text-text-light leading-relaxed">{v.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* FAQ */}
+            {effectiveRecipe?.faq_recette?.length > 0 && (
+              <div className="mt-8">
+                <p className="text-xs font-medium uppercase tracking-wide text-primary mb-3">Questions fréquentes</p>
+                <div className="space-y-3">
+                  {effectiveRecipe.faq_recette.map((item, i) => (
+                    <details key={i} className="group rounded-xl border border-border bg-white">
+                      <summary className="cursor-pointer p-4 text-sm font-medium text-text flex items-center justify-between">
+                        {item.question}
+                        <ChevronRight size={14} className="text-text-light group-open:rotate-90 transition-transform" />
+                      </summary>
+                      <p className="px-4 pb-4 text-sm text-text-light leading-relaxed">{item.answer}</p>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -20,7 +20,7 @@ function formatDate(dateStr) {
 
 export default function Blog() {
   usePageMeta({
-    title: 'Blog nutrition végétale & performance sportive',
+    title: 'Blog nutrition végétale & performance | Mamie Végé',
     description: 'Conseils nutrition sportive végétale, guides meal prep végétarien, témoignages et comparatifs pour sportifs végétariens et végétaliens.',
     canonical: canonicalUrl('/blog'),
   });
@@ -65,7 +65,7 @@ export default function Blog() {
             Nutrition vegetale & performance sportive
           </h1>
           <p className="mt-3 text-sm text-text-light leading-relaxed">
-            Conseils, guides et retours d&apos;experience pour optimiser ta nutrition vegetale en tant que sportif.
+            Et si manger vegetarien rendait tes seances plus efficaces ? Ici, pas de dogme ni de marketing bien-etre. Juste des articles bases sur les recommandations ANSES et INSEP, traduits en assiettes reelles et en recettes faisables en 20 minutes apres une seance.
           </p>
         </div>
 

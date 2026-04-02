@@ -146,6 +146,8 @@ function webSiteJsonLd() {
 
 function recipeJsonLd(r, url) {
   const t = r.time || 0;
+  const schema = r.schema_recipe || {};
+  const nps = r.nutrition_per_serving || {};
   return {
     '@context': 'https://schema.org',
     '@type': 'Recipe',
@@ -153,14 +155,14 @@ function recipeJsonLd(r, url) {
     image: r.image ? [r.image] : [],
     author: { '@type': 'Person', name: AUTHOR },
     datePublished: r.created_at?.slice?.(0, 10) || new Date().toISOString().slice(0, 10),
-    description: `Recette végétarienne : ${r.title}. ${r.calories} kcal, ${r.protein}g de protéines.`,
+    description: r.meta_description || `Recette végétarienne : ${r.title}. ${r.calories} kcal, ${r.protein}g de protéines.`,
     prepTime: `PT${Math.max(5, Math.round(t * 0.4))}M`,
     cookTime: `PT${Math.max(5, t - Math.round(t * 0.4))}M`,
     totalTime: `PT${t}M`,
     recipeYield: `${r.servings || 1} portion${(r.servings || 1) > 1 ? 's' : ''}`,
-    recipeCategory: CAT[r.category] || r.category,
-    recipeCuisine: 'Végétarienne',
-    keywords: [
+    recipeCategory: schema.recipeCategory || CAT[r.category] || r.category,
+    recipeCuisine: schema.recipeCuisine || 'Végétarienne',
+    keywords: schema.keywords || [
       'végétarien',
       'protéines végétales',
       ...(r.tags || []).map((tag) => tag.replace('#', '')),
@@ -169,10 +171,11 @@ function recipeJsonLd(r, url) {
     ].join(', '),
     nutrition: {
       '@type': 'NutritionInformation',
-      calories: `${r.calories} kcal`,
-      proteinContent: `${r.protein}g`,
-      carbohydrateContent: `${r.carbs}g`,
-      fatContent: `${r.fat}g`,
+      calories: `${nps.calories || r.calories} kcal`,
+      proteinContent: `${nps.proteins_g || r.protein}g`,
+      carbohydrateContent: `${nps.carbs_g || r.carbs}g`,
+      fatContent: `${nps.fat_g || r.fat}g`,
+      ...(nps.fiber_g ? { fiberContent: `${nps.fiber_g}g` } : {}),
     },
     recipeIngredient: r.ingredients || [],
     recipeInstructions: (r.steps || []).map((step, i) => ({
@@ -181,6 +184,19 @@ function recipeJsonLd(r, url) {
       text: step,
     })),
     url,
+  };
+}
+
+function faqJsonLd(faqItems) {
+  if (!faqItems || faqItems.length === 0) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    })),
   };
 }
 
@@ -230,7 +246,7 @@ async function fetchFromSupabase(table, select) {
 // Recettes : Supabase en priorité, fallback fichier local
 let recipes = [];
 try {
-  const data = await fetchFromSupabase('recipes', 'id,title,category,time,calories,protein,carbs,fat,servings,tags,regime,season,objective,image,ingredients,steps,created_at');
+  const data = await fetchFromSupabase('recipes', 'id,title,category,time,calories,protein,carbs,fat,servings,tags,regime,season,objective,image,ingredients,steps,created_at,slug,meta_title,meta_description,intro,image_alt,sport_timing,conservation,variants,nutrition_per_serving,schema_recipe,faq_recette');
   if (data && data.length > 0) {
     recipes = data;
     console.log(`  Recettes depuis Supabase : ${recipes.length}`);
@@ -362,7 +378,7 @@ const statics = [
   },
   {
     path: '/recettes',
-    title: 'Recettes végétariennes protéinées pour sportifs',
+    title: 'Recettes végétariennes protéinées sportifs | Mamie Végé',
     description:
       'Découvrez toutes nos recettes végétariennes et végétaliennes riches en protéines. Filtrez par catégorie, régime alimentaire, tags et temps de préparation.',
     keywords: 'recettes végétariennes, protéines végétales, recettes sportifs, filtrer recettes',
@@ -370,7 +386,7 @@ const statics = [
   },
   {
     path: '/planning',
-    title: 'Planning repas végétarien sportif en 2 minutes',
+    title: 'Planning repas végétarien sportif | Mamie Végé',
     description:
       'Crée ton planning végétarien sportif en 2 minutes. Ajuste les portions, suis tes macros, génère ta liste de courses et exporte vers ton calendrier.',
     keywords: 'planning repas végétarien, meal prep, liste de courses, macros végétarien',
@@ -378,11 +394,25 @@ const statics = [
   },
   {
     path: '/blog',
-    title: 'Blog nutrition végétale & performance sportive',
+    title: 'Blog nutrition végétale & performance | Mamie Végé',
     description:
       'Conseils nutrition sportive végétale, guides meal prep végétarien, témoignages et comparatifs pour sportifs végétariens et végétaliens.',
     keywords: 'blog nutrition végétale, sportif végétarien, meal prep, protéines végétales',
-    bodyHtml: `<h1>Blog nutrition végétale</h1><p>Conseils, guides et témoignages pour sportifs végétariens et végétaliens.</p><ul>${allArticleLinks}</ul>`,
+    bodyHtml: `<h1>Blog nutrition végétale &amp; performance sportive</h1>
+<p>Et si manger végétarien rendait tes séances plus efficaces ? C'est la question que je me pose depuis que j'ai commencé à réduire ma consommation de viande tout en continuant à courir et à faire de la musculation. Ce blog, c'est le carnet de bord de cette transition : honnête, sourcé, et conçu pour les sportifs qui veulent des réponses concrètes plutôt que des discours.</p>
+<p>Ici, pas de dogme végétalien ni de marketing bien-être. Juste des articles basés sur les recommandations de l'ANSES, de l'INSEP et des données scientifiques disponibles, traduits en assiettes réelles et en recettes faisables en 20 minutes après une séance.</p>
+<h2>Protéines végétales et musculation</h2>
+<p>Les protéines végétales peuvent-elles vraiment soutenir une prise de masse musculaire ? Oui — à condition de connaître les bonnes sources et les bonnes associations. On couvre les besoins par sport, par poids corporel, et par objectif, avec des données chiffrées issues de la table Ciqual de l'ANSES.</p>
+<h2>Glucides, énergie et endurance</h2>
+<p>Pour les coureurs, cyclistes et traileurs végétariens : les meilleures sources de glucides végétaux, le timing autour de l'effort, et les recettes de récupération les plus efficaces après une longue sortie.</p>
+<h2>Nutrition pratique et meal prep</h2>
+<p>Manger végétarien en faisant du sport sans se ruiner ni passer sa vie en cuisine. Batch cooking du dimanche, menus à 30 à 40 euros par semaine, recettes express en 5 à 20 minutes : tout ce qu'il faut pour tenir sur la durée.</p>
+<h2>Compléments alimentaires</h2>
+<p>Vitamine B12, fer, oméga-3, créatine, vitamine D : quels compléments sont vraiment utiles, dans quels cas, et à quelles doses. Aucun complément n'est recommandé sans bilan sanguin préalable.</p>
+<h2>Recettes sportives végétariennes</h2>
+<p>Des recettes testées et approuvées pour chaque moment clé : avant l'entraînement, pendant l'effort, en récupération, en petit-déjeuner. Chaque recette indique les macros par portion, le temps de préparation et le coût estimé.</p>
+<h2>Nos articles</h2>
+<ul>${allArticleLinks}</ul>`,
   },
   {
     path: '/mentions-legales',
@@ -425,11 +455,22 @@ for (const r of recipes) {
   if (allRelArticles.length) relHtml += `<nav><h2>Articles liés</h2><ul>${articleLinksHtml(allRelArticles)}</ul></nav>`;
   relHtml += `<p><a href="/recettes">Toutes nos recettes végétariennes</a></p>`;
 
+  // Contenu enrichi SEO
+  const introHtml = r.intro ? `<p>${esc(r.intro)}</p>` : '';
+  const conservHtml = r.conservation ? `<h2>Conservation</h2><p>${esc(r.conservation)}</p>` : '';
+  const sportHtml = r.sport_timing ? `<h2>Quand consommer</h2><p>${esc(r.sport_timing)}</p>` : '';
+  const variantsHtml = (r.variants || []).length > 0
+    ? `<h2>Variantes</h2><ul>${r.variants.map((v) => `<li><strong>${esc(v.title)}</strong> — ${esc(v.description)}</li>`).join('')}</ul>`
+    : '';
+  const faqHtml = (r.faq_recette || []).length > 0
+    ? `<section><h2>Questions fréquentes</h2>${r.faq_recette.map((f) => `<h3>${esc(f.question)}</h3><p>${esc(f.answer)}</p>`).join('')}</section>`
+    : '';
+
   writePage(
     path,
     render({
-      title: r.title,
-      description: `Recette végétarienne : ${r.title}. ${r.calories} kcal, ${r.protein}g de protéines. Prête en ${r.time} min.`,
+      title: r.meta_title || r.title,
+      description: r.meta_description || `Recette végétarienne : ${r.title}. ${r.calories} kcal, ${r.protein}g de protéines. Prête en ${r.time} min.`,
       canonical: url,
       image: r.image,
       keywords: `${r.title}, recette végétarienne, ${cat}, ${r.protein}g protéines, ${(r.tags || []).map((t) => t.replace('#', '')).join(', ')}`,
@@ -440,8 +481,9 @@ for (const r of recipes) {
           { name: 'Recettes', url: `${SITE_URL}/recettes` },
           { name: r.title, url },
         ]),
-      ],
-      bodyHtml: `<article><h1>${esc(r.title)}</h1><p>${esc(cat)} · ${r.time} min · ${r.calories} kcal · ${r.protein}g protéines</p><h2>Ingrédients</h2><ul>${ingHtml}</ul><h2>Instructions</h2><ol>${stepsHtml}</ol></article>${relHtml}`,
+        faqJsonLd(r.faq_recette),
+      ].filter(Boolean),
+      bodyHtml: `<article><h1>${esc(r.title)}</h1><p>${esc(cat)} · ${r.time} min · ${r.calories} kcal · ${r.protein}g protéines</p>${introHtml}<h2>Ingrédients</h2><ul>${ingHtml}</ul><h2>Instructions</h2><ol>${stepsHtml}</ol>${conservHtml}${sportHtml}${variantsHtml}</article>${faqHtml}${relHtml}`,
     }),
   );
   count++;

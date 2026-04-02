@@ -124,6 +124,14 @@ function mapRecipeRow(row) {
     ingredients: row.ingredients || [],
     steps: row.steps || [],
     notes: row.notes ?? null,
+    meta_title: row.meta_title ?? null,
+    meta_description: row.meta_description ?? null,
+    intro: row.intro ?? null,
+    image_alt: row.image_alt ?? null,
+    sport_timing: row.sport_timing ?? null,
+    conservation: row.conservation ?? null,
+    variants: row.variants || [],
+    faq_recette: row.faq_recette || [],
   };
 }
 
@@ -148,6 +156,14 @@ function mapRecipeSummaryRow(row) {
     image: row.image,
     ingredients: row.ingredients || [],
     steps: null,
+    meta_title: row.meta_title ?? null,
+    meta_description: row.meta_description ?? null,
+    intro: row.intro ?? null,
+    image_alt: row.image_alt ?? null,
+    sport_timing: row.sport_timing ?? null,
+    conservation: row.conservation ?? null,
+    variants: row.variants || [],
+    faq_recette: row.faq_recette || [],
   };
 }
 
@@ -187,7 +203,7 @@ export async function fetchRecipes() {
   if (useLocalDataOnly()) return [...(await getLocalRecipes())];
   if (isSupabaseConfigured()) {
     try {
-      const cols = 'id,title,category,time,calories,protein,carbs,fat,servings,difficulty,tags,objective,regime,season,main_ingredient,image,ingredients';
+      const cols = 'id,title,category,time,calories,protein,carbs,fat,servings,difficulty,tags,objective,regime,season,main_ingredient,image,ingredients,meta_title,meta_description,intro,image_alt,sport_timing,conservation,variants,faq_recette';
       const data = await restGet(`recipes?select=${cols}&order=id.asc`);
       if (Array.isArray(data)) return data.map(mapRecipeSummaryRow).filter(Boolean);
     } catch (e) {
