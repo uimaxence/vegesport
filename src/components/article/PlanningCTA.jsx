@@ -20,7 +20,7 @@ export default function PlanningCTA() {
           </p>
           <Link
             to="/planning"
-            className="inline-flex items-center gap-2 mt-4 text-sm font-medium text-white bg-primary hover:bg-primary-dark transition-colors px-4 py-2.5 rounded-lg"
+            className="inline-flex items-center gap-2 mt-4 text-sm font-medium text-white bg-primary hover:bg-primary-dark transition-colors px-7 py-3.5 rounded-full shadow-lg shadow-primary/20"
           >
             Ouvrir le planning <ArrowRight size={16} />
           </Link>

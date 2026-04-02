@@ -15,14 +15,14 @@ function Heading({ level = 2, children }) {
 }
 
 function Paragraph({ children }) {
-  return <p className="text-[18px] text-text-light leading-relaxed whitespace-pre-line">{children}</p>;
+  return <p className="text-base text-text-light leading-relaxed whitespace-pre-line">{children}</p>;
 }
 
 function List({ items = [] }) {
   return (
     <ul className="mt-3 space-y-2">
       {items.map((it, i) => (
-        <li key={i} className="flex items-start gap-2 text-[18px] text-text-light leading-relaxed">
+        <li key={i} className="flex items-start gap-2 text-base text-text-light leading-relaxed">
           <span className="w-1.5 h-1.5 rounded-sm bg-primary/40 mt-2 flex-shrink-0" />
           <span className="whitespace-pre-line">{it}</span>
         </li>
@@ -59,13 +59,13 @@ function SourceBlock({ label, url }) {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[18px] text-text-light hover:text-primary transition-colors flex items-center gap-1.5 break-all"
+          className="text-base text-text-light hover:text-primary transition-colors flex items-center gap-1.5 break-all"
         >
           {label || url}
           <ExternalLink size={12} className="flex-shrink-0 opacity-60" aria-hidden />
         </a>
       ) : (
-        <span className="text-[18px] text-text-light">{label}</span>
+        <span className="text-base text-text-light">{label}</span>
       )}
     </aside>
   );
@@ -75,7 +75,7 @@ function TableBlock({ headers = [], rows = [] }) {
   if (!headers.length || !rows.length) return null;
   return (
     <div className="my-8 overflow-x-auto rounded-lg border border-border">
-      <table className="w-full min-w-[400px] text-[18px]">
+      <table className="w-full min-w-[400px] text-base">
         <thead>
           <tr className="border-b border-border bg-bg-warm">
             {headers.map((h, i) => (
@@ -119,7 +119,7 @@ function FAQBlock({ items = [] }) {
               <h3 className="font-display text-base font-medium text-text mb-2">
                 {q}
               </h3>
-              <p className="text-[18px] text-text-light leading-relaxed">
+              <p className="text-base text-text-light leading-relaxed">
                 {typeof a === 'string' ? a : ''}
               </p>
             </article>
@@ -145,13 +145,13 @@ function SourcesListBlock({ items = [] }) {
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[18px] text-text-light hover:text-primary transition-colors flex items-center gap-1.5"
+                className="text-base text-text-light hover:text-primary transition-colors flex items-center gap-1.5"
               >
                 {label || url}
                 <ExternalLink size={12} className="flex-shrink-0 opacity-60" aria-hidden />
               </a>
             ) : (
-              <span className="text-[18px] text-text-light">{label}</span>
+              <span className="text-base text-text-light">{label}</span>
             )}
           </li>
         );

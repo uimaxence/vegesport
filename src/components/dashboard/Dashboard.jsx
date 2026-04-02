@@ -41,7 +41,7 @@ export default function Dashboard({ recipes }) {
           </div>
           <Link
             to="/planning"
-            className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-sm hover:bg-primary-dark transition-colors"
+            className="flex-shrink-0 inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
           >
             Créer mon planning
             <ArrowRight size={14} />

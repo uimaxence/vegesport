@@ -15,7 +15,7 @@ export default class ErrorBoundary extends Component {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-bg text-text">
-          <h1 className="font-display text-2xl text-text mb-2">Oups, une erreur est survenue</h1>
+          <h1 className="font-display text-3xl sm:text-4xl text-text mb-2">Oups, une erreur est survenue</h1>
           <p className="text-text-light text-center max-w-md mb-8">
             Recharge la page ou retourne à l&apos;accueil.
           </p>
@@ -23,19 +23,19 @@ export default class ErrorBoundary extends Component {
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
+              className="inline-flex items-center justify-center px-7 py-3.5 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
             >
               Recharger la page
             </button>
             <a
               href="/"
-              className="px-5 py-2.5 border border-border text-sm font-medium rounded-lg hover:border-text transition-colors"
+              className="inline-flex items-center justify-center px-7 py-3.5 bg-white border border-border text-sm font-medium rounded-full text-text hover:border-text transition-colors shadow-sm"
             >
               Accueil
             </a>
             <a
               href="/connexion"
-              className="px-5 py-2.5 border border-border text-sm font-medium rounded-lg hover:border-text transition-colors"
+              className="inline-flex items-center justify-center px-7 py-3.5 bg-white border border-border text-sm font-medium rounded-full text-text hover:border-text transition-colors shadow-sm"
             >
               Connexion
             </a>

@@ -68,7 +68,7 @@ export default function Recipes({ favorites, toggleFavorite }) {
   if (loading) return <RecipesSkeleton />;
   if (error) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center px-6">
+      <div className="min-h-screen flex items-center justify-center px-6">
         <p className="text-red-600">Erreur : {error}</p>
       </div>
     );

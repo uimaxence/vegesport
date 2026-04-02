@@ -69,14 +69,14 @@ export default function BlogArticle() {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <p className="text-text-light">Chargement…</p>
       </div>
     );
   }
   if (error) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center px-6">
+      <div className="min-h-screen flex items-center justify-center px-6">
         <p className="text-red-600">Erreur : {error}</p>
       </div>
     );
@@ -129,12 +129,15 @@ export default function BlogArticle() {
               </p>
             )}
 
-            <div className="mt-8 aspect-[2/1] rounded-sm overflow-hidden bg-bg-warm">
+            <div className="mt-8 aspect-[2/1] rounded-lg overflow-hidden bg-bg-warm">
               <img
                 src={getSafeImageSrc(article.image)}
                 alt={article.title}
                 onError={handleMediaImageError}
                 className="w-full h-full object-cover"
+                decoding="async"
+                width="800"
+                height="400"
               />
             </div>
 
@@ -143,7 +146,7 @@ export default function BlogArticle() {
                 <ArticleBlocks blocks={article.contentJson} recipes={recipes} />
               ) : (
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-[18px] text-text-light leading-relaxed whitespace-pre-line">
+                  <p className="text-base text-text-light leading-relaxed whitespace-pre-line">
                     {article.content}
                   </p>
                 </div>
@@ -153,7 +156,7 @@ export default function BlogArticle() {
             {/* Comments placeholder */}
             <div className="mt-16 pt-8 border-t border-border">
               <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-6">Commentaires</h2>
-              <div className="bg-bg-warm rounded-sm p-6 text-center">
+              <div className="bg-bg-warm rounded-lg p-6 text-center">
                 <p className="text-sm text-text-light">
                   Les commentaires seront disponibles prochainement.
                 </p>
@@ -166,7 +169,7 @@ export default function BlogArticle() {
 
           <aside className="lg:pt-14">
             <div className="lg:sticky lg:top-24 space-y-8">
-              <section className="rounded-sm border border-border p-4">
+              <section className="rounded-lg border border-border p-4">
                 <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-4 flex items-center gap-2">
                   <Share2 size={14} /> Partager
                 </h2>
@@ -175,7 +178,7 @@ export default function BlogArticle() {
                     href={`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 text-xs rounded-sm bg-bg-warm hover:bg-bg-warm/80 text-text-light transition-colors"
+                    className="px-3 py-1.5 text-xs rounded-lg bg-bg-warm hover:bg-bg-warm/80 text-text-light transition-colors"
                   >
                     LinkedIn
                   </a>
@@ -183,13 +186,13 @@ export default function BlogArticle() {
                     href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 text-xs rounded-sm bg-bg-warm hover:bg-bg-warm/80 text-text-light transition-colors"
+                    className="px-3 py-1.5 text-xs rounded-lg bg-bg-warm hover:bg-bg-warm/80 text-text-light transition-colors"
                   >
                     X / Twitter
                   </a>
                   <a
                     href={`mailto:?subject=${shareTitle}&body=${shareUrl}`}
-                    className="px-3 py-1.5 text-xs rounded-sm bg-bg-warm hover:bg-bg-warm/80 text-text-light transition-colors"
+                    className="px-3 py-1.5 text-xs rounded-lg bg-bg-warm hover:bg-bg-warm/80 text-text-light transition-colors"
                   >
                     Email
                   </a>
@@ -202,12 +205,16 @@ export default function BlogArticle() {
                   <div className="space-y-4">
                     {otherArticles.map(a => (
                       <Link key={a.id} to={`/blog/${getSlug(a.title)}`} className="group block">
-                        <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
+                        <div className="aspect-[3/2] rounded-lg overflow-hidden bg-bg-warm">
                           <img
                             src={getSafeImageSrc(a.image)}
                             alt={a.title}
                             onError={handleMediaImageError}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            loading="lazy"
+                            decoding="async"
+                            width="280"
+                            height="187"
                           />
                         </div>
                         <h3 className="mt-2 text-sm font-medium text-text group-hover:text-primary transition-colors leading-snug">

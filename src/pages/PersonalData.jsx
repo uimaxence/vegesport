@@ -65,11 +65,13 @@ export default function PersonalData() {
   return (
     <div className="px-6 lg:px-8 py-12">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-2 text-primary mb-2">
-          <Shield size={20} />
-          <span className="text-xs uppercase tracking-wider font-medium">Données personnelles</span>
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Shield size={16} className="text-primary" />
+          </div>
+          <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium">Données personnelles</p>
         </div>
-        <h1 className="font-display text-3xl text-text mb-6">
+        <h1 className="font-display text-3xl sm:text-4xl text-text mb-6">
           Politique de confidentialité &amp; gestion des données
         </h1>
 
@@ -86,7 +88,7 @@ export default function PersonalData() {
         </section>
 
         {!user ? (
-          <div className="bg-bg-warm rounded-sm p-6 text-center">
+          <div className="bg-bg-warm rounded-lg p-6 text-center">
             <p className="text-sm text-text-light mb-4">
               Connecte-toi pour gérer tes données et tes préférences de consentement.
             </p>
@@ -103,7 +105,7 @@ export default function PersonalData() {
             {/* Données affichées */}
             <section className="mb-10">
               <h2 className="text-xs uppercase tracking-wider text-primary mb-3">Données du compte</h2>
-              <div className="bg-bg-warm rounded-sm p-4 space-y-2 text-sm">
+              <div className="bg-bg-warm rounded-lg p-4 space-y-2 text-sm">
                 <p><span className="text-text-light">Email :</span> {user.email}</p>
                 <p><span className="text-text-light">Prénom :</span> {user.name}</p>
               </div>
@@ -113,7 +115,7 @@ export default function PersonalData() {
             <section className="mb-10">
               <h2 className="text-xs uppercase tracking-wider text-primary mb-3">Préférences de communication</h2>
               <div className="space-y-3 text-sm">
-                <label className="flex items-center justify-between gap-4 p-3 bg-bg-warm rounded-sm cursor-pointer">
+                <label className="flex items-center justify-between gap-4 p-3 bg-bg-warm rounded-lg cursor-pointer">
                   <span className="text-text">Newsletter (actualités du site)</span>
                   <input
                     type="checkbox"
@@ -122,7 +124,7 @@ export default function PersonalData() {
                     className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20"
                   />
                 </label>
-                <label className="flex items-center justify-between gap-4 p-3 bg-bg-warm rounded-sm cursor-pointer">
+                <label className="flex items-center justify-between gap-4 p-3 bg-bg-warm rounded-lg cursor-pointer">
                   <span className="text-text">Publicité personnalisée (ex. Google Ads)</span>
                   <input
                     type="checkbox"
@@ -131,7 +133,7 @@ export default function PersonalData() {
                     className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20"
                   />
                 </label>
-                <label className="flex items-center justify-between gap-4 p-3 bg-bg-warm rounded-sm cursor-pointer">
+                <label className="flex items-center justify-between gap-4 p-3 bg-bg-warm rounded-lg cursor-pointer">
                   <span className="text-text">Partage email avec partenaires (offres / mailing ciblés)</span>
                   <input
                     type="checkbox"
@@ -153,7 +155,7 @@ export default function PersonalData() {
                 type="button"
                 onClick={handleExport}
                 disabled={!!exportStatus && exportStatus !== 'Téléchargement lancé.'}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-bg-warm border border-border rounded-sm text-sm font-medium hover:border-text transition-colors disabled:opacity-60"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-border rounded-full text-sm font-medium hover:border-text transition-colors shadow-sm disabled:opacity-60"
               >
                 <Download size={16} />
                 Exporter mes données
@@ -176,14 +178,14 @@ export default function PersonalData() {
                 value={deleteConfirm}
                 onChange={(e) => setDeleteConfirm(e.target.value)}
                 placeholder="SUPPRIMER"
-                className="w-full max-w-xs bg-bg-warm border border-border rounded-sm px-3 py-2 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full max-w-xs bg-black/[0.04] border border-transparent rounded-[10px] px-3 py-2 text-sm text-text placeholder:text-text-light/60 mb-2 focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white"
               />
               <br />
               <button
                 type="button"
                 onClick={handleDeleteAccount}
                 disabled={deleteConfirm !== 'SUPPRIMER'}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-sm text-sm font-medium hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-700 border border-red-200 rounded-full text-sm font-medium hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Trash2 size={16} />
                 Supprimer mon compte

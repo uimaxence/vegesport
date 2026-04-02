@@ -137,13 +137,13 @@ export default function Login() {
         </div>
 
         {sessionExpired && !error && (
-          <p className="mb-4 text-sm text-amber-700 bg-amber-50 rounded-sm px-3 py-2">
+          <p className="mb-4 text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
             Ta session a expiré après inactivité. Reconnecte-toi pour continuer.
           </p>
         )}
 
         {error && (
-          <p className="mb-4 text-sm text-red-600 bg-red-50 rounded-sm px-3 py-2">{error}</p>
+          <p className="mb-4 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -157,7 +157,7 @@ export default function Login() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full bg-bg-warm border-0 rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full bg-black/[0.04] border border-transparent rounded-[10px] px-4 py-3 text-sm text-text placeholder:text-text-light/60 focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white"
                 placeholder="Ton prénom"
               />
             </div>
@@ -171,7 +171,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-bg-warm border-0 rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full bg-black/[0.04] border border-transparent rounded-[10px] px-4 py-3 text-sm text-text placeholder:text-text-light/60 focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white"
               placeholder="ton@email.com"
             />
           </div>
@@ -185,7 +185,7 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full bg-bg-warm border-0 rounded-sm px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full bg-black/[0.04] border border-transparent rounded-[10px] px-4 py-3 text-sm text-text placeholder:text-text-light/60 focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white"
               placeholder="••••••••"
             />
           </div>
@@ -239,7 +239,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-primary text-white text-sm font-medium rounded-sm hover:bg-primary-dark transition-colors disabled:opacity-60"
+            className="w-full py-3 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20 disabled:opacity-60"
           >
             {loading ? 'Chargement…' : isLogin ? 'Se connecter' : 'Créer mon compte'}
           </button>
@@ -268,7 +268,7 @@ export default function Login() {
             type="button"
             onClick={handleGoogle}
             disabled={loading}
-            className="w-full py-3 border border-border text-sm rounded-sm hover:border-text transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+            className="w-full py-3 border border-border text-sm font-medium rounded-full hover:border-text transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-60"
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>

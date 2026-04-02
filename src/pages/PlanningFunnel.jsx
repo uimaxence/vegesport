@@ -190,7 +190,7 @@ function ExistingPlanningModal({ weekLabel, onView, onCreateNext, onClose }) {
           <button
             type="button"
             onClick={onView}
-            className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors shadow-sm shadow-primary/20"
+            className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-full bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
           >
             <Eye size={16} />
             Voir / modifier mon planning
@@ -198,7 +198,7 @@ function ExistingPlanningModal({ weekLabel, onView, onCreateNext, onClose }) {
           <button
             type="button"
             onClick={onCreateNext}
-            className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-xl border border-border text-sm font-medium text-text hover:border-text/30 hover:bg-bg-warm transition-colors"
+            className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-full bg-white border border-border text-sm font-medium text-text hover:border-text transition-colors shadow-sm"
           >
             <ArrowRight size={16} />
             Créer pour la semaine prochaine
@@ -282,7 +282,7 @@ export default function PlanningFunnel() {
   // Attendre le chargement des plannings avant de décider quoi afficher
   if (mineMode && user && authLoading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -344,7 +344,7 @@ export default function PlanningFunnel() {
           <Link
             to="/planning/setup"
             onClick={handleCreateClick}
-            className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+            className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
           >
             Créer mon planning
             <ArrowRight size={16} />
@@ -392,14 +392,14 @@ export default function PlanningFunnel() {
                 <Link
                   to="/planning/setup"
                   onClick={handleCreateClick}
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
                 >
                   Créer mon planning
                   <ArrowRight size={16} />
                 </Link>
                 <Link
                   to="/recettes"
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 border border-border text-sm font-medium rounded-xl text-text hover:border-text/30 hover:bg-white/60 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white border border-border text-sm font-medium rounded-full text-text hover:border-text transition-colors shadow-sm"
                 >
                   Voir les recettes
                 </Link>
@@ -512,7 +512,7 @@ export default function PlanningFunnel() {
             <Link
               to="/planning/setup"
               onClick={handleCreateClick}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white text-base font-medium rounded-xl hover:bg-primary-light transition-colors shadow-lg shadow-primary/30"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white text-base font-medium rounded-full hover:bg-primary-light transition-colors shadow-lg shadow-primary/30"
             >
               Créer mon planning gratuitement
               <ArrowRight size={18} />

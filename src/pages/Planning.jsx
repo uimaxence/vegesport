@@ -1735,7 +1735,7 @@ export default function Planning({ user, savePlanning }) {
                               <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); openDuplicatePanel(day, mt.id); }}
-                                className="p-1 rounded-sm text-text-light hover:text-text hover:bg-black/5 transition-colors"
+                                className="p-1 rounded-lg text-text-light hover:text-text hover:bg-black/5 transition-colors"
                                 title="Dupliquer vers d'autres jours"
                               >
                                 <Copy size={12} />
@@ -1752,13 +1752,13 @@ export default function Planning({ user, savePlanning }) {
                                         : { day, mealType: mt.id }
                                     );
                                   }}
-                                  className="p-1 rounded-sm text-text-light hover:text-text hover:bg-black/5 transition-colors"
+                                  className="p-1 rounded-lg text-text-light hover:text-text hover:bg-black/5 transition-colors"
                                 >
                                   <MoreVertical size={14} />
                                 </button>
                                 {contextMenu.day === day && contextMenu.mealType === mt.id && (
                                   <>
-                                    <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-sm shadow-lg overflow-hidden">
+                                    <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-lg shadow-lg overflow-hidden">
                                       <button
                                         type="button"
                                         onClick={(e) => { e.stopPropagation(); togglePin(day, mt.id); setContextMenu({ day: null, mealType: null }); }}
@@ -1806,7 +1806,7 @@ export default function Planning({ user, savePlanning }) {
                                 )}
                               {dupPanel.day === day && dupPanel.mealType === mt.id && (
                                 <>
-                                  <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-sm shadow-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                                  <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-lg shadow-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
                                     <p className="px-3 pt-2.5 pb-1 text-[13px] font-medium uppercase tracking-wider text-text-light">
                                       Dupliquer vers
                                     </p>
@@ -1814,7 +1814,7 @@ export default function Planning({ user, savePlanning }) {
                                       {days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))).map(d => (
                                         <label
                                           key={d}
-                                          className="flex items-center gap-2 px-1.5 py-1.5 rounded-sm hover:bg-black/5 cursor-pointer transition-colors"
+                                          className="flex items-center gap-2 px-1.5 py-1.5 rounded-lg hover:bg-black/5 cursor-pointer transition-colors"
                                           onClick={(e) => { e.preventDefault(); toggleDupDay(d); }}
                                         >
                                           <span className={`w-4 h-4 rounded-sm border flex items-center justify-center flex-shrink-0 transition-colors ${
@@ -1830,7 +1830,7 @@ export default function Planning({ user, savePlanning }) {
                                       <button
                                         type="button"
                                         onClick={() => setDupPanel(prev => ({ ...prev, selectedDays: days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))) }))}
-                                        className="flex-1 text-[13px] py-1.5 text-text-light hover:text-text border border-border rounded-sm transition-colors"
+                                        className="flex-1 text-[13px] py-1.5 text-text-light hover:text-text border border-border rounded-lg transition-colors"
                                       >
                                         Tous
                                       </button>
@@ -1838,7 +1838,7 @@ export default function Planning({ user, savePlanning }) {
                                         type="button"
                                         onClick={confirmDuplicate}
                                         disabled={dupPanel.selectedDays.length === 0}
-                                        className="flex-1 text-[13px] py-1.5 font-medium bg-primary text-white rounded-sm hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                        className="flex-1 text-[13px] py-1.5 font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                       >
                                         Valider
                                       </button>
@@ -2182,7 +2182,7 @@ export default function Planning({ user, savePlanning }) {
                 <button
                   type="button"
                   onClick={() => setPreviewRecipe(null)}
-                  className="p-2 text-text-light hover:text-text rounded-sm transition-colors"
+                  className="p-2 text-text-light hover:text-text rounded-lg transition-colors"
                   aria-label="Fermer"
                 >
                   <X size={18} />
@@ -2224,7 +2224,7 @@ export default function Planning({ user, savePlanning }) {
                 {previewRecipe.tags?.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {previewRecipe.tags.slice(0, 4).map(tag => (
-                      <span key={tag} className="text-[13px] px-2 py-0.5 rounded-sm bg-black/5 text-text border border-border">
+                      <span key={tag} className="text-[13px] px-2 py-0.5 rounded-lg bg-black/5 text-text border border-border">
                         {tag.replace('#', '')}
                       </span>
                     ))}
@@ -2242,7 +2242,7 @@ export default function Planning({ user, savePlanning }) {
                       : undefined
                   }
                   onClick={() => setPreviewRecipe(null)}
-                  className="mt-6 inline-flex items-center gap-2 px-5 py-3 bg-primary text-white text-base font-medium rounded-sm hover:bg-primary-dark transition-colors"
+                  className="mt-6 inline-flex items-center gap-2 px-5 py-3 bg-primary text-white text-base font-medium rounded-full hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
                 >
                   Voir la recette complète
                 </Link>

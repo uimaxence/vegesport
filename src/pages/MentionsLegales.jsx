@@ -13,11 +13,13 @@ export default function MentionsLegales() {
   return (
     <div className="px-6 lg:px-8 py-12">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-2 text-primary mb-2">
-          <FileText size={20} />
-          <span className="text-xs uppercase tracking-wider font-medium">Mentions légales</span>
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <FileText size={16} className="text-primary" />
+          </div>
+          <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium">Mentions légales</p>
         </div>
-        <h1 className="font-display text-3xl text-text mb-6">
+        <h1 className="font-display text-3xl sm:text-4xl text-text mb-6">
           Conditions d&apos;utilisation
         </h1>
 

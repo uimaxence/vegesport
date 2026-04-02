@@ -183,7 +183,7 @@ export default function Profile({ user, favorites, savedPlannings }) {
           </div>
           <Link
             to="/planning?mine=1"
-            className="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-medium rounded-sm hover:bg-primary-dark transition-colors"
+            className="flex-shrink-0 inline-flex items-center gap-2 px-7 py-3.5 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
           >
             {currentPlanning ? 'Mon planning' : 'Créer mon planning'}
           </Link>
@@ -191,19 +191,19 @@ export default function Profile({ user, favorites, savedPlannings }) {
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-          <div className="bg-bg-warm rounded-sm p-4 text-center">
+          <div className="bg-bg-warm rounded-lg p-4 text-center">
             <p className="font-display text-2xl text-primary">{favorites.length}</p>
             <p className="text-xs text-text-light mt-1">Favoris</p>
           </div>
-          <div className="bg-bg-warm rounded-sm p-4 text-center">
+          <div className="bg-bg-warm rounded-lg p-4 text-center">
             <p className="font-display text-2xl text-primary">{savedPlannings.length}</p>
             <p className="text-xs text-text-light mt-1">Plannings</p>
           </div>
-          <div className="bg-bg-warm rounded-sm p-4 text-center">
+          <div className="bg-bg-warm rounded-lg p-4 text-center">
             <p className="font-display text-2xl text-primary">{totalMealsDone}</p>
             <p className="text-xs text-text-light mt-1">Repas réalisés</p>
           </div>
-          <div className="bg-bg-warm rounded-sm p-4 text-center">
+          <div className="bg-bg-warm rounded-lg p-4 text-center">
             <p className="font-display text-2xl text-primary">{badges.filter(b => b.earned).length}</p>
             <p className="text-xs text-text-light mt-1">Badges</p>
           </div>
@@ -216,7 +216,7 @@ export default function Profile({ user, favorites, savedPlannings }) {
             {badges.map((badge, i) => (
               <div
                 key={i}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs ${
                   badge.earned
                     ? 'bg-primary/10 text-primary'
                     : 'bg-bg-warm text-text-light/40'
@@ -241,7 +241,7 @@ export default function Profile({ user, favorites, savedPlannings }) {
               ))}
             </div>
           ) : (
-            <div className="bg-bg-warm rounded-sm p-6 text-center">
+            <div className="bg-bg-warm rounded-lg p-6 text-center">
               <Heart size={24} className="mx-auto text-text-light/30 mb-2" />
               <p className="text-sm text-text-light">Aucune recette en favori pour l'instant.</p>
               <Link to="/recettes" className="text-xs text-primary hover:text-primary-dark mt-1 inline-block">
@@ -287,7 +287,7 @@ export default function Profile({ user, favorites, savedPlannings }) {
                   });
                 });
                 return (
-                  <div key={id} className="bg-bg-warm rounded-sm overflow-hidden">
+                  <div key={id} className="bg-bg-warm rounded-lg overflow-hidden">
                     <button
                       type="button"
                       onClick={() => setExpandedPlanningId((prev) => (prev === id ? null : id))}
@@ -325,7 +325,7 @@ export default function Profile({ user, favorites, savedPlannings }) {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                           {days.map((day) => (
-                            <div key={day} className="bg-white/60 rounded-sm p-3 border border-black/5">
+                            <div key={day} className="bg-white/60 rounded-lg p-3 border border-black/5">
                               <p className="text-xs font-medium text-primary capitalize mb-2">{day}</p>
                               <ul className="space-y-1.5">
                                 {mealTypes.map((mt) => {
@@ -358,7 +358,7 @@ export default function Profile({ user, favorites, savedPlannings }) {
                           ))}
                         </div>
                         {(totalProtein > 0 || totalCalories > 0) && (
-                          <div className="flex flex-wrap gap-4 p-3 rounded-sm bg-primary/5 border border-primary/10">
+                          <div className="flex flex-wrap gap-4 p-3 rounded-lg bg-primary/5 border border-primary/10">
                             <span className="flex items-center gap-1.5 text-sm text-text">
                               <Beef size={14} className="text-primary" />
                               <strong>{totalProtein} g</strong> protéines (repas faits)
@@ -379,7 +379,7 @@ export default function Profile({ user, favorites, savedPlannings }) {
               })}
             </div>
           ) : (
-            <div className="bg-bg-warm rounded-sm p-6 text-center">
+            <div className="bg-bg-warm rounded-lg p-6 text-center">
               <Calendar size={24} className="mx-auto text-text-light/30 mb-2" />
               <p className="text-sm text-text-light">Aucun planning sauvegardé.</p>
               <Link to="/planning?mine=1" className="text-xs text-primary hover:text-primary-dark mt-1 inline-block">

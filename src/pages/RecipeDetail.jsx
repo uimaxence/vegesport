@@ -1156,7 +1156,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           <div className="flex-1 flex flex-col justify-center">
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               {tags.slice(0, 3).map(tag => (
-                <Link key={tag} to={`/recettes?tag=${encodeURIComponent(tag)}`} className="text-[13px] font-medium px-2.5 py-0.5 rounded-sm border border-border text-text-light hover:border-primary hover:text-primary transition-colors">
+                <Link key={tag} to={`/recettes?tag=${encodeURIComponent(tag)}`} className="text-[13px] font-medium px-2.5 py-0.5 rounded-lg border border-border text-text-light hover:border-primary hover:text-primary transition-colors">
                   {tag.replace('#', '')}
                 </Link>
               ))}
@@ -1181,7 +1181,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
             <div className="mt-6 flex flex-wrap gap-2">
               <button
                 onClick={() => toggleFavorite(recipe.id)}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-sm text-sm border transition-colors ${
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm border transition-colors ${
                   isFavorite
                     ? 'border-primary bg-primary/5 text-primary'
                     : 'border-border text-text-light hover:border-text'
@@ -1199,14 +1199,14 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                 setIngredientsStepPhase(hasPantry ? 'pantry' : 'rest');
                 setPantryChecked(new Set());
               }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-sm text-sm bg-primary text-white hover:bg-primary-dark transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm bg-primary text-white hover:bg-primary-dark transition-colors"
               >
                 <ChefHat size={14} />
                 Mode cuisine
               </button>
               <button
                 onClick={handleShare}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-sm text-sm border border-border text-text-light hover:border-text transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm border border-border text-text-light hover:border-text transition-colors"
               >
                 {shareStatus === 'copied' ? (
                   <><Copy size={14} className="text-secondary" /> Lien copié !</>
@@ -1235,19 +1235,19 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
             <>
               <p className="text-[11px] uppercase tracking-[0.15em] text-text-light font-accent">Tes macros pour ce plat</p>
               <div className="mt-1.5 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                <div className="bg-bg-warm rounded-lg p-3 text-center">
                   <p className="text-lg font-medium text-primary">{planningOwnerMacros.protein}g</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Protéines</p>
                 </div>
-                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                <div className="bg-bg-warm rounded-lg p-3 text-center">
                   <p className="text-lg font-medium text-text">{planningOwnerMacros.carbs}g</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Glucides</p>
                 </div>
-                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                <div className="bg-bg-warm rounded-lg p-3 text-center">
                   <p className="text-lg font-medium text-text">{planningOwnerMacros.fat}g</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Lipides</p>
                 </div>
-                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                <div className="bg-bg-warm rounded-lg p-3 text-center">
                   <p className="text-lg font-medium text-text">{planningOwnerMacros.calories}</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">kcal</p>
                 </div>
@@ -1294,19 +1294,19 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
             <>
               <p className="text-[11px] uppercase tracking-[0.15em] text-text-light font-accent">Par portion</p>
               <div className="mt-1.5 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                <div className="bg-bg-warm rounded-lg p-3 text-center">
                   <p className="text-lg font-medium text-primary">{computedMacros.protein}g</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Protéines</p>
                 </div>
-                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                <div className="bg-bg-warm rounded-lg p-3 text-center">
                   <p className="text-lg font-medium text-text">{computedMacros.carbs}g</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Glucides</p>
                 </div>
-                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                <div className="bg-bg-warm rounded-lg p-3 text-center">
                   <p className="text-lg font-medium text-text">{computedMacros.fat}g</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">Lipides</p>
                 </div>
-                <div className="bg-bg-warm rounded-sm p-3 text-center">
+                <div className="bg-bg-warm rounded-lg p-3 text-center">
                   <p className="text-lg font-medium text-text">{computedMacros.calories}</p>
                   <p className="text-[13px] uppercase tracking-wider text-text-light mt-0.5">kcal</p>
                 </div>
@@ -1319,14 +1319,14 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setServings(Math.max(1, servings - 1))}
-                    className="w-8 h-8 rounded-sm border border-border flex items-center justify-center text-sm hover:border-text transition-colors"
+                    className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-sm hover:border-text transition-colors"
                   >
                     -
                   </button>
                   <span className="text-sm font-medium w-6 text-center">{servings}</span>
                   <button
                     onClick={() => setServings(servings + 1)}
-                    className="w-8 h-8 rounded-sm border border-border flex items-center justify-center text-sm hover:border-text transition-colors"
+                    className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-sm hover:border-text transition-colors"
                   >
                     +
                   </button>

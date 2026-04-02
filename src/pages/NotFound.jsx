@@ -13,7 +13,7 @@ export default function NotFound() {
     <div className="min-h-[70vh] flex items-center justify-center px-6">
       <div className="text-center max-w-md">
         <p className="text-8xl font-display text-primary/20 mb-4 select-none">404</p>
-        <h1 className="font-display text-2xl sm:text-3xl text-text mb-3">
+        <h1 className="font-display text-3xl sm:text-4xl text-text mb-3">
           Page introuvable
         </h1>
         <p className="text-text-light mb-8 leading-relaxed">
