@@ -4,7 +4,7 @@
  * - Courses U (Super U) : lien direct (pas d’affiliation publique).
  */
 
-const CARREFOUR_DRIVE_DEFAULT = 'https://www.carrefour.fr/drive';
+const CARREFOUR_DRIVE_DEFAULT = 'https://action.metaffiliation.com/trk.php?mclic=P51378758A50B2131&redir=https%3A%2F%2Fwww.carrefour.fr%2Fservices%2Fdrive';
 const COURSES_U_DRIVE = 'https://www.coursesu.com/drive/home';
 
 export function getCarrefourDriveUrl() {
@@ -18,7 +18,5 @@ export function getCoursesUDriveUrl() {
 }
 
 export function hasCarrefourAffiliate() {
-  return Boolean(
-    typeof import.meta !== 'undefined' && import.meta.env?.VITE_CARREFOUR_DRIVE_URL
-  );
+  return true;
 }

@@ -167,6 +167,7 @@ export default function Planning({ user, savePlanning }) {
   const [groceryListStep, setGroceryListStep] = useState('loading');
   const [pantryChecked, setPantryChecked] = useState(() => new Set());
   const [groceryChecked, setGroceryChecked] = useState(() => new Set());
+  const [collapsedAisles, setCollapsedAisles] = useState(() => new Set());
   const [pinnedMeals, setPinnedMeals] = useState({});
   const [generated, setGenerated] = useState(() => Boolean(setupPreviewInit));
   const [previewRecipe, setPreviewRecipe] = useState(null);
@@ -2323,35 +2324,57 @@ export default function Planning({ user, savePlanning }) {
                   À acheter pour la semaine. Cochez au fur et à mesure de vos courses.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
-                  {toBuyByCategoryOrdered.map(([category, items]) => (
-                    <div key={category} className="rounded-xl border border-black/[0.08] bg-black/[0.02] p-4">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-text-light mb-3 pb-2 border-b border-black/[0.08]">
-                        {category}
-                      </p>
-                      <ul className="space-y-1">
-                        {items.map((item) => {
-                          const key = `${category}-${item}`;
-                          const checked = groceryChecked.has(key);
-                          return (
-                            <li key={key}>
-                              <button
-                                type="button"
-                                onClick={() => toggleGroceryItem(category, item)}
-                                className="flex items-center gap-3 w-full text-left py-2 px-2 -mx-2 rounded-lg hover:bg-white transition-colors min-w-0"
-                              >
-                                <span className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${checked ? 'bg-primary border-primary' : 'border-border'}`}>
-                                  {checked && <Check size={12} className="text-white" strokeWidth={3} />}
-                                </span>
-                                <span className={`text-sm truncate min-w-0 ${checked ? 'text-text-light line-through' : 'text-text'}`}>
-                                  {item}
-                                </span>
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  ))}
+                  {toBuyByCategoryOrdered.map(([category, items]) => {
+                    const isCollapsed = collapsedAisles.has(category);
+                    const checkedCount = items.filter(item => groceryChecked.has(`${category}-${item}`)).length;
+                    return (
+                      <div key={category} className="rounded-xl border border-black/[0.08] bg-black/[0.02]">
+                        <button
+                          type="button"
+                          onClick={() => setCollapsedAisles(prev => {
+                            const next = new Set(prev);
+                            next.has(category) ? next.delete(category) : next.add(category);
+                            return next;
+                          })}
+                          className="w-full flex items-center justify-between px-4 py-3 text-left"
+                        >
+                          <span className="text-xs font-semibold uppercase tracking-wider text-text-light">
+                            {category}
+                          </span>
+                          <span className="flex items-center gap-2">
+                            {checkedCount > 0 && (
+                              <span className="text-[11px] text-text-light tabular-nums">{checkedCount}/{items.length}</span>
+                            )}
+                            <ChevronDown size={14} className={`text-text-light transition-transform ${isCollapsed ? '-rotate-90' : ''}`} />
+                          </span>
+                        </button>
+                        {!isCollapsed && (
+                          <ul className="space-y-1 px-4 pb-3 pt-0 border-t border-black/[0.06]">
+                            {items.map((item) => {
+                              const key = `${category}-${item}`;
+                              const checked = groceryChecked.has(key);
+                              return (
+                                <li key={key}>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleGroceryItem(category, item)}
+                                    className="flex items-center gap-3 w-full text-left py-2 px-2 -mx-2 rounded-lg hover:bg-white transition-colors min-w-0"
+                                  >
+                                    <span className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${checked ? 'bg-primary border-primary' : 'border-border'}`}>
+                                      {checked && <Check size={12} className="text-white" strokeWidth={3} />}
+                                    </span>
+                                    <span className={`text-sm truncate min-w-0 ${checked ? 'text-text-light line-through' : 'text-text'}`}>
+                                      {item}
+                                    </span>
+                                  </button>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
                 <div className="flex flex-wrap gap-3 items-center">
                   <button
