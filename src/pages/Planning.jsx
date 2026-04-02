@@ -407,7 +407,8 @@ export default function Planning({ user, savePlanning }) {
 
       setPlanning(newPlanning);
 
-      // Auto-calcul : ajuster portions + multipliers pour atteindre l'objectif protéines
+      // Auto-calcul : tester toutes les combinaisons portions × multiplier
+      // pour trouver celle qui atteint le mieux l'objectif protéines
       const activeTypes = mealTypes.slice(0, mealsPerDay);
       let rawTotalProtein = 0;
       let rawCountedDays = 0;
@@ -421,24 +422,25 @@ export default function Planning({ user, savePlanning }) {
       });
       if (rawCountedDays > 0 && DAILY_TARGETS?.protein) {
         const avgProtPerDay = rawTotalProtein / rawCountedDays;
-        // Ratio idéal pour atteindre la cible
-        const idealRatio = DAILY_TARGETS.protein / avgProtPerDay;
-        // Portions (entier 1-4)
-        const bestPortions = Math.max(1, Math.min(4, Math.round(idealRatio)));
-        setPortions(bestPortions);
-        // Fine-tune avec mealMultiplier uniforme
-        const remainingRatio = idealRatio / bestPortions;
-        // Trouver le multiplier le plus proche parmi les options disponibles
-        const availableMults = MEAL_SIZE_OPTIONS.map(o => o.mult);
-        const bestMult = availableMults.reduce((best, m) =>
-          Math.abs(m - remainingRatio) < Math.abs(best - remainingRatio) ? m : best
-        );
-        if (bestMult !== 1) {
+        const target = DAILY_TARGETS.protein;
+        const mults = MEAL_SIZE_OPTIONS.map(o => o.mult);
+        let bestCombo = { portions: 1, mult: 1, diff: Infinity };
+        for (let p = 1; p <= 4; p++) {
+          for (const m of mults) {
+            const achieved = avgProtPerDay * p * m;
+            const diff = Math.abs(achieved - target);
+            if (diff < bestCombo.diff) {
+              bestCombo = { portions: p, mult: m, diff };
+            }
+          }
+        }
+        setPortions(bestCombo.portions);
+        if (bestCombo.mult !== 1) {
           const newMultipliers = {};
           days.forEach(day => {
             activeTypes.forEach(mt => {
               if (newPlanning[day]?.[mt.id]) {
-                newMultipliers[`${day}-${mt.id}`] = bestMult;
+                newMultipliers[`${day}-${mt.id}`] = bestCombo.mult;
               }
             });
           });
@@ -1035,7 +1037,7 @@ export default function Planning({ user, savePlanning }) {
       if (dayProt > 0) { rawCountedDays++; rawTotalProtein += dayProt; }
     });
     if (rawCountedDays === 0) return;
-    const avg = rawTotalProtein / rawCountedDays;
+    const avgProtPerDay = rawTotalProtein / rawCountedDays;
     const kg = Math.max(40, Math.min(150, Number(setupPreviewInit.poids ?? poids) || 70));
     const obj = setupPreviewInit.objective ?? objective;
     const niv = setupPreviewInit.niveau ?? niveau;
@@ -1046,23 +1048,27 @@ export default function Planning({ user, savePlanning }) {
       sante:     { debutant: 1.3, amateur: 1.5, confirme: 1.7 },
     };
     const protPerKg = (proteinRefs[obj] ?? proteinRefs.masse)[niv] ?? 1.9;
-    const targetProt = Math.round(protPerKg * kg);
-    const idealRatio = targetProt / avg;
-    const bestPortions = Math.max(1, Math.min(4, Math.round(idealRatio)));
-    setPortions(bestPortions);
-    // Fine-tune avec mealMultiplier uniforme
-    const remainingRatio = idealRatio / bestPortions;
-    const availableMults = MEAL_SIZE_OPTIONS.map(o => o.mult);
-    const bestMult = availableMults.reduce((best, m) =>
-      Math.abs(m - remainingRatio) < Math.abs(best - remainingRatio) ? m : best
-    );
-    if (bestMult !== 1) {
+    const target = Math.round(protPerKg * kg);
+    // Tester toutes les combinaisons portions × multiplier
+    const mults = MEAL_SIZE_OPTIONS.map(o => o.mult);
+    let bestCombo = { portions: 1, mult: 1, diff: Infinity };
+    for (let p = 1; p <= 4; p++) {
+      for (const m of mults) {
+        const achieved = avgProtPerDay * p * m;
+        const diff = Math.abs(achieved - target);
+        if (diff < bestCombo.diff) {
+          bestCombo = { portions: p, mult: m, diff };
+        }
+      }
+    }
+    setPortions(bestCombo.portions);
+    if (bestCombo.mult !== 1) {
       const activeTypes = mealTypes.slice(0, mealsPerDay);
       const newMultipliers = {};
       days.forEach(day => {
         activeTypes.forEach(mt => {
           if (setupPreviewInit.planning[day]?.[mt.id]) {
-            newMultipliers[`${day}-${mt.id}`] = bestMult;
+            newMultipliers[`${day}-${mt.id}`] = bestCombo.mult;
           }
         });
       });
@@ -1563,15 +1569,6 @@ export default function Planning({ user, savePlanning }) {
         {/* Barre d'actions fixe en bas (mobile) */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-border px-4 py-3 safe-bottom">
           <div className="flex items-center justify-between gap-2">
-            <button
-              type="button"
-              onClick={generatePlanning}
-              disabled={isGenerating}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-[10px] border border-border bg-white text-text hover:bg-black/[0.04] disabled:opacity-75 disabled:cursor-not-allowed"
-            >
-              {isGenerating ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-              {isGenerating ? '\u2026' : generated ? 'Reg\u00e9n\u00e9rer' : 'G\u00e9n\u00e9rer'}
-            </button>
             <button
               type="button"
               onClick={handleGroceryClick}

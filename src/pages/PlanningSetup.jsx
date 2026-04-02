@@ -401,7 +401,7 @@ export default function PlanningSetup() {
         <div className="max-w-6xl mx-auto">
 
           {/* ─── Top bar ─────────────────────────────────────────────── */}
-          <div className="flex items-center justify-between gap-4 mb-8">
+          <div className="mb-10">
             <Link
               to="/planning"
               className="inline-flex items-center gap-1.5 text-sm text-text-light hover:text-text transition-colors"
@@ -409,10 +409,9 @@ export default function PlanningSetup() {
               <ChevronLeft size={15} />
               Retour
             </Link>
-            <p className="text-xs font-accent uppercase tracking-[0.2em] text-text-light">
+            <p className="text-xs font-accent uppercase tracking-[0.2em] text-text-light text-center mt-4">
               Planning en 2 minutes
             </p>
-            <div className="w-16" />
           </div>
 
           {/* ─── Main card ───────────────────────────────────────────── */}
@@ -497,12 +496,14 @@ export default function PlanningSetup() {
                 {/* ── Step 2 : Ton foyer ─────────────────────────── */}
                 {step === 2 && (
                   <>
-                    <div className="mb-6">
-                      <h2 className="font-display text-xl sm:text-2xl text-text mb-2">
+                    <div className="mb-8">
+                      <h2 className="font-display text-xl sm:text-2xl text-text mb-3">
                         Tu cuisines pour d'autres personnes ?
                       </h2>
                       <p className="text-sm text-text-light leading-relaxed">
                         Tes macros et quantités sont déjà calculées pour <strong className="text-text">toi</strong> grâce à ton profil.
+                      </p>
+                      <p className="text-sm text-text-light leading-relaxed mt-2">
                         Si tu cuisines aussi pour d'autres personnes, ajoute-les ici : les quantités d'ingrédients seront adaptées pour tout le foyer.
                       </p>
                     </div>
