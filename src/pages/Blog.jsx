@@ -20,8 +20,8 @@ function formatDate(dateStr) {
 
 export default function Blog() {
   usePageMeta({
-    title: 'Blog nutrition végétale & performance | Mamie Végé',
-    description: 'Conseils nutrition sportive végétale, guides meal prep végétarien, témoignages et comparatifs pour sportifs végétariens et végétaliens.',
+    title: 'Blog nutrition végétale et performance | Mamie Végé',
+    description: 'Nutrition végétarienne pour sportifs : protéines, glucides, fer, meal prep et recettes. Articles sourcés ANSES et INSEP pour courir, se muscler et récupérer sans viande.',
     canonical: canonicalUrl('/blog'),
   });
   const { articles, loading, error } = useData();

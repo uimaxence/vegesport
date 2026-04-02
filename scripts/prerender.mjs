@@ -394,23 +394,31 @@ const statics = [
   },
   {
     path: '/blog',
-    title: 'Blog nutrition végétale & performance | Mamie Végé',
+    title: 'Blog nutrition végétale et performance | Mamie Végé',
     description:
-      'Conseils nutrition sportive végétale, guides meal prep végétarien, témoignages et comparatifs pour sportifs végétariens et végétaliens.',
-    keywords: 'blog nutrition végétale, sportif végétarien, meal prep, protéines végétales',
-    bodyHtml: `<h1>Blog nutrition végétale &amp; performance sportive</h1>
-<p>Et si manger végétarien rendait tes séances plus efficaces ? C'est la question que je me pose depuis que j'ai commencé à réduire ma consommation de viande tout en continuant à courir et à faire de la musculation. Ce blog, c'est le carnet de bord de cette transition : honnête, sourcé, et conçu pour les sportifs qui veulent des réponses concrètes plutôt que des discours.</p>
-<p>Ici, pas de dogme végétalien ni de marketing bien-être. Juste des articles basés sur les recommandations de l'ANSES, de l'INSEP et des données scientifiques disponibles, traduits en assiettes réelles et en recettes faisables en 20 minutes après une séance.</p>
+      'Nutrition végétarienne pour sportifs : protéines, glucides, fer, meal prep et recettes. Articles sourcés ANSES et INSEP pour courir, se muscler et récupérer sans viande.',
+    keywords: 'blog nutrition végétale, sportif végétarien, meal prep, protéines végétales, ANSES, nutrition sportive',
+    bodyHtml: `<h1>Blog nutrition végétale et performance sportive</h1>
+<p>Manger végétarien et faire du sport : deux choix qui se complètent mieux qu'on ne le croit. Ce blog est né d'une question simple — est-ce qu'on peut courir, se muscler et récupérer efficacement sans viande ? La réponse que j'ai trouvée, et que chaque article ici documente : oui, mais ça demande de savoir quoi manger, combien, et quand.</p>
+<p>Je suis Maxence. Je ne suis pas diététicien ni coach. Je suis un sportif amateur en transition végétarienne, qui a cherché des réponses concrètes et s'est retrouvé face à des contenus soit trop généraux, soit déconnectés du sport réel. Ce blog, c'est ce que j'aurais voulu trouver quand j'ai commencé.</p>
+<p>Chaque article s'appuie sur les recommandations de l'ANSES, de l'INSEP et de Santé Publique France. Pas de discours bien-être. Pas de superlatifs non sourcés. Des chiffres, des recettes, des repères pratiques.</p>
 <h2>Protéines végétales et musculation</h2>
-<p>Les protéines végétales peuvent-elles vraiment soutenir une prise de masse musculaire ? Oui — à condition de connaître les bonnes sources et les bonnes associations. On couvre les besoins par sport, par poids corporel, et par objectif, avec des données chiffrées issues de la table Ciqual de l'ANSES.</p>
+<p>La question qui revient le plus souvent : « Est-ce qu'on peut vraiment prendre de la masse sans viande ? ». Les données disponibles répondent clairement oui, à condition de couvrir 1,6 à 2 g de protéines par kilo de poids corporel par jour avec des sources variées. Les articles de cette catégorie couvrent les meilleures sources végétales par sport (lentilles, tofu, tempeh, quinoa, graines de chanvre), le timing des apports autour des séances, la place de la créatine végane et les recettes les plus denses en protéines du blog.</p>
+<p>Les repères chiffrés que tu trouveras ici sont tirés de la table Ciqual de l'ANSES — pas de valeurs approximatives ou marketing. Si une lentille cuite apporte 9 g de protéines pour 100 g selon Ciqual, c'est ce qui est écrit.</p>
 <h2>Glucides, énergie et endurance</h2>
-<p>Pour les coureurs, cyclistes et traileurs végétariens : les meilleures sources de glucides végétaux, le timing autour de l'effort, et les recettes de récupération les plus efficaces après une longue sortie.</p>
-<h2>Nutrition pratique et meal prep</h2>
-<p>Manger végétarien en faisant du sport sans se ruiner ni passer sa vie en cuisine. Batch cooking du dimanche, menus à 30 à 40 euros par semaine, recettes express en 5 à 20 minutes : tout ce qu'il faut pour tenir sur la durée.</p>
-<h2>Compléments alimentaires</h2>
-<p>Vitamine B12, fer, oméga-3, créatine, vitamine D : quels compléments sont vraiment utiles, dans quels cas, et à quelles doses. Aucun complément n'est recommandé sans bilan sanguin préalable.</p>
-<h2>Recettes sportives végétariennes</h2>
-<p>Des recettes testées et approuvées pour chaque moment clé : avant l'entraînement, pendant l'effort, en récupération, en petit-déjeuner. Chaque recette indique les macros par portion, le temps de préparation et le coût estimé.</p>
+<p>Pour les coureurs, cyclistes et traileurs végétariens, les glucides végétaux sont souvent un avantage plutôt qu'un inconvénient. Les céréales complètes, les légumineuses et les fruits offrent une énergie progressive, stable, sans les pics glycémiques des glucides raffinés.</p>
+<p>Les articles de cette catégorie couvrent les besoins glucidiques par volume d'entraînement (de 3 à 10 g/kg/j selon l'INSEP), le timing autour des sorties longues, les recettes de récupération post-effort et les alternatives végétales aux gels industriels.</p>
+<h2>Compléments alimentaires végétariens</h2>
+<p>Vitamine B12, fer, oméga-3 DHA, vitamine D, créatine, zinc : ce sont les six micronutriments et compléments qui méritent une attention particulière dans un profil sportif végétarien. Aucun n'est recommandé ici sans bilan sanguin préalable — c'est la règle que j'applique, et elle est cohérente avec les recommandations de l'ANSES et d'Ameli.</p>
+<p>La vitamine B12 est le seul complément obligatoire pour les végétaliens — absente de toutes les sources végétales fiables. Le fer est à surveiller par bilan ferritine, surtout pour les coureurs (hémolyse mécanique). Les articles expliquent comment optimiser l'absorption du fer végétal (association avec la vitamine C), quelles formes de compléments sont mieux tolérées, et pourquoi la créatine monohydrate est particulièrement pertinente pour les végétariens pratiquant la musculation.</p>
+<h2>Meal prep et organisation</h2>
+<p>Tenir une alimentation végétarienne sportive sur la durée, ça se prépare. Le batch cooking du dimanche, les listes de courses à 30–40 euros, les menus sur 5 ou 7 jours avec les macros calculés : cette catégorie est la plus pratique du blog.</p>
+<p>L'idée centrale : avec 1h30 de préparation le dimanche (lentilles cuites, riz complet, houmous, curry ou chili en grande quantité), les repas de la semaine s'assemblent en 5 à 15 minutes chaque soir. C'est cette organisation qui permet de tenir sans se retrouver à commander une pizza après la séance.</p>
+<h2>Recettes végétariennes pour sportifs</h2>
+<p>Plus de 60 recettes testées, avec les macros par portion, le coût estimé et le timing sportif recommandé. Chaque recette indique si elle est adaptée avant ou après l'entraînement, combien de protéines elle apporte, et si elle est compatible avec un budget étudiant.</p>
+<p>Les recettes phares du blog : le bowl lentilles-quinoa-tofu mariné (38 g de protéines), le curry de lentilles corail express (22 g, moins de 25 minutes), les barres énergétiques maison aux dattes et à l'avoine (alternative végétale aux gels industriels), et le smoothie vert protéiné post-effort.</p>
+<h2>Catégorie Étudiant / Petit budget</h2>
+<p>Manger végétarien et sportif n'implique pas de budget élevé. Les légumineuses sèches, les flocons d'avoine, le riz complet et les épinards surgelés sont parmi les sources de protéines et de micronutriments les moins chères du marché. Les articles de cette catégorie montrent comment construire un menu sportif complet pour 30 à 40 euros par semaine, avec des listes de courses détaillées et des prix indicatifs.</p>
 <h2>Nos articles</h2>
 <ul>${allArticleLinks}</ul>`,
   },
