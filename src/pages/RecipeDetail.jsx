@@ -713,6 +713,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
       ? {
           title: effectiveRecipe?.meta_title || `${recipeTitle} — Recette végétarienne protéinée`,
           description: effectiveRecipe?.meta_description || recipeDesc,
+          fullTitle: Boolean(effectiveRecipe?.meta_title),
           canonical: recipeUrl,
           image: effectiveRecipe?.image || recipe?.image,
           type: 'article',
