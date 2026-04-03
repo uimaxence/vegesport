@@ -378,7 +378,7 @@ const statics = [
   },
   {
     path: '/recettes',
-    title: 'Recettes végétariennes protéinées sportifs | Mamie Végé',
+    title: 'Recettes végé protéinées sportifs',
     description:
       'Découvrez toutes nos recettes végétariennes et végétaliennes riches en protéines. Filtrez par catégorie, régime alimentaire, tags et temps de préparation.',
     keywords: 'recettes végétariennes, protéines végétales, recettes sportifs, filtrer recettes',
@@ -386,7 +386,7 @@ const statics = [
   },
   {
     path: '/planning',
-    title: 'Planning repas végétarien sportif | Mamie Végé',
+    title: 'Planning repas végétarien',
     description:
       'Crée ton planning végétarien sportif en 2 minutes. Ajuste les portions, suis tes macros, génère ta liste de courses et exporte vers ton calendrier.',
     keywords: 'planning repas végétarien, meal prep, liste de courses, macros végétarien',
@@ -394,7 +394,7 @@ const statics = [
   },
   {
     path: '/blog',
-    title: 'Blog nutrition végétale et performance | Mamie Végé',
+    title: 'Blog nutrition végétale et sport',
     description:
       'Nutrition végétarienne pour sportifs : protéines, glucides, fer, meal prep et recettes. Articles sourcés ANSES et INSEP pour courir, se muscler et récupérer sans viande.',
     keywords: 'blog nutrition végétale, sportif végétarien, meal prep, protéines végétales, ANSES, nutrition sportive',

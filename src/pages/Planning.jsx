@@ -128,7 +128,7 @@ function isDayPast(day, weekStart) {
 
 export default function Planning({ user, savePlanning }) {
   usePageMeta({
-    title: 'Planning repas végétarien hebdomadaire',
+    title: 'Planning repas végétarien',
     description: 'Crée ton planning hebdomadaire de repas végétariens personnalisé. Choisis ton objectif sportif (prise de masse, sèche, endurance), génère ta liste de courses et sauvegarde ton planning.',
     canonical: canonicalUrl('/planning'),
   });

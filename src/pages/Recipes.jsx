@@ -10,7 +10,7 @@ import RecipesSkeleton from '../components/skeleton/RecipesSkeleton';
 
 export default function Recipes({ favorites, toggleFavorite }) {
   usePageMeta({
-    title: 'Recettes végétariennes protéinées sportifs | Mamie Végé',
+    title: 'Recettes végé protéinées sportifs',
     description: 'Découvrez toutes nos recettes végétariennes et végétaliennes riches en protéines. Filtrez par catégorie, régime alimentaire, tags et temps de préparation.',
     canonical: canonicalUrl('/recettes'),
   });
