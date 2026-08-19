@@ -16,6 +16,7 @@ import { readFileSync, existsSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI, Modality } from '@google/genai';
+import { removeBackground } from '@imgly/background-removal-node';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
@@ -84,53 +85,20 @@ async function generateRecipeImage(recipe) {
 async function removeBackgroundAndConvertWebp(imageBuffer) {
   const sharp = (await import('sharp')).default;
 
-  const metadata = await sharp(imageBuffer).metadata();
-  const w = metadata.width;
-  const h = metadata.height;
+  // Détourage IA (même pipeline que process-recipe-images.mjs) —
+  // le détourage par tolérance de couleur laisse des restes d'ombres.
+  const pngInput = await sharp(imageBuffer).png().toBuffer();
+  const inputBlob = new Blob([pngInput], { type: 'image/png' });
+  const blob = await removeBackground(inputBlob, {
+    output: { format: 'image/png' },
+  });
+  const pngBuffer = Buffer.from(await blob.arrayBuffer());
 
-  const cornerRaw = await sharp(imageBuffer)
-    .extract({ left: 0, top: 0, width: Math.min(10, w), height: Math.min(10, h) })
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-
-  const { data, info } = cornerRaw;
-  const channels = info.channels;
-  let rSum = 0, gSum = 0, bSum = 0;
-  const pixelCount = data.length / channels;
-  for (let i = 0; i < data.length; i += channels) {
-    rSum += data[i];
-    gSum += data[i + 1];
-    bSum += data[i + 2];
-  }
-  const bgR = Math.round(rSum / pixelCount);
-  const bgG = Math.round(gSum / pixelCount);
-  const bgB = Math.round(bSum / pixelCount);
-
-  const tolerance = 35;
-  const rawBuffer = await sharp(imageBuffer)
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-
-  const pixels = rawBuffer.data;
-  for (let i = 0; i < pixels.length; i += 4) {
-    const dr = Math.abs(pixels[i] - bgR);
-    const dg = Math.abs(pixels[i + 1] - bgG);
-    const db = Math.abs(pixels[i + 2] - bgB);
-    if (dr <= tolerance && dg <= tolerance && db <= tolerance) {
-      pixels[i + 3] = 0;
-    }
-  }
-
-  const trimmed = await sharp(pixels, {
-    raw: { width: rawBuffer.info.width, height: rawBuffer.info.height, channels: 4 },
-  })
+  const trimmed = await sharp(pngBuffer)
     .trim()
     .toBuffer({ resolveWithObject: true });
 
-  return sharp(trimmed.data, {
-    raw: { width: trimmed.info.width, height: trimmed.info.height, channels: 4 },
-  })
+  return sharp(trimmed.data)
     .resize(800, 600, { fit: 'inside', withoutEnlargement: true })
     .extend({
       top: 20, bottom: 20, left: 20, right: 20,
