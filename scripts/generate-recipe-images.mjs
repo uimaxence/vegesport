@@ -53,6 +53,10 @@ const genai = new GoogleGenAI({ apiKey: geminiApiKey });
 const STORAGE_BUCKET = 'recipes';
 const STORAGE_BASE_URL = `${url}/storage/v1/object/public/${STORAGE_BUCKET}/`;
 
+// Modèle d'image : surchargeable via IMAGE_MODEL dans .env
+// (imagen-* n'est pas disponible sur les clés AI Studio standard)
+const IMAGE_MODEL = process.env.IMAGE_MODEL || 'gemini-3.1-flash-image';
+
 async function generateRecipeImage(recipe) {
   const recipeJson = JSON.stringify({
     title: recipe.title,
@@ -64,11 +68,10 @@ async function generateRecipeImage(recipe) {
   const prompt = `En te basant sur le JSON suivant, génère une image du plat décrit. Photo simple, lumière naturelle, fond sobre et uni. Il faut IMPERATIVEMENT que le plat soit photographié du dessus et qu'il y ait bien que 1 plat au centre de l'image.\n\nJSON:\n${recipeJson}`;
 
   const response = await genai.models.generateContent({
-    model: 'imagen-4.0-generate-001',
+    model: IMAGE_MODEL,
     contents: prompt,
     config: {
       responseModalities: [Modality.IMAGE],
-      numberOfImages: 1,
     },
   });
 
