@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Heart, Clock } from 'lucide-react';
 import { getSlug } from '../lib/slug';
+import MacroBadges from './MacroBadges';
 import { getSafeImageSrc, handleMediaImageError, isRecipeImageMissing, getOptimizedImageUrl } from '../lib/imageFallback';
 
 export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout = 'grid' }) {
@@ -68,9 +69,13 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
           <h3 className="font-display text-lg text-text leading-snug">
             {recipe.title}
           </h3>
-          <p className="mt-1 text-sm font-medium text-text-light">
-            {recipe.time} min · {recipe.calories} kcal
-          </p>
+          <div className="mt-1.5 flex items-center gap-2.5 flex-wrap">
+            <span className="inline-flex items-center gap-1 font-accent text-xs tabular-nums text-text-light">
+              <Clock size={11} />
+              {recipe.time} min
+            </span>
+            <MacroBadges recipe={recipe} />
+          </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {recipe.tags.slice(0, 3).map(tag => (
               <span

@@ -49,6 +49,7 @@ function getSlug(title) {
 const staticRoutes = [
   { path: '/',         priority: '1.0', changefreq: 'weekly' },
   { path: '/recettes', priority: '0.9', changefreq: 'daily' },
+  { path: '/ravitaillement', priority: '0.9', changefreq: 'weekly' },
   { path: '/planning', priority: '0.9', changefreq: 'weekly' },
   { path: '/blog',     priority: '0.9', changefreq: 'weekly' },
   { path: '/mentions-legales', priority: '0.3', changefreq: 'yearly' },

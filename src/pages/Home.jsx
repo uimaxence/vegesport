@@ -47,6 +47,7 @@ function HeroRecipeCard({ recipe }) {
 }
 
 const categoryShowcase = [
+  { label: "Ravitaillement", filter: r => r.category === "collation" || r.tags?.includes("#PostEntraînement"), href: "/ravitaillement" },
   { label: "Riches en protéines", filter: r => r.protein >= 25, href: "/recettes?filtre=proteines" },
   { label: "Prêt en 15 min", filter: r => r.time <= 15, href: "/recettes?temps=15" },
   { label: "100 % végétal", filter: r => r.regime?.includes("vegetalien"), href: "/recettes?regime=vegetalien" },
@@ -58,8 +59,8 @@ const categoryShowcase = [
 
 export default function Home() {
   usePageMeta({
-    title: 'et si mamie était végé ? — Recettes végétariennes protéinées',
-    description: 'Recettes végétariennes et végétaliennes riches en protéines pour sportifs. Planning repas hebdomadaire personnalisé, liste de courses automatique et conseils nutrition sportive végétale.',
+    title: 'et si mamie était végé ? — Le ravito végétal fait maison',
+    description: 'Recettes végétariennes et végétaliennes riches en protéines pour les sports d’endurance : vélo, trail, running. Ravitaillement fait maison, planning repas personnalisé et conseils nutrition sportive végétale.',
     fullTitle: true,
     canonical: canonicalUrl('/'),
     type: 'website',
@@ -103,14 +104,14 @@ export default function Home() {
           {/* Top: text content centered */}
           <div className="max-w-3xl mx-auto text-center mb-14 lg:mb-20">
             <p className="font-accent text-xs uppercase tracking-[0.25em] text-primary mb-6 animate-[hero-text-in_0.6s_ease-out]">
-              Nutrition végétale pour sportifs
+              Nutrition végétale pour sports d&rsquo;endurance
             </p>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-text leading-[1.08] tracking-tight animate-[hero-text-in_0.6s_ease-out_0.1s_both]">
               Tes repas végétariens protéinés,{' '}
               <span className="font-accent italic text-primary">planifiés en 2 clics</span>
             </h1>
             <p className="mt-6 text-base lg:text-lg text-text-light leading-relaxed max-w-xl mx-auto animate-[hero-text-in_0.6s_ease-out_0.2s_both]">
-              Recettes optimisées pour la performance sportive. Planning personnalisé, liste de courses automatique et suivi des macros.
+              Du petit déjeuner d&rsquo;avant sortie au repas de récupération : recettes avec macros par portion, planning personnalisé et liste de courses automatique.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center animate-[hero-text-in_0.6s_ease-out_0.3s_both]">
               <Link

@@ -13,6 +13,7 @@ export default function Navbar({ user }) {
   const links = [
     { path: '/', label: 'Accueil' },
     { path: '/recettes', label: 'Recettes' },
+    { path: '/ravitaillement', label: 'Ravitaillement' },
     { path: planningPath, label: user ? 'Mon planning' : 'Planning' },
     { path: '/blog', label: 'Blog' },
   ];

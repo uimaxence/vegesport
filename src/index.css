@@ -308,6 +308,23 @@
   animation: toast-progress-shrink linear forwards;
 }
 
+/* Profil d'étape décoratif (registre route — pages Ravitaillement) */
+.deco-route {
+  width: 72px;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 14'%3E%3Cpath fill='none' stroke='%23E8450E' stroke-width='1.2' stroke-linejoin='round' d='M0 13 L10 9 L16 10 L26 4 L34 6 L46 1 L54 5 L62 3 L72 13'/%3E%3C/svg%3E") no-repeat center;
+  margin-top: 0.25rem;
+}
+
+/* Label de phase ravito (avant / pendant / après) */
+.ravito-phase-label {
+  font-family: var(--font-accent);
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
 /* Ligne ondulée décorative (séparateur style carnet) */
 .deco-wave {
   width: 48px;

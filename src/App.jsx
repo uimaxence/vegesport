@@ -16,6 +16,7 @@ const RecipeDetail = lazy(() => import('./pages/RecipeDetail'));
 const Planning = lazy(() => import('./pages/Planning'));
 const PlanningFunnel = lazy(() => import('./pages/PlanningFunnel'));
 const PlanningSetup = lazy(() => import('./pages/PlanningSetup'));
+const Ravito = lazy(() => import('./pages/Ravito'));
 const Blog = lazy(() => import('./pages/Blog'));
 const BlogArticle = lazy(() => import('./pages/BlogArticle'));
 const BlogLegacyRedirect = lazy(() => import('./components/BlogLegacyRedirect'));
@@ -62,6 +63,7 @@ function AppRoutes() {
             } />
             <Route path="/planning" element={<PlanningFunnel />} />
             <Route path="/planning/setup" element={<PlanningSetup />} />
+            <Route path="/ravitaillement" element={<Ravito />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogArticle />} />
             {/* Legacy redirect: /blog/123/slug → /blog/slug */}

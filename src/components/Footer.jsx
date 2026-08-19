@@ -10,7 +10,7 @@ export default function Footer() {
               <img src="/logo.svg" alt="et si mamie était végé ?" className="h-10 w-auto" width="119" height="40" />
             </Link>
             <p className="mt-3 text-sm text-text-light leading-relaxed">
-              Recettes végétariennes et végétaliennes riches en protéines, conçues pour les sportifs.
+              Le ravito végétal fait maison — recettes riches en protéines pour les sports d&rsquo;endurance.
             </p>
           </div>
 
@@ -18,6 +18,7 @@ export default function Footer() {
             <h4 className="text-xs font-medium uppercase tracking-wider text-text-light mb-4">Navigation</h4>
             <div className="space-y-2">
               <Link to="/recettes" className="block text-sm text-text-light hover:text-text transition-colors">Recettes</Link>
+              <Link to="/ravitaillement" className="block text-sm text-text-light hover:text-text transition-colors">Ravitaillement</Link>
               <Link to="/planning" className="block text-sm text-text-light hover:text-text transition-colors">Planning</Link>
               <Link to="/blog" className="block text-sm text-text-light hover:text-text transition-colors">Blog</Link>
             </div>
@@ -43,7 +44,7 @@ export default function Footer() {
         </div>
 
         <p className="mt-8 text-center recipe-annotation text-text-light/80 text-lg">
-          Recettes de grand-mère, version sportive et 100 % végétale.
+          Le ravito de mamie vaut tous les gels du commerce.
         </p>
         <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-text-light">

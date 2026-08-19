@@ -385,6 +385,23 @@ const statics = [
     bodyHtml: `<h1>Recettes végétariennes protéinées</h1><p>Toutes nos recettes végétariennes riches en protéines pour sportifs.</p><ul>${allRecipeLinks}</ul>`,
   },
   {
+    path: '/ravitaillement',
+    title: 'Ravitaillement vélo fait maison : barres, boissons et gels végétaux',
+    description:
+      'Recettes de ravitaillement maison pour le vélo et les sports d’endurance : barres énergétiques, boisson isotonique, collations et récupération — 100 % végétal, avec les macros par portion.',
+    keywords:
+      'ravitaillement vélo, barre énergétique maison, boisson isotonique maison, gel énergétique maison, nutrition cyclisme, recette ravito',
+    bodyHtml: `<h1>Le ravito végétal fait maison</h1>
+<p>Avant, pendant et après la sortie : des recettes pensées pour l'endurance — vélo, trail, running — avec les macros par portion. Moins chères et meilleures que les gels industriels.</p>
+<h2>Avant la sortie — charger les batteries</h2>
+<p>1 à 4 g de glucides par kilo, 1 à 4 heures avant le départ : un repas digeste, riche en glucides complexes.</p>
+<h2>Pendant l'effort — le ravito de la musette</h2>
+<p>30 à 90 g de glucides par heure selon l'intensité : barres, bouchées et boissons maison, avec des ingrédients qu'on reconnaît.</p>
+<h2>Après la sortie — récupérer et reconstruire</h2>
+<p>20 à 30 g de protéines et des glucides dans les 2 heures : reconstituer le glycogène et reconstruire le muscle, 100 % végétal.</p>
+<nav><h2>Nos recettes</h2><ul>${allRecipeLinks}</ul></nav>`,
+  },
+  {
     path: '/planning',
     title: 'Planning repas végétarien',
     description:

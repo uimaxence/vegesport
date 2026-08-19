@@ -5,6 +5,49 @@
 
 ---
 
+## 0. Direction de marque (pivot endurance — aout 2026)
+
+### Positionnement
+
+**« Le ravito végétal fait maison »** — nutrition végétale pour sports d'endurance
+(vélo, trail, running). Le vélo est le fil rouge éditorial et l'incarnation de la
+marque ; le ciblage SEO reste l'endurance au sens large.
+
+- Le nom **« et si mamie était végé ? » / Mamie Végé** est conservé. Le paradoxe
+  mamie × performance EST le positionnement : le fait-maison de mamie contre les
+  gels et barres industriels.
+- Ancienne tagline « et si mamie était végé ? » → nouvelle signature :
+  **« Le ravito végétal fait maison »**.
+
+### Deux registres visuels (la tension fait l'identité)
+
+| Registre | Rôle | Vocabulaire |
+| -------- | ---- | ----------- |
+| **Carnet de cuisine** (socle existant) | Chaleur, confiance, fait-maison | Texture papier, annotations Caveat, tampon incliné, `deco-wave`, orange `primary` |
+| **Route & données** (nouveau) | Crédibilité sportive, performance | Space Grotesk (`font-accent`) + `tabular-nums` pour toute donnée chiffrée, badges macros, profil d'étape `deco-route`, timing avant/pendant/après |
+
+### Règles
+
+- **Garder** : texture papier, Caveat, la chaleur générale, l'orange `#E8450E`
+  (déjà très « signalétique vélo » : fléchage de course, maillot).
+- **Ajouter** : le registre données partout où il y a un chiffre — macros par
+  portion (g protéines / g glucides / kcal), glucides par heure, durées.
+  Toujours en `font-accent` + `tabular-nums`.
+- **Ne jamais faire** : basculer dans les codes « sport nutrition » industriels
+  (fond noir, néon, typo condensée agressive, vocabulaire « fuel / boost »).
+  On resterait la copie fade de Prozis et on perdrait la différenciation.
+- **Photographie** : privilégier le réel — bidons, musettes, barres emballées
+  dans du papier cuisson, bord de route, cuisine vivante. Les images détourées
+  sur fond chaud restent le fallback des cartes recettes.
+
+### Objets graphiques de la marque
+
+La **musette**, le **bidon**, le **roadbook / profil d'étape** sont les objets
+identitaires du registre route. Le profil d'étape remplace la `deco-wave` sur
+les pages Ravitaillement (voir `.deco-route`).
+
+---
+
 ## 1. Couleurs
 
 ### Palette principale
@@ -1019,4 +1062,57 @@ w-1.5 h-1.5 rounded-full bg-primary
 .scrollbar-none {
   scrollbar-width: none;
 }
+```
+
+---
+
+## 23. Registre « Route & données » — composants
+
+### Badges macros (`MacroBadges`)
+
+Rangée de données nutritionnelles par portion. Composant `src/components/MacroBadges.jsx`.
+Toujours `font-accent` + `tabular-nums`. La protéine est la donnée héros (couleur `secondary`).
+
+```
+/* Conteneur */
+flex items-center gap-3 font-accent text-xs tabular-nums
+
+/* Item */
+flex items-center gap-1 text-text-light
+  valeur : font-medium text-text
+  protéine : font-medium text-secondary
+
+/* Exemple rendu : 32 g prot · 68 g gluc · 540 kcal */
+```
+
+Usage : cartes recettes (grille), page recette, cartes hero, planning.
+Ne jamais réafficher « X min · Y kcal » en texte plat quand les badges sont présents.
+
+### Profil d'étape (`.deco-route`)
+
+Séparateur décoratif du registre route — silhouette de profil d'étape (roadbook).
+Remplace `.deco-wave` sur les pages Ravitaillement uniquement.
+
+```css
+.deco-route {
+  width: 72px;
+  height: 14px;
+  /* SVG : ligne de profil montagneux, stroke primary */
+  margin-top: 0.25rem;
+}
+```
+
+### Timeline ravito (avant / pendant / après)
+
+Structure canonique de la page `/ravitaillement` et des futurs contenus ravito.
+Trois phases, chacune : label `font-accent` uppercase + repère glucidique + recettes.
+
+```
+/* Label phase */
+.ravito-phase-label
+  font-accent text-[11px] uppercase tracking-[0.2em] text-primary
+
+/* Repère nutritionnel de phase (donnée, pas décoration) */
+font-accent text-sm text-text-light tabular-nums
+  ex : « 1–4 g de glucides / kg, 1–4 h avant »
 ```

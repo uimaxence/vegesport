@@ -2,31 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.mamie-vege.fr/</loc>
-    <lastmod>2026-04-03</lastmod>
+    <lastmod>2026-08-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.mamie-vege.fr/recettes</loc>
-    <lastmod>2026-04-03</lastmod>
+    <lastmod>2026-08-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://www.mamie-vege.fr/ravitaillement</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://www.mamie-vege.fr/planning</loc>
-    <lastmod>2026-04-03</lastmod>
+    <lastmod>2026-08-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.mamie-vege.fr/blog</loc>
-    <lastmod>2026-04-03</lastmod>
+    <lastmod>2026-08-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.mamie-vege.fr/mentions-legales</loc>
-    <lastmod>2026-04-03</lastmod>
+    <lastmod>2026-08-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
@@ -409,6 +415,54 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.mamie-vege.fr/recettes/boisson-isotonique-maison-au-citron-2-bidons</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mamie-vege.fr/recettes/barres-energetiques-maison-avoine-dattes-et-amandes</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mamie-vege.fr/recettes/gel-energetique-maison-au-sirop-de-riz-et-citron</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mamie-vege.fr/recettes/rice-cakes-banane-coco-facon-peloton</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mamie-vege.fr/recettes/porridge-du-cycliste-avant-sortie-longue</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mamie-vege.fr/recettes/riz-au-lait-vanille-d-avant-course</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mamie-vege.fr/recettes/boisson-de-recuperation-choco-banane-glucides-proteines</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mamie-vege.fr/recettes/mini-sandwichs-de-ravito-au-houmous</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.mamie-vege.fr/blog/proteines-vegetales-pour-sportifs-comment-couvrir-ses-besoins-sans-viande</loc>
     <lastmod>2026-04-03</lastmod>
     <changefreq>monthly</changefreq>
@@ -537,6 +591,12 @@
   <url>
     <loc>https://www.mamie-vege.fr/blog/liste-de-courses-vegetarienne-sportif-1-semaine-pour-40-euros</loc>
     <lastmod>2026-04-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.mamie-vege.fr/blog/ravitaillement-velo-quoi-manger-pendant-une-sortie-et-combien-de-glucides-par-heure</loc>
+    <lastmod>2026-08-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
