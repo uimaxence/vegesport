@@ -7,10 +7,11 @@ export const FALLBACK_MEDIA_IMAGE = '/images/mamie-fallback.png';
  */
 export function getOptimizedImageUrl(src, width, quality = 60) {
   if (!src || !src.includes('/storage/v1/object/public/')) return src;
+  // resize=contain : sans lui, Supabase rogne la largeur au lieu de redimensionner
   return src.replace(
     '/storage/v1/object/public/',
     '/storage/v1/render/image/public/'
-  ) + `?width=${width}&quality=${quality}`;
+  ) + `?width=${width}&quality=${quality}&resize=contain`;
 }
 
 /** True quand la recette n’a pas d’URL d’image (on affiche le visuel de secours). */
