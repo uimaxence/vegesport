@@ -119,9 +119,10 @@ const CATEGORY_MAP = {
   'dejeuner': 'dejeuner',
   'dîner': 'diner',
   'diner': 'diner',
-  'snack': 'snack',
+  'snack': 'collation',
+  'collation': 'collation',
   'dessert': 'dessert',
-  'goûter': 'snack',
+  'goûter': 'collation',
 };
 
 const DIFFICULTY_MAP = {
@@ -288,7 +289,7 @@ function normalizeRecipe(raw) {
 
 /* ── Validation recette ───────────────────────────────── */
 
-const VALID_CATEGORIES = new Set(['petit-dejeuner', 'dejeuner', 'diner', 'snack', 'dessert']);
+const VALID_CATEGORIES = new Set(['petit-dejeuner', 'dejeuner', 'diner', 'collation', 'dessert']);
 
 function validateRecipe(data) {
   const errors = [];

@@ -12,7 +12,8 @@
     "import:article": "node scripts/import-article-json.mjs",
     "import": "node scripts/import-content.mjs",
     "import:dry": "node scripts/import-content.mjs --dry-run",
-    "images": "node scripts/process-recipe-images.mjs"
+    "images": "node scripts/process-recipe-images.mjs",
+    "images:generate": "node scripts/generate-recipe-images.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",
