@@ -7,6 +7,7 @@ import Planning from './Planning';
 import RepasDuMoment from '../components/dashboard/RepasDuMoment';
 import SuiviApportsChart from '../components/dashboard/SuiviApportsChart';
 import { getPlanningForCurrentWeek } from '../utils/dashboardPlanning';
+import { getWeekStart, getNextWeekStart } from '../lib/planningEngine';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { canonicalUrl } from '../lib/seo';
 import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
@@ -135,22 +136,6 @@ function StepCard({ number, title, children }) {
   );
 }
 
-/** Retourne le lundi (YYYY-MM-DD) de la semaine contenant `date`. */
-function getWeekStart(date) {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  d.setDate(d.getDate() + diff);
-  return d.toISOString().slice(0, 10);
-}
-
-/** Retourne le lundi de la semaine suivante. */
-function getNextWeekStart() {
-  const d = new Date();
-  d.setDate(d.getDate() + (7 - ((d.getDay() + 6) % 7)));
-  return d.toISOString().slice(0, 10);
-}
-
 /** Formatte un lundi YYYY-MM-DD en libellé « Semaine du 31 mars » */
 function formatWeekLabel(ws) {
   const d = new Date(ws + 'T00:00:00');
@@ -216,7 +201,7 @@ export default function PlanningFunnel() {
     canonical: canonicalUrl('/planning'),
   });
 
-  const { user, savePlanning, savedPlannings, loading: authLoading } = useAuth();
+  const { user, savedPlannings, loading: authLoading } = useAuth();
   const { recipes } = useData();
   const location = useLocation();
   const navigate = useNavigate();
@@ -354,10 +339,10 @@ export default function PlanningFunnel() {
     );
   }
   if (showEditor) {
-    return <Planning user={user} savePlanning={savePlanning} />;
+    return <Planning />;
   }
   if (showPlanningEditor) {
-    return <Planning user={user} savePlanning={savePlanning} />;
+    return <Planning />;
   }
 
   const previewRecipes = recipes.filter((r) => r.image && r.protein > 0).slice(0, 4);

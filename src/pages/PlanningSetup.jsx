@@ -5,8 +5,10 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { canonicalUrl } from '../lib/seo';
-import { defaultPlannings, days, mealTypes } from '../data/plannings';
+import { defaultPlannings } from '../data/plannings';
 import { objectives, regimes } from '../data/recipes';
+import { generateWeekPlanning, computeAutoPortions } from '../lib/planningEngine';
+import { getDailyTargetsFromObjective } from '../utils/dashboardPlanning';
 import { APPETITE_OPTIONS, appetiteToFactor, totalFactor } from '../lib/household';
 import HouseholdEditor from '../components/HouseholdEditor';
 
@@ -196,6 +198,7 @@ export default function PlanningSetup() {
   const generationIntervalRef = useRef(null);
   const generationTimeoutRef = useRef(null);
   const step2AutoGenStartedRef = useRef(false);
+  const autoPortionsRef = useRef(null);
 
   const cancelGenerationTimers = useCallback(() => {
     if (generationIntervalRef.current != null) {
@@ -282,9 +285,9 @@ export default function PlanningSetup() {
     setGenerationProgress(0);
     setGenerationDotsIndex(0);
 
-    const DURATION_MS = 4500;
-    const STAGE_1_MS = 1500;
-    const STAGE_2_MS = 3000;
+    const DURATION_MS = 2500;
+    const STAGE_1_MS = 850;
+    const STAGE_2_MS = 1700;
 
     const startedAt = Date.now();
     generationIntervalRef.current = window.setInterval(() => {
@@ -304,38 +307,29 @@ export default function PlanningSetup() {
       if (generationRunIdRef.current !== runId) return;
       cancelGenerationTimers();
 
-      const list = recipesList || [];
-      const usedIds = new Set();
-      const newPlanning = {};
-      days.forEach((day) => {
-        newPlanning[day] = {};
-        mealTypes.forEach((mt) => {
-          let pool = list.filter((r) => {
-            if (r.category !== mt.id) return false;
-            if (!r.objective?.includes(objective)) return false;
-            if (regime !== 'vegetarien' && !r.regime?.includes(regime)) return false;
-            return true;
-          });
-          if (pool.length === 0) pool = list.filter((r) => r.category === mt.id && r.objective?.includes(objective));
-          if (pool.length === 0) pool = list.filter((r) => r.category === mt.id);
-          if (pool.length === 0) {
-            newPlanning[day][mt.id] = null;
-            return;
-          }
-          const fresh = pool.filter((r) => !usedIds.has(r.id));
-          const candidates = fresh.length > 0 ? fresh : pool;
-          const picked = candidates[Math.floor(Math.random() * candidates.length)];
-          newPlanning[day][mt.id] = picked.id;
-          usedIds.add(picked.id);
-        });
+      const newPlanning = generateWeekPlanning({
+        recipes: recipesList,
+        objective,
+        regime,
       });
+
+      // Portions × taille de repas calibrées sur l'objectif protéines du profil
+      const targets = getDailyTargetsFromObjective(objective, Number(poids) || 70, niveau);
+      const auto = computeAutoPortions({
+        planning: newPlanning,
+        recipes: recipesList,
+        mealsPerDay: Number(mealsPerDay) || 4,
+        targetProtein: targets.protein,
+      });
+      autoPortionsRef.current = auto?.portions ?? null;
+
       setPlanning(newPlanning);
-      setMealMultipliers({});
+      setMealMultipliers(auto?.mealMultipliers ?? {});
       setIsGenerating(false);
       setGenerationProgress(100);
       setPreviewUnlocked(true);
     }, DURATION_MS);
-  }, [objective, regime, recipesList, cancelGenerationTimers]);
+  }, [objective, regime, niveau, poids, mealsPerDay, recipesList, cancelGenerationTimers]);
 
   useEffect(() => {
     if (step !== 3) {
@@ -374,7 +368,7 @@ export default function PlanningSetup() {
           regime,
           poids: preferencesPayload.poids,
           mealsPerDay: preferencesPayload.meals_per_day,
-          portions: preferencesPayload.portions,
+          portions: autoPortionsRef.current ?? preferencesPayload.portions,
           household: fullHousehold,
           targetWeekStart,
         },

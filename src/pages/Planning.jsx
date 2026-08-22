@@ -77,27 +77,22 @@ function launchConfetti() {
   };
 }
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Download, Lock, LockOpen, RefreshCw, ShoppingCart, ChevronDown, ChevronRight, Check, Copy, MoreVertical, X, Clock, Flame, Beef, Users, ExternalLink, Trash2, RotateCcw, Pencil, Plus, Loader2, Calendar } from 'lucide-react';
+import { Download, RefreshCw, ShoppingCart, ChevronDown, ChevronRight, Check, Copy, MoreVertical, X, Clock, Flame, Beef, Users, ExternalLink, Trash2, RotateCcw, Pencil, Plus, Loader2, Calendar, ArrowRight } from 'lucide-react';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { canonicalUrl } from '../lib/seo';
 import Toast from '../components/Toast';
 import { getSlug } from '../lib/slug';
 import { defaultPlannings, days, mealTypes } from '../data/plannings';
-import { objectives, regimes } from '../data/recipes';
+import { objectives } from '../data/recipes';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import { totalFactor as calcTotalFactor, ownerMacros, getOwner, appetiteToFactor } from '../lib/household';
-import HouseholdEditor from '../components/HouseholdEditor';
+import { MEAL_SIZE_OPTIONS, getWeekStart, pickReplacement } from '../lib/planningEngine';
+import { getDailyTargetsFromObjective } from '../utils/dashboardPlanning';
 import { getCarrefourDriveUrl, getCoursesUDriveUrl, hasCarrefourAffiliate } from '../lib/driveLinks';
 import { buildPlanningIcs, downloadPlanningIcs } from '../lib/calendarExport';
 import { addToGoogleCalendar, hasGoogleCalendarConfig } from '../lib/googleCalendar';
 
-const MEAL_SIZE_OPTIONS = [
-  { mult: 0.5, label: '½',     title: 'Demi-portion' },
-  { mult: 1,   label: '×1',    title: 'Portion normale' },
-  { mult: 1.5, label: '×1.5',  title: 'Portion et demie' },
-  { mult: 2,   label: 'Double', title: 'Double portion' },
-];
 const SESSION_PLANNING_PREVIEW_KEY = 'planning_preview_v1';
 const SESSION_PLANNING_PREVIEW_MAX_AGE_MS = 1000 * 60 * 60 * 24; // 24h
 
@@ -126,7 +121,7 @@ function isDayPast(day, weekStart) {
   return dateOfDay.getTime() < getTodayStr();
 }
 
-export default function Planning({ user, savePlanning }) {
+export default function Planning() {
   usePageMeta({
     title: 'Planning repas végétarien',
     description: 'Crée ton planning hebdomadaire de repas végétariens personnalisé. Choisis ton objectif sportif (prise de masse, sèche, endurance), génère ta liste de courses et sauvegarde ton planning.',
@@ -136,6 +131,8 @@ export default function Planning({ user, savePlanning }) {
   const navigate = useNavigate();
   const location = useLocation();
   const {
+    user,
+    savePlanning,
     savedPlannings,
     updatePlanning,
     loading: authLoading,
@@ -168,7 +165,6 @@ export default function Planning({ user, savePlanning }) {
   const [pantryChecked, setPantryChecked] = useState(() => new Set());
   const [groceryChecked, setGroceryChecked] = useState(() => new Set());
   const [collapsedAisles, setCollapsedAisles] = useState(() => new Set());
-  const [pinnedMeals, setPinnedMeals] = useState({});
   const [generated, setGenerated] = useState(() => Boolean(setupPreviewInit));
   const [previewRecipe, setPreviewRecipe] = useState(null);
   const [contextMenu, setContextMenu] = useState({ day: null, mealType: null });
@@ -184,19 +180,18 @@ export default function Planning({ user, savePlanning }) {
     () => setupPreviewInit?.mealMultipliers ?? {}
   );
   const [actionFeedback, setActionFeedback] = useState(null);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [hasSavedPlanning, setHasSavedPlanning] = useState(false);
   const [editingPlanningId, setEditingPlanningId] = useState(null);
   const [editWeekStart, setEditWeekStart] = useState(null);
   const [editInitDone, setEditInitDone] = useState(false);
-  const [onboardingStep, setOnboardingStep] = useState(
-    () => (user ? 'preview' : setupPreviewInit ? 'preview' : 'preferences')
-  );
   const [cameFromSetupFunnel] = useState(() => Boolean(setupPreviewInit));
   const setupPreviewClearedRef = useRef(false);
-  const autoPortionsSetRef = useRef(false);
   const confettiFiredRef = useRef(false);
   const intentHandledRef = useRef(false);
+
+  // Un utilisateur connecté a toujours accès à l'aperçu ; un invité doit
+  // d'abord passer par le funnel /planning/setup (ou restaurer sa session).
+  const showPreview = Boolean(user) || generated;
 
   // Foyer : depuis AuthContext (user connecté) ou depuis setupPreview (onboarding guest)
   const setupHousehold = setupPreviewInit?.household;
@@ -219,12 +214,6 @@ export default function Planning({ user, savePlanning }) {
 
   const isFunnelPlanningPreview =
     cameFromSetupFunnel || Boolean(location.state?.setupPreview);
-
-  const currentStepIndex = useMemo(() => {
-    if (onboardingStep === 'preferences') return 1;
-    if (!user) return 2;
-    return 3;
-  }, [onboardingStep, user]);
 
   const getCurrentPreferencesPayload = () => ({
     objective,
@@ -257,7 +246,6 @@ export default function Planning({ user, savePlanning }) {
       ...prev,
       [day]: { ...prev[day], [mealType]: null }
     }));
-    setPinnedMeals(prev => { const n = { ...prev }; delete n[key]; return n; });
     setMealMultipliers(prev => { const n = { ...prev }; delete n[key]; return n; });
     setContextMenu({ day: null, mealType: null });
   };
@@ -316,180 +304,18 @@ export default function Planning({ user, savePlanning }) {
     setSkippedDays(prev => ({ ...prev, [day]: !prev[day] }));
   };
 
-  function scoreRecipeForObjective(recipe, obj) {
-    const protein = Number(recipe?.protein) || 0;
-    const carbs = Number(recipe?.carbs) || 0;
-    const fat = Number(recipe?.fat) || 0;
-    const calories = Number(recipe?.calories) || 0;
-
-    // Densité protéique (g / 100 kcal) : robuste même si calories approx.
-    const protDensity = calories > 0 ? (protein / calories) * 100 : 0;
-    const carbShare = calories > 0 ? (carbs * 4) / calories : 0;
-    const fatShare = calories > 0 ? (fat * 9) / calories : 0;
-
-    switch (obj) {
-      case 'masse':
-        // Protéines + calories suffisantes (mais on évite de favoriser uniquement les bombes caloriques).
-        return protein * 2 + calories * 0.15 + protDensity * 6 - fatShare * 10;
-      case 'seche':
-        // Densité protéines + calories plus basses.
-        return protDensity * 20 + protein * 1.2 - calories * 0.08 - fatShare * 12;
-      case 'endurance':
-        // Glucides + énergie, protéines ok.
-        return carbs * 1.8 + calories * 0.08 + protein * 0.6 + carbShare * 10 - fatShare * 6;
-      case 'sante':
-      default:
-        // Équilibre global: protéines correctes, ni trop gras, ni trop extrême.
-        return protein * 1.1 + carbs * 0.7 + protDensity * 8 - Math.abs(fatShare - 0.25) * 40;
-    }
-  }
-
-  const generatePlanning = () => {
-    setIsGenerating(true);
-
-    // Petit délai pour le spinner + éviter le freeze UI
-    setTimeout(() => {
-      // Pool de recettes déjà choisies sur cette génération pour limiter les doublons
-      const usedIds = new Set(
-        Object.values(pinnedMeals).length > 0
-          ? Object.entries(pinnedMeals)
-              .filter(([, pinned]) => pinned)
-              .map(([key]) => {
-                const [day, mt] = key.split('-');
-                return planning[day]?.[mt];
-              })
-              .filter(Boolean)
-          : []
-      );
-
-      const newPlanning = {};
-
-      days.forEach(day => {
-        newPlanning[day] = {};
-        mealTypes.forEach(mt => {
-          const key = `${day}-${mt.id}`;
-
-          // Repas verrouillé → on le conserve tel quel
-          if (pinnedMeals[key]) {
-            newPlanning[day][mt.id] = planning[day]?.[mt.id];
-            return;
-          }
-
-          // Pool: catégorie + régime (l'objectif influence le tri/reco, pas l'exclusion)
-          let pool = (recipesList || []).filter(r => {
-            if (r.category !== mt.id) return false;
-            if (regime !== 'vegetarien' && !r.regime.includes(regime)) return false;
-            return true;
-          });
-
-          // Fallback ultime : catégorie seule
-          if (pool.length === 0) {
-            pool = (recipesList || []).filter(r => r.category === mt.id);
-          }
-
-          if (pool.length === 0) {
-            newPlanning[day][mt.id] = null;
-            return;
-          }
-
-          // Préférer les recettes pas encore utilisées dans ce planning
-          const fresh = pool.filter(r => !usedIds.has(r.id));
-          const candidates = (fresh.length > 0 ? fresh : pool)
-            .map((r) => ({ r, score: scoreRecipeForObjective(r, objective) }))
-            .sort((a, b) => b.score - a.score)
-            .map((x) => x.r);
-
-          const topN = Math.min(8, candidates.length);
-          const picked = candidates[Math.floor(Math.random() * topN)];
-          newPlanning[day][mt.id] = picked.id;
-          usedIds.add(picked.id);
-        });
-      });
-
-      setPlanning(newPlanning);
-
-      // Auto-calcul : tester toutes les combinaisons portions × multiplier
-      // pour trouver celle qui atteint le mieux l'objectif protéines
-      const activeTypes = mealTypes.slice(0, mealsPerDay);
-      let rawTotalProtein = 0;
-      let rawCountedDays = 0;
-      days.forEach(day => {
-        let dayProt = 0;
-        activeTypes.forEach(mt => {
-          const r = (recipesList || []).find(rx => rx.id === newPlanning[day]?.[mt.id]);
-          if (r) dayProt += (r.protein ?? 0);
-        });
-        if (dayProt > 0) { rawCountedDays++; rawTotalProtein += dayProt; }
-      });
-      if (rawCountedDays > 0 && DAILY_TARGETS?.protein) {
-        const avgProtPerDay = rawTotalProtein / rawCountedDays;
-        const target = DAILY_TARGETS.protein;
-        const mults = MEAL_SIZE_OPTIONS.map(o => o.mult);
-        let bestCombo = { portions: 1, mult: 1, diff: Infinity };
-        for (let p = 1; p <= 4; p++) {
-          for (const m of mults) {
-            const achieved = avgProtPerDay * p * m;
-            const diff = Math.abs(achieved - target);
-            if (diff < bestCombo.diff) {
-              bestCombo = { portions: p, mult: m, diff };
-            }
-          }
-        }
-        setPortions(bestCombo.portions);
-        if (bestCombo.mult !== 1) {
-          const newMultipliers = {};
-          days.forEach(day => {
-            activeTypes.forEach(mt => {
-              if (newPlanning[day]?.[mt.id]) {
-                newMultipliers[`${day}-${mt.id}`] = bestCombo.mult;
-              }
-            });
-          });
-          setMealMultipliers(newMultipliers);
-        } else {
-          setMealMultipliers({});
-        }
-      }
-
-      setGenerated(true);
-      setIsGenerating(false);
-    }, 500);
-  };
-
-  const handleGenerateFromPreferences = () => {
-    setOnboardingStep('preview');
-    generatePlanning();
-  };
-
   const replaceRecipe = (day, mealType) => {
-    const currentId = planning[day]?.[mealType];
-    const basePool = (recipesList || []).filter((r) => {
-      if (r.category !== mealType) return false;
-      if (r.id === currentId) return false;
-      if (regime !== 'vegetarien' && !r.regime.includes(regime)) return false;
-      return true;
+    const picked = pickReplacement({
+      recipes: recipesList,
+      objective,
+      regime,
+      mealTypeId: mealType,
+      excludeId: planning[day]?.[mealType],
     });
-    const eligible = basePool.length > 0 ? basePool : (recipesList || []).filter((r) => r.category === mealType && r.id !== currentId);
-    if (eligible.length === 0) {
-      const fallback = (recipesList || []).filter(r => r.category === mealType && r.id !== currentId);
-      if (fallback.length > 0) {
-        const random = fallback[Math.floor(Math.random() * fallback.length)];
-        setPlanning(prev => ({
-          ...prev,
-          [day]: { ...prev[day], [mealType]: random.id }
-        }));
-      }
-      return;
-    }
-    const ranked = eligible
-      .map((r) => ({ r, score: scoreRecipeForObjective(r, objective) }))
-      .sort((a, b) => b.score - a.score)
-      .map((x) => x.r);
-    const topN = Math.min(8, ranked.length);
-    const random = ranked[Math.floor(Math.random() * topN)];
+    if (!picked) return;
     setPlanning(prev => ({
       ...prev,
-      [day]: { ...prev[day], [mealType]: random.id }
+      [day]: { ...prev[day], [mealType]: picked.id }
     }));
   };
 
@@ -536,9 +362,121 @@ export default function Planning({ user, savePlanning }) {
     setDupPanel({ day: null, mealType: null, selectedDays: [] });
   };
 
-  const togglePin = (day, mealType) => {
-    const key = `${day}-${mealType}`;
-    setPinnedMeals(prev => ({ ...prev, [key]: !prev[key] }));
+  /** Actions d'une case repas (dupliquer + menu ⋯) — partagées entre desktop et mobile. */
+  const renderMealActions = (day, mealTypeId, recipe) => {
+    const dupTargets = days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart)));
+    return (
+      <div className="flex items-center gap-0.5">
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); openDuplicatePanel(day, mealTypeId); }}
+          className="p-1 rounded-lg text-text-light hover:text-text hover:bg-black/5 transition-colors"
+          title="Dupliquer vers d'autres jours"
+        >
+          <Copy size={12} />
+        </button>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setDupPanel({ day: null, mealType: null, selectedDays: [] });
+              setContextMenu(prev =>
+                prev.day === day && prev.mealType === mealTypeId
+                  ? { day: null, mealType: null }
+                  : { day, mealType: mealTypeId }
+              );
+            }}
+            className="p-1 rounded-lg text-text-light hover:text-text hover:bg-black/5 transition-colors"
+          >
+            <MoreVertical size={14} />
+          </button>
+          {contextMenu.day === day && contextMenu.mealType === mealTypeId && (
+            <>
+              <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-lg shadow-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); replaceRecipe(day, mealTypeId); setContextMenu({ day: null, mealType: null }); }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-text hover:bg-black/5 transition-colors"
+                >
+                  <RefreshCw size={12} />
+                  Remplacer
+                </button>
+                <Link
+                  to={getRecipeUrl(recipe, day, mealTypeId)}
+                  state={getRecipeLinkState(day, mealTypeId)}
+                  onClick={(e) => { e.stopPropagation(); setContextMenu({ day: null, mealType: null }); }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-text hover:bg-black/5 transition-colors"
+                >
+                  <ExternalLink size={12} />
+                  Ouvrir en détail
+                </Link>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); startEditNote(day, mealTypeId); removeMeal(day, mealTypeId); }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-text hover:bg-black/5 transition-colors"
+                >
+                  <Pencil size={12} />
+                  Écrire ma recette
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); removeMeal(day, mealTypeId); }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-red-500 hover:bg-red-50 transition-colors"
+                >
+                  <Trash2 size={12} />
+                  Supprimer
+                </button>
+              </div>
+              <div className="fixed inset-0 z-20" onClick={(e) => { e.stopPropagation(); closeAllMenus(); }} />
+            </>
+          )}
+          {dupPanel.day === day && dupPanel.mealType === mealTypeId && (
+            <>
+              <div className="absolute right-0 top-full mt-1 z-30 w-48 bg-white border border-border rounded-lg shadow-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                <p className="px-3 pt-2.5 pb-1 text-[13px] font-medium uppercase tracking-wider text-text-light">
+                  Dupliquer vers
+                </p>
+                <div className="px-2 py-1 space-y-0.5">
+                  {dupTargets.map(d => (
+                    <label
+                      key={d}
+                      className="flex items-center gap-2 px-1.5 py-1.5 rounded-lg hover:bg-black/5 cursor-pointer transition-colors"
+                      onClick={(e) => { e.preventDefault(); toggleDupDay(d); }}
+                    >
+                      <span className={`w-4 h-4 rounded-sm border flex items-center justify-center flex-shrink-0 transition-colors ${
+                        dupPanel.selectedDays.includes(d) ? 'bg-black border-black' : 'border-border'
+                      }`}>
+                        {dupPanel.selectedDays.includes(d) && <Check size={10} className="text-white" />}
+                      </span>
+                      <span className="text-xs text-text capitalize">{d}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="px-2 pb-2 pt-1 flex gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setDupPanel(prev => ({ ...prev, selectedDays: dupTargets }))}
+                    className="flex-1 text-[13px] py-1.5 text-text-light hover:text-text border border-border rounded-lg transition-colors"
+                  >
+                    Tous
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmDuplicate}
+                    disabled={dupPanel.selectedDays.length === 0}
+                    className="flex-1 text-[13px] py-1.5 font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Valider
+                  </button>
+                </div>
+              </div>
+              <div className="fixed inset-0 z-20" onClick={(e) => { e.stopPropagation(); closeAllMenus(); }} />
+            </>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const swapMeals = (fromDay, toDay, mealType) => {
@@ -552,16 +490,6 @@ export default function Planning({ user, savePlanning }) {
     }));
     const fromKey = `${fromDay}-${mealType}`;
     const toKey = `${toDay}-${mealType}`;
-    setPinnedMeals(prev => {
-      const a = !!prev[fromKey];
-      const b = !!prev[toKey];
-      const next = { ...prev };
-      if (a !== b) {
-        next[fromKey] = b;
-        next[toKey] = a;
-      }
-      return next;
-    });
     setMealMultipliers(prev => {
       const fromMult = prev[fromKey] ?? 1;
       const toMult = prev[toKey] ?? 1;
@@ -766,14 +694,7 @@ export default function Planning({ user, savePlanning }) {
   };
 
   /** Lundi de la semaine courante (YYYY-MM-DD) si pas de semaine en édition. */
-  const weekStartForCalendar = editWeekStart || (() => {
-    const today = new Date();
-    const day = today.getDay();
-    const diff = day === 0 ? -6 : 1 - day;
-    const monday = new Date(today);
-    monday.setDate(today.getDate() + diff);
-    return monday.toISOString().slice(0, 10);
-  })();
+  const weekStartForCalendar = editWeekStart || getWeekStart();
 
   const handleAddToCalendar = () => {
     if (requireAuthForAction('claim_planning')) return;
@@ -804,13 +725,8 @@ export default function Planning({ user, savePlanning }) {
 
   const doSavePlanning = () => {
     if (requireAuthForAction('claim_planning')) return;
-    const today = new Date();
-    const dateLabel = today.toLocaleDateString('fr-FR');
-    const day = today.getDay();
-    const diff = day === 0 ? -6 : 1 - day;
-    const monday = new Date(today);
-    monday.setDate(today.getDate() + diff);
-    const weekStart = setupPreviewInit?.targetWeekStart || monday.toISOString().slice(0, 10);
+    const dateLabel = new Date().toLocaleDateString('fr-FR');
+    const weekStart = setupPreviewInit?.targetWeekStart || getWeekStart();
 
     if (editingPlanningId && updatePlanning) {
       savePlanningPreferences?.(getCurrentPreferencesPayload());
@@ -876,10 +792,8 @@ export default function Planning({ user, savePlanning }) {
     setPortions(Math.min(4, Math.max(1, Number(saved.portions) || 2)));
     setPlanning(nextPlanning);
     setMealMultipliers(saved.mealMultipliers && typeof saved.mealMultipliers === 'object' ? saved.mealMultipliers : {});
-    setPinnedMeals(saved.pinnedMeals && typeof saved.pinnedMeals === 'object' ? saved.pinnedMeals : {});
     setSkippedDays(saved.skippedDays && typeof saved.skippedDays === 'object' ? saved.skippedDays : {});
     setGenerated(true);
-    setOnboardingStep('preview');
   }, [user, editInitDone, mineMode, editId, loadFromState, setupPreviewInit, generated]);
 
   // Persister le planning guest en session pour éviter de le regénérer après navigation
@@ -890,7 +804,7 @@ export default function Planning({ user, savePlanning }) {
     }
     if (!editInitDone) return;
     if (mineMode || editId || loadFromState || setupPreviewInit) return;
-    if (onboardingStep !== 'preview' || !generated) return;
+    if (!generated) return;
 
     const payload = {
       ts: Date.now(),
@@ -902,7 +816,6 @@ export default function Planning({ user, savePlanning }) {
       portions,
       planning,
       mealMultipliers,
-      pinnedMeals,
       skippedDays,
     };
     sessionStorage.setItem(SESSION_PLANNING_PREVIEW_KEY, JSON.stringify(payload));
@@ -913,7 +826,6 @@ export default function Planning({ user, savePlanning }) {
     editId,
     loadFromState,
     setupPreviewInit,
-    onboardingStep,
     generated,
     objective,
     regime,
@@ -923,7 +835,6 @@ export default function Planning({ user, savePlanning }) {
     portions,
     planning,
     mealMultipliers,
-    pinnedMeals,
     skippedDays,
   ]);
 
@@ -950,7 +861,7 @@ export default function Planning({ user, savePlanning }) {
       setPortions(Math.min(4, Math.max(1, pref.portions || 2)));
       setPlanning(restoredPlanning);
       setMealMultipliers(restoredMultipliers);
-      setOnboardingStep('preview');
+      setGenerated(true);
       savePlanningPreferences?.(pref);
       savePlanning?.({
         date: new Date().toLocaleDateString('fr-FR'),
@@ -972,7 +883,6 @@ export default function Planning({ user, savePlanning }) {
     setRegime(planningPreferences.regime || 'vegetarien');
     setMealsPerDay(planningPreferences.meals_per_day || 4);
     setPortions(Math.min(4, Math.max(1, planningPreferences.portions || 2)));
-    setOnboardingStep('preview');
   }, [user, planningPreferences, editingPlanningId]);
 
   // Charger un planning sauvegardé en mode édition (?edit=id ou state.loadPlanning)
@@ -1021,71 +931,10 @@ export default function Planning({ user, savePlanning }) {
     return () => clearTimeout(t);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-portions au montage pour les plannings venus du funnel PlanningSetup
-  useEffect(() => {
-    if (autoPortionsSetRef.current) return;
-    if (!setupPreviewInit?.planning || !recipesList?.length) return;
-    autoPortionsSetRef.current = true;
-    const activeTypes = mealTypes.slice(0, mealsPerDay);
-    let rawTotalProtein = 0;
-    let rawCountedDays = 0;
-    days.forEach(day => {
-      let dayProt = 0;
-      activeTypes.forEach(mt => {
-        const r = recipesList.find(rx => rx.id === setupPreviewInit.planning[day]?.[mt.id]);
-        if (r) dayProt += (r.protein ?? 0);
-      });
-      if (dayProt > 0) { rawCountedDays++; rawTotalProtein += dayProt; }
-    });
-    if (rawCountedDays === 0) return;
-    const avgProtPerDay = rawTotalProtein / rawCountedDays;
-    const kg = Math.max(40, Math.min(150, Number(setupPreviewInit.poids ?? poids) || 70));
-    const obj = setupPreviewInit.objective ?? objective;
-    const niv = setupPreviewInit.niveau ?? niveau;
-    const proteinRefs = {
-      masse:     { debutant: 1.7, amateur: 1.9, confirme: 2.1 },
-      seche:     { debutant: 1.9, amateur: 2.1, confirme: 2.35 },
-      endurance: { debutant: 1.3, amateur: 1.5, confirme: 1.7 },
-      sante:     { debutant: 1.3, amateur: 1.5, confirme: 1.7 },
-    };
-    const protPerKg = (proteinRefs[obj] ?? proteinRefs.masse)[niv] ?? 1.9;
-    const target = Math.round(protPerKg * kg);
-    // Tester toutes les combinaisons portions × multiplier
-    const mults = MEAL_SIZE_OPTIONS.map(o => o.mult);
-    let bestCombo = { portions: 1, mult: 1, diff: Infinity };
-    for (let p = 1; p <= 4; p++) {
-      for (const m of mults) {
-        const achieved = avgProtPerDay * p * m;
-        const diff = Math.abs(achieved - target);
-        if (diff < bestCombo.diff) {
-          bestCombo = { portions: p, mult: m, diff };
-        }
-      }
-    }
-    setPortions(bestCombo.portions);
-    if (bestCombo.mult !== 1) {
-      const activeTypes = mealTypes.slice(0, mealsPerDay);
-      const newMultipliers = {};
-      days.forEach(day => {
-        activeTypes.forEach(mt => {
-          if (setupPreviewInit.planning[day]?.[mt.id]) {
-            newMultipliers[`${day}-${mt.id}`] = bestCombo.mult;
-          }
-        });
-      });
-      setMealMultipliers(newMultipliers);
-    }
-  }, [recipesList]); // eslint-disable-line react-hooks/exhaustive-deps
-
   useEffect(() => {
     if (!mineMode || !user || authLoading || editId) return;
     if (!savedPlannings?.length) return;
-    const now = new Date();
-    const day = now.getDay();
-    const diff = day === 0 ? -6 : 1 - day;
-    const monday = new Date(now);
-    monday.setDate(now.getDate() + diff);
-    const currentWeekStart = monday.toISOString().slice(0, 10);
+    const currentWeekStart = getWeekStart();
     const mine = savedPlannings.find((p) => p.weekStart === currentWeekStart) || savedPlannings[0];
     if (!mine) return;
     setPlanning(mine.meals || defaultPlannings.masse.meals);
@@ -1093,7 +942,6 @@ export default function Planning({ user, savePlanning }) {
     setObjective(mine.objective || objective);
     setEditWeekStart(mine.weekStart || null);
     setEditingPlanningId(mine.id || null);
-    setOnboardingStep('preview');
     setGenerated(true);
   }, [mineMode, user, authLoading, editId, savedPlannings]);
 
@@ -1110,46 +958,10 @@ export default function Planning({ user, savePlanning }) {
     [poids]
   );
 
-  /*
-   * Références en g/kg et tendance calorique (vs maintien ~30 kcal/kg),
-   * d'après recommandations sportives (6dsportsnutrition, athleticlab, rippedbody, etc.)
-   */
-  const DAILY_TARGETS = useMemo(() => {
-    const kg = normalizedWeight;
-    const MAINTENANCE_KCAL_PER_KG = 30;
-
-    const targetsByObjectiveLevel = {
-      masse: {
-        debutant: { proteinPerKg: 1.7, carbsPerKg: 4.5, fatPerKg: 0.9, calMult: 1.08 },
-        amateur:  { proteinPerKg: 1.9, carbsPerKg: 5,   fatPerKg: 0.9, calMult: 1.10 },
-        confirme: { proteinPerKg: 2.1, carbsPerKg: 6,   fatPerKg: 0.85, calMult: 1.10 },
-      },
-      endurance: {
-        debutant: { proteinPerKg: 1.3, carbsPerKg: 4.5, fatPerKg: 0.9, calMult: 1.0 },
-        amateur:  { proteinPerKg: 1.5, carbsPerKg: 6,   fatPerKg: 0.9, calMult: 1.0 },
-        confirme: { proteinPerKg: 1.7, carbsPerKg: 7,   fatPerKg: 0.9, calMult: 1.05 },
-      },
-      sante: {
-        debutant: { proteinPerKg: 1.3, carbsPerKg: 3.5, fatPerKg: 0.9, calMult: 1.0 },
-        amateur:  { proteinPerKg: 1.5, carbsPerKg: 4,   fatPerKg: 0.9, calMult: 1.0 },
-        confirme: { proteinPerKg: 1.7, carbsPerKg: 5,   fatPerKg: 0.9, calMult: 1.0 },
-      },
-      seche: {
-        debutant: { proteinPerKg: 1.9, carbsPerKg: 2.5, fatPerKg: 0.7, calMult: 0.875 },
-        amateur:  { proteinPerKg: 2.1, carbsPerKg: 2.75, fatPerKg: 0.65, calMult: 0.825 },
-        confirme: { proteinPerKg: 2.35, carbsPerKg: 2.25, fatPerKg: 0.6, calMult: 0.85 },
-      },
-    };
-
-    const obj = targetsByObjectiveLevel[objective] || targetsByObjectiveLevel.masse;
-    const ref = obj[niveau] || obj.amateur;
-    return {
-      protein: Math.round(ref.proteinPerKg * kg),
-      carbs:   Math.round(ref.carbsPerKg * kg),
-      fat:    Math.round(ref.fatPerKg * kg),
-      calories: Math.round(MAINTENANCE_KCAL_PER_KG * kg * ref.calMult),
-    };
-  }, [objective, niveau, normalizedWeight]);
+  const DAILY_TARGETS = useMemo(
+    () => getDailyTargetsFromObjective(objective, normalizedWeight, niveau),
+    [objective, niveau, normalizedWeight]
+  );
 
   const dailyNutrition = useMemo(() => {
     const activeDays = days.filter(d => !skippedDays[d]);
@@ -1207,63 +1019,6 @@ export default function Planning({ user, savePlanning }) {
     };
   }, [dailyNutrition, DAILY_TARGETS]);
 
-  const nutritionWarnings = useMemo(() => {
-    if (!nutritionBars) return [];
-    const warnings = [];
-    if (nutritionBars.protein.pct < 80) warnings.push('protein');
-    if (nutritionBars.calories.pct < 80) warnings.push('calories');
-    if (nutritionBars.carbs.pct < 75) warnings.push('carbs');
-    return warnings;
-  }, [nutritionBars]);
-
-  const planningWhy = useMemo(() => {
-    if (!dailyNutrition || !nutritionBars) return null;
-
-    const objectiveLabel = objectives.find((o) => o.id === objective)?.label ?? objective;
-    const niveauLabel = niveaux.find((n) => n.id === niveau)?.label ?? niveau;
-    const t = DAILY_TARGETS;
-
-    let best = null;
-    days.forEach((day) => {
-      if (skippedDays?.[day]) return;
-      activeMealTypes.forEach((mt) => {
-        const recipeId = planning?.[day]?.[mt.id];
-        if (!recipeId) return;
-        const recipe = getRecipe(recipeId);
-        if (!recipe) return;
-        const mult = getMealMultiplier(day, mt.id);
-        const effectiveP = householdFactor ?? (Number(portions) || 1);
-        const ratio = effectiveP * (Number(mult) || 1);
-        const prot = Math.round((recipe.protein ?? 0) * ratio);
-        if (!best || prot > best.protein) {
-          best = { day, mealLabel: mt.label, recipeTitle: recipe.title, protein: prot };
-        }
-      });
-    });
-
-    const proteinLine = t?.protein
-      ? `En moyenne, tu es à ${nutritionBars.protein.pct}% de ton objectif protéines (${nutritionBars.protein.value}g / ${t.protein}g).`
-      : `En moyenne, tu es à ${nutritionBars.protein.value}g de protéines par jour.`;
-
-    const exampleLine = best
-      ? `Exemple : ${best.mealLabel} (${best.day}) te donne ~${best.protein}g de protéines.`
-      : null;
-
-    return { objectiveLabel, niveauLabel, proteinLine, exampleLine };
-  }, [
-    DAILY_TARGETS,
-    activeMealTypes,
-    dailyNutrition,
-    getMealMultiplier,
-    getRecipe,
-    nutritionBars,
-    objective,
-    niveau,
-    planning,
-    portions,
-    skippedDays,
-  ]);
-
   return (
     <div className="px-6 lg:px-8 py-12">
       <div className="max-w-7xl mx-auto">
@@ -1315,212 +1070,39 @@ export default function Planning({ user, savePlanning }) {
           )}
         </Toast>
 
-        {/* Header : étape préférences (pleine largeur) ou aperçu (titre centré, plus compact) */}
-        {onboardingStep === 'preferences' ? (
-          <div className="mb-16 flex flex-col lg:flex-row lg:items-start lg:gap-8 px-[10%] lg:px-[10%]">
-            <div className="lg:max-w-md shrink-0">
-              <p className="text-xs uppercase tracking-[0.2em] text-text-light mb-3">Programme alimentaire végétarien</p>
-              <h1 className="font-display text-3xl sm:text-4xl text-text">
-                Ton planning repas végétarien de la semaine
-              </h1>
-              {editingPlanningId && (
-                <p className="mt-3 text-sm text-primary bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 max-w-xl">
-                  Tu modifies un planning sauvegardé. Les jours déjà passés ne sont pas modifiables.
-                </p>
-              )}
-            </div>
-            <p className="mt-4 lg:mt-9 lg:flex-1 lg:min-w-0 text-base sm:text-lg text-text-light leading-relaxed">
-              Dis-nous ton objectif et ton profil : on te prépare un premier planning personnalisé en quelques secondes.
+        {/* Header */}
+        <div className="mb-8 text-center max-w-2xl mx-auto px-2">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-text-light mb-2">Programme alimentaire végétarien</p>
+          <h1 className="font-display text-3xl sm:text-4xl text-text">Découvre ton planning de la semaine</h1>
+          <p className="mt-3 text-sm sm:text-base text-text-light leading-relaxed">
+            Modifie comme tu souhaites ton planning et enregistre-le pour commencer à cuisiner.
+          </p>
+          {editingPlanningId && (
+            <p className="mt-4 text-sm text-primary bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 inline-block">
+              Tu modifies un planning sauvegardé — les jours passés ne sont plus modifiables.
             </p>
-          </div>
-        ) : (
-          <div className="mb-8 text-center max-w-2xl mx-auto px-2">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-text-light mb-2">Programme alimentaire végétarien</p>
-            <h1 className="font-display text-3xl sm:text-4xl text-text">Découvre ton planning de la semaine</h1>
-            <p className="mt-3 text-sm sm:text-base text-text-light leading-relaxed">
-              Modifie comme tu souhaites ton planning et enregistre-le pour commencer à cuisiner.
+          )}
+        </div>
+
+        {/* Invité sans planning généré → direction le funnel de création */}
+        {!showPreview && (
+          <div className="max-w-md mx-auto text-center rounded-2xl border border-border bg-white p-8">
+            <p className="text-sm text-text-light mb-5">
+              Réponds à quelques questions (objectif, poids, régime…) et on te génère
+              une semaine complète de repas personnalisés.
             </p>
-            {editingPlanningId && (
-              <p className="mt-4 text-sm text-primary bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 inline-block">
-                Tu modifies un planning sauvegardé — les jours passés ne sont plus modifiables.
-              </p>
-            )}
+            <Link
+              to="/planning/setup"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+            >
+              Créer mon planning
+              <ArrowRight size={16} />
+            </Link>
           </div>
-        )}
-
-        {!isFunnelPlanningPreview && onboardingStep === 'preferences' && (
-        <section className="mb-10 rounded-2xl border border-border bg-white p-4 sm:p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            <aside className="lg:col-span-3">
-              <p className="text-xs uppercase tracking-[0.15em] text-text-light mb-3">
-                Etape {currentStepIndex} sur 3
-              </p>
-              <div className="space-y-2">
-                {[
-                  { id: 1, label: 'Tes infos sportives' },
-                  { id: 2, label: 'Ton planning personalise' },
-                  { id: 3, label: 'Sauvegarde sur ton compte' },
-                ].map((step) => {
-                  const isDone = currentStepIndex > step.id;
-                  const isActive = currentStepIndex === step.id;
-                  return (
-                    <div
-                      key={step.id}
-                      className={`rounded-lg border px-3 py-2.5 text-sm transition-colors ${
-                        isActive
-                          ? 'border-primary/40 bg-primary/10 text-primary font-medium'
-                          : isDone
-                            ? 'border-secondary/30 bg-secondary/10 text-secondary'
-                            : 'border-border bg-bg-warm text-text-light'
-                      }`}
-                    >
-                      {isDone ? '✓ ' : `${step.id}. `}
-                      {step.label}
-                    </div>
-                  );
-                })}
-              </div>
-            </aside>
-
-            <div className="lg:col-span-9">
-              {/* Settings — style segmented / champs neutres */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-5">
-                <div>
-                  <label className="planning-filter-label">
-                    Objectif
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={objective}
-                      onChange={(e) => setObjective(e.target.value)}
-                      className="planning-filter-input w-full appearance-none bg-[rgb(0,0,0,0.04)] border border-transparent rounded-[10px] px-4 py-3 text-text pr-10 focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white"
-                    >
-                      {objectives.map(o => (
-                        <option key={o.id} value={o.id}>{o.label}</option>
-                      ))}
-                    </select>
-                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
-                  </div>
-                </div>
-                <div>
-                  <label className="planning-filter-label">
-                    Régime
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={regime}
-                      onChange={(e) => setRegime(e.target.value)}
-                      className="planning-filter-input w-full appearance-none bg-[rgb(0,0,0,0.04)] border border-transparent rounded-[10px] px-4 py-3 text-text pr-10 focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white"
-                    >
-                      {regimes.map(r => (
-                        <option key={r.id} value={r.id}>{r.label}</option>
-                      ))}
-                    </select>
-                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
-                  </div>
-                </div>
-                <div>
-                  <label className="planning-filter-label">
-                    Niveau
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={niveau}
-                      onChange={(e) => setNiveau(e.target.value)}
-                      className="planning-filter-input w-full appearance-none bg-[rgb(0,0,0,0.04)] border border-transparent rounded-[10px] px-4 py-3 text-text pr-10 focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white"
-                    >
-                      {niveaux.map(n => (
-                        <option key={n.id} value={n.id}>{n.label}</option>
-                      ))}
-                    </select>
-                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
-                  </div>
-                </div>
-                <div>
-                  <label className="planning-filter-label">
-                    Poids (kg)
-                  </label>
-                  <input
-                    type="number"
-                    min={40}
-                    max={150}
-                    value={poids}
-                    onFocus={(e) => e.target.select()}
-                    onChange={(e) => setPoids(e.target.value)}
-                    className="planning-filter-input w-full bg-[rgb(0,0,0,0.04)] border border-transparent rounded-[10px] px-4 py-3 text-text focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white"
-                    placeholder="70"
-                  />
-                </div>
-                <div>
-                  <label className="planning-filter-label">
-                    Repas / jour
-                  </label>
-                  <div className="segment-group segment-group--compact">
-                    {[3, 4].map(n => (
-                      <button
-                        key={n}
-                        type="button"
-                        onClick={() => setMealsPerDay(n)}
-                        className={`segment-item ${mealsPerDay === n ? 'is-selected' : ''}`}
-                      >
-                        {n} repas
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  {hasHousehold ? (
-                    <HouseholdEditor compact />
-                  ) : (
-                    <>
-                      <label className="planning-filter-label">
-                        Personnes
-                      </label>
-                      <div className="segment-group segment-group--compact">
-                        {[
-                          { n: 1, label: 'Moi' },
-                          { n: 2, label: '2 pers.' },
-                          { n: 3, label: '3 pers.' },
-                          { n: 4, label: '4 pers.' },
-                        ].map(({ n, label }) => (
-                          <button
-                            key={n}
-                            type="button"
-                            onClick={() => setPortions(n)}
-                            className={`segment-item ${portions === n ? 'is-selected' : ''}`}
-                          >
-                            {label}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {onboardingStep === 'preferences' && (
-                <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-                  <p className="text-sm text-text mb-3">
-                    Renseigne tes infos puis genere ton planning personnalise.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleGenerateFromPreferences}
-                    className="inline-flex items-center gap-2 px-4 py-3 bg-primary text-white text-sm font-medium rounded-[10px] hover:bg-primary-dark transition-colors"
-                  >
-                    Voir mon planning personnalise
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-              )}
-
-            </div>
-          </div>
-        </section>
         )}
 
         {/* Macro cards */}
-        {onboardingStep === 'preview' && nutritionBars && (
+        {showPreview && nutritionBars && (
           <div className="mb-5">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {[
@@ -1565,7 +1147,7 @@ export default function Planning({ user, savePlanning }) {
 
 
 
-        {onboardingStep === 'preview' && (
+        {showPreview && (
         <>
         {/* Barre d'actions fixe en bas (mobile) */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-border px-4 py-3 safe-bottom">
@@ -1698,7 +1280,6 @@ export default function Planning({ user, savePlanning }) {
                   }
                   const recipeId = planning[day]?.[mt.id];
                   const recipe = getRecipe(recipeId);
-                  const isPinned = pinnedMeals[`${day}-${mt.id}`];
                   const isPast = editingPlanningId && isDayPast(day, editWeekStart);
                   const isDragSource = dragState.day === day && dragState.mealType === mt.id;
                   const isDropTarget = !isPast && hoverDrop.day === day && hoverDrop.mealType === mt.id && !isDragSource;
@@ -1714,9 +1295,7 @@ export default function Planning({ user, savePlanning }) {
                       onDrop={(e) => handleDrop(e, day, mt.id)}
                       className={`planning-cell bg-white rounded-xl p-3 min-h-[120px] flex flex-col border border-[rgb(0,0,0,0.08)] ${!isPast && recipe ? 'cursor-grab active:cursor-grabbing' : ''} ${isPast ? 'opacity-90 bg-black/[0.02]' : ''} ${
                         isDragSource ? 'is-drag-source' : ''
-                      } ${isDropTarget ? 'is-drop-target' : ''} ${isLanded ? 'just-landed' : ''} ${
-                        isPinned ? 'ring-1 ring-black/20' : ''
-                      }`}
+                      } ${isDropTarget ? 'is-drop-target' : ''} ${isLanded ? 'just-landed' : ''}`}
                     >
                       {recipe && !isDragSource ? (
                         <>
@@ -1731,123 +1310,8 @@ export default function Planning({ user, savePlanning }) {
                             </div>
                           </div>
                           {!isPast && (
-                            <div className="flex items-center justify-end gap-0.5 mb-1">
-                              <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); openDuplicatePanel(day, mt.id); }}
-                                className="p-1 rounded-lg text-text-light hover:text-text hover:bg-black/5 transition-colors"
-                                title="Dupliquer vers d'autres jours"
-                              >
-                                <Copy size={12} />
-                              </button>
-                              <div className="relative">
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setDupPanel({ day: null, mealType: null, selectedDays: [] });
-                                    setContextMenu(prev =>
-                                      prev.day === day && prev.mealType === mt.id
-                                        ? { day: null, mealType: null }
-                                        : { day, mealType: mt.id }
-                                    );
-                                  }}
-                                  className="p-1 rounded-lg text-text-light hover:text-text hover:bg-black/5 transition-colors"
-                                >
-                                  <MoreVertical size={14} />
-                                </button>
-                                {contextMenu.day === day && contextMenu.mealType === mt.id && (
-                                  <>
-                                    <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-lg shadow-lg overflow-hidden">
-                                      <button
-                                        type="button"
-                                        onClick={(e) => { e.stopPropagation(); togglePin(day, mt.id); setContextMenu({ day: null, mealType: null }); }}
-                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
-                                      >
-                                        {isPinned ? <Lock size={12} /> : <LockOpen size={12} />}
-                                        {isPinned ? 'Déverrouiller' : 'Garder ce plat'}
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={(e) => { e.stopPropagation(); replaceRecipe(day, mt.id); setContextMenu({ day: null, mealType: null }); }}
-                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
-                                      >
-                                        <RefreshCw size={12} />
-                                        Remplacer
-                                      </button>
-                                      <Link
-                                        to={getRecipeUrl(recipe, day, mt.id)}
-                                        state={getRecipeLinkState(day, mt.id)}
-                                        onClick={(e) => { e.stopPropagation(); setContextMenu({ day: null, mealType: null }); }}
-                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
-                                      >
-                                        <ExternalLink size={12} />
-                                        Ouvrir en détail
-                                      </Link>
-                                      <button
-                                        type="button"
-                                        onClick={(e) => { e.stopPropagation(); startEditNote(day, mt.id); removeMeal(day, mt.id); }}
-                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text hover:bg-black/5 transition-colors"
-                                      >
-                                        <Pencil size={12} />
-                                        Écrire ma recette
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={(e) => { e.stopPropagation(); removeMeal(day, mt.id); }}
-                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors"
-                                      >
-                                        <Trash2 size={12} />
-                                        Supprimer
-                                      </button>
-                                    </div>
-                                    <div className="fixed inset-0 z-20" onClick={(e) => { e.stopPropagation(); closeAllMenus(); }} />
-                                  </>
-                                )}
-                              {dupPanel.day === day && dupPanel.mealType === mt.id && (
-                                <>
-                                  <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-lg shadow-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
-                                    <p className="px-3 pt-2.5 pb-1 text-[13px] font-medium uppercase tracking-wider text-text-light">
-                                      Dupliquer vers
-                                    </p>
-                                    <div className="px-2 py-1 space-y-0.5">
-                                      {days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))).map(d => (
-                                        <label
-                                          key={d}
-                                          className="flex items-center gap-2 px-1.5 py-1.5 rounded-lg hover:bg-black/5 cursor-pointer transition-colors"
-                                          onClick={(e) => { e.preventDefault(); toggleDupDay(d); }}
-                                        >
-                                          <span className={`w-4 h-4 rounded-sm border flex items-center justify-center flex-shrink-0 transition-colors ${
-                                            dupPanel.selectedDays.includes(d) ? 'bg-black border-black' : 'border-border'
-                                          }`}>
-                                            {dupPanel.selectedDays.includes(d) && <Check size={10} className="text-white" />}
-                                          </span>
-                                          <span className="text-xs text-text capitalize">{d}</span>
-                                        </label>
-                                      ))}
-                                    </div>
-                                    <div className="px-2 pb-2 pt-1 flex gap-1.5">
-                                      <button
-                                        type="button"
-                                        onClick={() => setDupPanel(prev => ({ ...prev, selectedDays: days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))) }))}
-                                        className="flex-1 text-[13px] py-1.5 text-text-light hover:text-text border border-border rounded-lg transition-colors"
-                                      >
-                                        Tous
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={confirmDuplicate}
-                                        disabled={dupPanel.selectedDays.length === 0}
-                                        className="flex-1 text-[13px] py-1.5 font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                                      >
-                                        Valider
-                                      </button>
-                                    </div>
-                                  </div>
-                                  <div className="fixed inset-0 z-20" onClick={(e) => { e.stopPropagation(); closeAllMenus(); }} />
-                                </>
-                              )}
-                            </div>
+                            <div className="flex items-center justify-end mb-1">
+                              {renderMealActions(day, mt.id, recipe)}
                             </div>
                           )}
                           <div className="w-full text-left flex-1 min-w-0">
@@ -1968,8 +1432,7 @@ export default function Planning({ user, savePlanning }) {
                     {activeMealTypes.map(mt => {
                       const recipeId = planning[day]?.[mt.id];
                       const recipe = getRecipe(recipeId);
-                      const isPinned = pinnedMeals[`${day}-${mt.id}`];
-                      const cellKey = `${day}-${mt.id}`;
+                          const cellKey = `${day}-${mt.id}`;
                       if (!recipe) return (
                         <div key={mt.id} className="rounded-lg bg-black/[0.02] border border-dashed border-black/8 p-3">
                           <span className="text-xs font-medium text-text-light/50 uppercase tracking-wider">{mt.label}</span>
@@ -1981,7 +1444,7 @@ export default function Planning({ user, savePlanning }) {
                         </div>
                       );
                       return (
-                        <div key={mt.id} className={`rounded-lg bg-black/[0.02] border border-black/8 overflow-hidden ${isPinned ? 'ring-1 ring-black/20' : ''} ${dayIsPast ? 'opacity-90' : ''}`}>
+                        <div key={mt.id} className={`rounded-lg bg-black/[0.02] border border-black/8 overflow-hidden ${dayIsPast ? 'opacity-90' : ''}`}>
                           {/* Photo recette mobile — format horizontal */}
                           <div className="overflow-hidden">
                             <div className="w-full aspect-[16/9] bg-bg-warm flex items-center justify-center">
@@ -1995,125 +1458,7 @@ export default function Planning({ user, savePlanning }) {
                           <div className="p-3.5">
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-xs font-medium text-text-light uppercase tracking-wider">{mt.label}</span>
-                            {!dayIsPast && (
-                            <div className="flex items-center gap-0.5">
-                              <button
-                                type="button"
-                                onClick={() => openDuplicatePanel(day, mt.id)}
-                                className="p-1 rounded text-text-light hover:text-text hover:bg-black/5 transition-colors"
-                                title="Dupliquer"
-                              >
-                                <Copy size={12} />
-                              </button>
-                              <div className="relative">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setDupPanel({ day: null, mealType: null, selectedDays: [] });
-                                    setContextMenu(prev =>
-                                      prev.day === day && prev.mealType === mt.id
-                                        ? { day: null, mealType: null }
-                                        : { day, mealType: mt.id }
-                                    );
-                                  }}
-                                  className="p-1 rounded text-text-light hover:text-text hover:bg-black/5 transition-colors"
-                                >
-                                  <MoreVertical size={14} />
-                                </button>
-                                {contextMenu.day === day && contextMenu.mealType === mt.id && (
-                                  <>
-                                    <div className="absolute right-0 top-full mt-1 z-30 w-44 bg-white border border-border rounded-lg shadow-lg overflow-hidden">
-                                      <button
-                                        type="button"
-                                        onClick={() => { togglePin(day, mt.id); setContextMenu({ day: null, mealType: null }); }}
-                                        className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-text hover:bg-black/5 transition-colors"
-                                      >
-                                        {isPinned ? <Lock size={12} /> : <LockOpen size={12} />}
-                                        {isPinned ? 'Déverrouiller' : 'Garder ce plat'}
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => { replaceRecipe(day, mt.id); setContextMenu({ day: null, mealType: null }); }}
-                                        className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-text hover:bg-black/5 transition-colors"
-                                      >
-                                        <RefreshCw size={12} />
-                                        Remplacer
-                                      </button>
-                                      <Link
-                                        to={getRecipeUrl(recipe, day, mt.id)}
-                                        state={getRecipeLinkState(day, mt.id)}
-                                        onClick={() => setContextMenu({ day: null, mealType: null })}
-                                        className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-text hover:bg-black/5 transition-colors"
-                                      >
-                                        <ExternalLink size={12} />
-                                        Ouvrir en détail
-                                      </Link>
-                                      <button
-                                        type="button"
-                                        onClick={() => { startEditNote(day, mt.id); removeMeal(day, mt.id); }}
-                                        className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-text hover:bg-black/5 transition-colors"
-                                      >
-                                        <Pencil size={12} />
-                                        Écrire ma recette
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => removeMeal(day, mt.id)}
-                                        className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-red-500 hover:bg-red-50 transition-colors"
-                                      >
-                                        <Trash2 size={12} />
-                                        Supprimer
-                                      </button>
-                                    </div>
-                                    <div className="fixed inset-0 z-20" onClick={closeAllMenus} />
-                                  </>
-                                )}
-                                {dupPanel.day === day && dupPanel.mealType === mt.id && (
-                                  <>
-                                    <div className="absolute right-0 top-full mt-1 z-30 w-52 bg-white border border-border rounded-lg shadow-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
-                                      <p className="px-3 pt-2.5 pb-1 text-[13px] font-medium uppercase tracking-wider text-text-light">
-                                        Dupliquer vers
-                                      </p>
-                                      <div className="px-2 py-1 space-y-0.5">
-                                        {days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))).map(d => (
-                                          <label
-                                            key={d}
-                                            className="flex items-center gap-2 px-1.5 py-1.5 rounded hover:bg-black/5 cursor-pointer transition-colors"
-                                            onClick={(e) => { e.preventDefault(); toggleDupDay(d); }}
-                                          >
-                                            <span className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
-                                              dupPanel.selectedDays.includes(d) ? 'bg-black border-black' : 'border-border'
-                                            }`}>
-                                              {dupPanel.selectedDays.includes(d) && <Check size={10} className="text-white" />}
-                                            </span>
-                                            <span className="text-xs text-text capitalize">{d}</span>
-                                          </label>
-                                        ))}
-                                      </div>
-                                      <div className="px-2 pb-2 pt-1 flex gap-1.5">
-                                        <button
-                                          type="button"
-                                          onClick={() => setDupPanel(prev => ({ ...prev, selectedDays: days.filter(d => d !== day && !(editingPlanningId && isDayPast(d, editWeekStart))) }))}
-                                          className="flex-1 text-[13px] py-1.5 text-text-light hover:text-text border border-border rounded transition-colors"
-                                        >
-                                          Tous
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={confirmDuplicate}
-                                          disabled={dupPanel.selectedDays.length === 0}
-                                          className="flex-1 text-[13px] py-1.5 font-medium bg-primary text-white rounded hover:bg-primary-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                                        >
-                                          Valider
-                                        </button>
-                                      </div>
-                                    </div>
-                                    <div className="fixed inset-0 z-20" onClick={closeAllMenus} />
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                            )}
+                            {!dayIsPast && renderMealActions(day, mt.id, recipe)}
                           </div>
                           {dayIsPast ? (
                             <Link
@@ -2251,7 +1596,7 @@ export default function Planning({ user, savePlanning }) {
           </div>
         )}
 
-        {onboardingStep === 'preview' && showGroceryList && (
+        {showPreview && showGroceryList && (
           <div className="mt-8 bg-white border border-black/[0.08] rounded-2xl p-6 sm:p-8 shadow-sm">
             <div className="flex flex-wrap items-baseline justify-between gap-4 mb-6">
               <h3 className="text-lg font-semibold text-text">

@@ -1,13 +1,9 @@
 import { days, mealTypes } from '../data/plannings';
+import { getWeekStart } from '../lib/planningEngine';
 
 /** Lundi de la semaine au format YYYY-MM-DD */
 export function getCurrentWeekMonday() {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  const day = d.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  d.setDate(d.getDate() + diff);
-  return d.toISOString().slice(0, 10);
+  return getWeekStart(new Date());
 }
 
 /**

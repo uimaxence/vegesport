@@ -9,6 +9,8 @@ import { getSlug } from '../lib/slug';
 import { canonicalUrl, buildRecipeJsonLd, buildBreadcrumbJsonLd, categoryLabel } from '../lib/seo';
 import RecipeCard from '../components/RecipeCard';
 import RecipeComments from '../components/RecipeComments';
+import AddToPlanning from '../components/AddToPlanning';
+import { isCommonPantry } from '../lib/planningEngine';
 import { getSafeImageSrc, handleMediaImageError, isRecipeImageMissing, getOptimizedImageUrl } from '../lib/imageFallback';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { ownerMacros, ingredientScale } from '../lib/household';
@@ -56,21 +58,6 @@ function scaleIngredient(ing, ratio) {
   const formatted = String(Math.round(scaled));
   const newQty = unit ? `${formatted} ${unit}` : formatted;
   return (newQty + ' ' + parsed.name).trim();
-}
-
-/** Ingrédients qu'on a souvent dans le placard / frigo (sel, poivre, épices, huile…). */
-function isCommonPantry(ingredientName) {
-  const lower = (ingredientName || '').toLowerCase();
-  const common = [
-    'sel', 'poivre', 'pâtes', 'pates', 'riz', 'oignon', 'oignons', 'ail', 'huile', 'farine',
-    'sucre', 'vinaigre', 'moutarde', 'paprika', 'curry', 'cumin', 'curcuma', 'origan',
-    'basilic', 'persil', 'thym', 'laurier', 'piment', 'cannelle', 'muscade', 'levure',
-    'bicarbonate', 'maïzena', 'cornichon', 'câpres', 'olive', 'tomate séchée', 'confiture',
-    'miel', 'sirop', 'sauce soja', 'tahini', 'bouillon', 'lait', 'crème', 'beurre',
-    'œuf', 'oeuf', 'pain', 'tortilla', 'quinoa', 'avoine', 'lentille', 'pois chiche',
-    'haricot', 'noix', 'amande', 'cacahuète', 'cacao', 'chocolat', 'coriandre'
-  ];
-  return common.some(term => lower.includes(term));
 }
 
 /** Unités sans espace après le nombre (80g, 200ml). */
@@ -1337,6 +1324,9 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           )}
         </div>
 
+        {/* Ajouter au planning (mode vitrine uniquement) */}
+        {!isPlanningMode && <AddToPlanning recipe={effectiveRecipe || recipe} />}
+
         {/* Ingredients & Steps */}
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-5 gap-10">
           <div className="lg:col-span-2">
@@ -1492,14 +1482,6 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
           </div>
         )}
 
-        {/* CTA Planning */}
-        <div className="mt-16 p-6 bg-bg-warm rounded-xl text-center">
-          <h2 className="font-display text-xl text-text mb-2">Envie d&apos;intégrer cette recette dans ton planning ?</h2>
-          <p className="text-sm text-text-light mb-4">Génère un planning personnalisé avec tes objectifs et ton régime.</p>
-          <Link to="/planning" className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-primary-light transition-colors">
-            Créer mon planning →
-          </Link>
-        </div>
       </div>
     </div>
   );
