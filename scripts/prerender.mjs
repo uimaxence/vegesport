@@ -10,6 +10,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { MERGED_RECIPE_IDS } from '../src/data/mergedRecipes.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
@@ -17,7 +18,15 @@ const distDir = join(root, 'dist');
 
 const SITE_URL = 'https://www.mamie-vege.fr';
 const SITE_NAME = 'et si mamie était végé ?';
+const SHORT_BRAND = 'Mamie Végé';
 const AUTHOR = 'Maxence';
+
+/** Retire un suffixe de marque déjà présent dans un meta_title (« … | Mamie Végé »). */
+function stripBrand(title) {
+  return String(title || '')
+    .replace(/\s*[|–—-]\s*(mamie\s+v[ée]g[ée]|et si mamie [ée]tait v[ée]g[ée]\s*\??)\s*$/i, '')
+    .trim();
+}
 
 /* ── Env ─────────────────────────────────────────────── */
 function loadEnv() {
@@ -54,6 +63,11 @@ function getSlug(title) {
     .replace(/^-+|-+$/g, '');
 }
 
+/** Slug figé en base si présent, sinon dérivé du titre. */
+function slugOf(item) {
+  return item?.slug || getSlug(item?.title);
+}
+
 const CAT = {
   'petit-dejeuner': 'Petit-déjeuner',
   dejeuner: 'Déjeuner',
@@ -75,26 +89,31 @@ function replaceMeta(html, attr, key, value) {
   return html.replace('</head>', `    <meta ${attr}="${key}" content="${esc(value)}" />\n  </head>`);
 }
 
-function render({ title, description, canonical, ogType = 'website', image, keywords, jsonLd, bodyHtml }) {
+function render({ title, description, canonical, ogType = 'website', image, keywords, jsonLd, bodyHtml, robots = 'index, follow' }) {
   let h = tpl;
-  const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
+  // Une seule mention de marque, courte, pour rester sous ~60 caractères.
+  const fullTitle = title.includes(SITE_NAME) ? title : `${stripBrand(title)} | ${SHORT_BRAND}`;
 
   // <title>
   h = h.replace(/<title>[^<]*<\/title>/, `<title>${esc(fullTitle)}</title>`);
 
   // canonical
-  h = h.replace(/<link rel="canonical" href="[^"]*"/, `<link rel="canonical" href="${canonical}"`);
+  if (canonical) {
+    h = h.replace(/<link rel="canonical" href="[^"]*"/, `<link rel="canonical" href="${canonical}"`);
+  } else {
+    h = h.replace(/\s*<link rel="canonical" href="[^"]*"\s*\/?>/, '');
+  }
 
   // meta
   h = replaceMeta(h, 'name', 'description', description);
   if (keywords) h = replaceMeta(h, 'name', 'keywords', keywords);
-  h = replaceMeta(h, 'name', 'robots', 'index, follow');
+  h = replaceMeta(h, 'name', 'robots', robots);
 
   // Open Graph
   h = replaceMeta(h, 'property', 'og:type', ogType);
   h = replaceMeta(h, 'property', 'og:title', fullTitle);
   h = replaceMeta(h, 'property', 'og:description', description);
-  h = replaceMeta(h, 'property', 'og:url', canonical);
+  if (canonical) h = replaceMeta(h, 'property', 'og:url', canonical);
   if (image) h = replaceMeta(h, 'property', 'og:image', image);
 
   // Twitter Cards
@@ -118,6 +137,10 @@ function render({ title, description, canonical, ogType = 'website', image, keyw
   }
 
   return h;
+}
+
+function writeFile(name, html) {
+  writeFileSync(join(distDir, name), html, 'utf8');
 }
 
 function writePage(routePath, html) {
@@ -222,6 +245,7 @@ function articleJsonLd(a, url) {
     image: a.image ? [a.image] : [],
     author: { '@type': 'Person', name: a.author || AUTHOR },
     datePublished: a.date || new Date().toISOString().slice(0, 10),
+    dateModified: a.updated_at?.slice?.(0, 10) || a.date || new Date().toISOString().slice(0, 10),
     publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     url,
@@ -248,7 +272,7 @@ let recipes = [];
 try {
   const data = await fetchFromSupabase('recipes', 'id,title,category,time,calories,protein,carbs,fat,servings,tags,regime,season,objective,image,ingredients,steps,created_at,slug,meta_title,meta_description,intro,image_alt,sport_timing,conservation,variants,nutrition_per_serving,schema_recipe,faq_recette');
   if (data && data.length > 0) {
-    recipes = data;
+    recipes = data.filter((r) => !(r.id in MERGED_RECIPE_IDS));
     console.log(`  Recettes depuis Supabase : ${recipes.length}`);
   } else {
     throw new Error('Aucune recette en base');
@@ -264,7 +288,7 @@ try {
 // Articles : Supabase uniquement
 let articles = [];
 try {
-  const data = await fetchFromSupabase('blog_articles', 'id,title,excerpt,meta_title,meta_description,image,date,author,category,content_json');
+  const data = await fetchFromSupabase('blog_articles', 'id,title,slug,excerpt,meta_title,meta_description,image,date,updated_at,author,category,content_json,faq_json');
   articles = data || [];
   console.log(`  Articles depuis Supabase : ${articles.length}`);
 } catch (e) {
@@ -273,6 +297,10 @@ try {
 
 /* ── Maillage interne : helpers ──────────────────────── */
 const recipeById = new Map(recipes.map((r) => [r.id, r]));
+// Un article qui cite encore un doublon pointe vers la fiche conservée.
+for (const [dup, keep] of Object.entries(MERGED_RECIPE_IDS)) {
+  if (recipeById.has(keep)) recipeById.set(Number(dup), recipeById.get(keep));
+}
 
 /** Rend les blocs content_json en HTML avec liens internes */
 function renderContentBlocks(blocks) {
@@ -290,7 +318,7 @@ function renderContentBlocks(blocks) {
           const links = (b.recipeIds || [])
             .map((id) => recipeById.get(id))
             .filter(Boolean)
-            .map((r) => `<li><a href="/recettes/${getSlug(r.title)}">${esc(r.title)} — ${r.calories} kcal, ${r.protein}g protéines</a></li>`);
+            .map((r) => `<li><a href="/recettes/${slugOf(r)}">${esc(r.title)} — ${r.calories} kcal, ${r.protein}g protéines</a></li>`);
           return links.length ? `<ul>${links.join('')}</ul>` : '';
         }
         case 'faq':
@@ -348,22 +376,47 @@ for (const a of articles) {
   }
 }
 
+/** FAQ d'un article : colonne faq_json, sinon blocs `faq` du contenu. */
+function articleFaq(a) {
+  if (Array.isArray(a.faq_json) && a.faq_json.length) {
+    return a.faq_json.filter((q) => q?.question && q?.answer);
+  }
+  const out = [];
+  for (const b of Array.isArray(a.content_json) ? a.content_json : []) {
+    if (b?.type === 'faq') {
+      for (const q of b.items || []) {
+        if (q?.question && q?.answer) out.push({ question: q.question, answer: q.answer });
+      }
+    }
+  }
+  return out;
+}
+
+/** Articles liés : même catégorie d'abord, puis les plus récents (hors article courant). */
+function getRelatedArticles(article, limit = 4) {
+  const others = articles.filter((o) => o.id !== article.id && slugOf(o));
+  const byDateDesc = (x, y) => String(y.date || '').localeCompare(String(x.date || ''));
+  const same = others.filter((o) => o.category === article.category).sort(byDateDesc);
+  const rest = others.filter((o) => o.category !== article.category).sort(byDateDesc);
+  return [...same, ...rest].slice(0, limit);
+}
+
 /** Liens HTML pour une liste de recettes */
 function recipeLinksHtml(list) {
-  return list.map((r) => `<li><a href="/recettes/${getSlug(r.title)}">${esc(r.title)}</a></li>`).join('');
+  return list.map((r) => `<li><a href="/recettes/${slugOf(r)}">${esc(r.title)}</a></li>`).join('');
 }
 
 /** Liens HTML pour une liste d'articles */
 function articleLinksHtml(list) {
-  return list.map((a) => `<li><a href="/blog/${getSlug(a.title)}">${esc(a.title)}</a></li>`).join('');
+  return list.map((a) => `<li><a href="/blog/${slugOf(a)}">${esc(a.title)}</a></li>`).join('');
 }
 
 /* ── Pages statiques ─────────────────────────────────── */
 let count = 0;
 
 // Liens pour les pages listing
-const allRecipeLinks = recipes.filter((r) => getSlug(r.title)).map((r) => `<li><a href="/recettes/${getSlug(r.title)}">${esc(r.title)} — ${esc(CAT[r.category] || r.category)}, ${r.calories} kcal, ${r.protein}g protéines</a></li>`).join('');
-const allArticleLinks = articles.filter((a) => getSlug(a.title)).map((a) => `<li><a href="/blog/${getSlug(a.title)}">${esc(a.title)}</a></li>`).join('');
+const allRecipeLinks = recipes.filter((r) => slugOf(r)).map((r) => `<li><a href="/recettes/${slugOf(r)}">${esc(r.title)} — ${esc(CAT[r.category] || r.category)}, ${r.calories} kcal, ${r.protein}g protéines</a></li>`).join('');
+const allArticleLinks = articles.filter((a) => slugOf(a)).map((a) => `<li><a href="/blog/${slugOf(a)}">${esc(a.title)}</a></li>`).join('');
 
 const statics = [
   {
@@ -378,11 +431,11 @@ const statics = [
   },
   {
     path: '/recettes',
-    title: 'Recettes végé protéinées sportifs',
+    title: `Recettes végétariennes protéinées : ${recipes.length} idées pour sportifs`,
     description:
-      'Découvrez toutes nos recettes végétariennes et végétaliennes riches en protéines. Filtrez par catégorie, régime alimentaire, tags et temps de préparation.',
+      `${recipes.length} recettes végétariennes riches en protéines, avec les macros par portion : petit-déjeuner, déjeuner, dîner, collation. Rapides, pas chères, pensées pour le sport.`,
     keywords: 'recettes végétariennes, protéines végétales, recettes sportifs, filtrer recettes',
-    bodyHtml: `<h1>Recettes végétariennes protéinées</h1><p>Toutes nos recettes végétariennes riches en protéines pour sportifs.</p><ul>${allRecipeLinks}</ul>`,
+    bodyHtml: `<h1>Recettes végétariennes protéinées</h1><p>Toutes nos recettes végétariennes riches en protéines pour sportifs, avec les macros par portion.</p><ul>${allRecipeLinks}</ul>`,
   },
   {
     path: '/ravitaillement',
@@ -403,11 +456,11 @@ const statics = [
   },
   {
     path: '/planning',
-    title: 'Planning repas végétarien',
+    title: 'Menu végétarien de la semaine : générateur gratuit',
     description:
-      'Crée ton planning végétarien sportif en 2 minutes. Ajuste les portions, suis tes macros, génère ta liste de courses et exporte vers ton calendrier.',
+      'Choisis ton objectif et obtiens en un clic un menu végétarien protéiné pour 7 jours, avec macros et liste de courses par rayon. Gratuit, sans inscription.',
     keywords: 'planning repas végétarien, meal prep, liste de courses, macros végétarien',
-    bodyHtml: `<h1>Planning repas végétarien sportif</h1><p>Crée ton planning personnalisé en 2 minutes. Portions, macros, liste de courses.</p><nav><h2>Découvrir nos recettes</h2><ul>${allRecipeLinks}</ul></nav>`,
+    bodyHtml: `<h1>Ton menu végétarien de la semaine, en un clic</h1><p>Choisis ton objectif (prise de masse, sèche, endurance, santé) : on génère 7 jours de repas végétariens protéinés, avec les macros et la liste de courses par rayon. Gratuit, sans inscription.</p><nav><h2>Découvrir nos recettes</h2><ul>${allRecipeLinks}</ul></nav>`,
   },
   {
     path: '/blog',
@@ -457,7 +510,7 @@ for (const p of statics) {
 
 /* ── Pages recettes ──────────────────────────────────── */
 for (const r of recipes) {
-  const slug = getSlug(r.title);
+  const slug = slugOf(r);
   if (!slug) continue;
   const path = `/recettes/${slug}`;
   const url = `${SITE_URL}${path}`;
@@ -516,7 +569,7 @@ for (const r of recipes) {
 
 /* ── Pages articles blog ─────────────────────────────── */
 for (const a of articles) {
-  const slug = getSlug(a.title);
+  const slug = slugOf(a);
   if (!slug) continue;
   const path = `/blog/${slug}`;
   const url = `${SITE_URL}${path}`;
@@ -525,7 +578,7 @@ for (const a of articles) {
   const contentHtml = renderContentBlocks(a.content_json);
 
   // Maillage interne : autres articles
-  const otherArt = articles.filter((o) => o.id !== a.id).slice(0, 3);
+  const otherArt = getRelatedArticles(a, 4);
   let relArtHtml = '';
   if (otherArt.length) relArtHtml += `<nav><h2>Articles liés</h2><ul>${articleLinksHtml(otherArt)}</ul></nav>`;
   relArtHtml += `<p><a href="/blog">Tous nos articles</a></p>`;
@@ -545,11 +598,28 @@ for (const a of articles) {
           { name: 'Blog', url: `${SITE_URL}/blog` },
           { name: a.title, url },
         ]),
-      ],
+        faqJsonLd(articleFaq(a)),
+      ].filter(Boolean),
       bodyHtml: `<article><h1>${esc(a.title)}</h1>${a.excerpt ? `<p>${esc(a.excerpt)}</p>` : ''}${contentHtml}</article>${relArtHtml}`,
     }),
   );
   count++;
 }
 
-console.log(`✓ ${count} pages pré-rendues dans dist/`);
+/* ── Coquille SPA + 404 ───────────────────────────────
+ * app.html : servie par les rewrites de vercel.json pour les routes purement
+ * applicatives (connexion, profil, admin…) et pour les fiches pas encore
+ * pré-rendues. noindex par défaut : React repasse en « index, follow » sur
+ * les pages publiques valides.
+ * 404.html : servie par Vercel avec un vrai statut 404 pour toute URL inconnue
+ * (avant : la page d'accueil en 200 → soft 404 indexés).
+ */
+const shell = {
+  description: 'Recettes végétariennes riches en protéines pour sportifs.',
+  canonical: null,
+  robots: 'noindex, follow',
+};
+writeFile('app.html', render({ ...shell, title: SITE_NAME }));
+writeFile('404.html', render({ ...shell, title: 'Page introuvable (404)' }));
+
+console.log(`✓ ${count} pages pré-rendues dans dist/ (+ app.html, 404.html)`);

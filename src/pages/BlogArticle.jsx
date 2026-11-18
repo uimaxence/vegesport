@@ -4,7 +4,7 @@ import { ArrowLeft, Clock, Share2 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { useJsonLd } from '../hooks/useJsonLd';
-import { getSlug } from '../lib/slug';
+import { getSlug, itemSlug } from '../lib/slug';
 import {
   canonicalUrl,
   buildArticleJsonLd,
@@ -19,8 +19,8 @@ export default function BlogArticle() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { articles, recipes, loading, error } = useData();
-  const article = articles.find((a) => getSlug(a.title) === slug);
-  const canonicalSlug = article ? getSlug(article.title) : '';
+  const article = articles.find((a) => itemSlug(a) === slug || getSlug(a.title) === slug);
+  const canonicalSlug = article ? itemSlug(article) : '';
   const articleUrl = article && canonicalSlug
     ? canonicalUrl(`/blog/${canonicalSlug}`)
     : '';
@@ -40,12 +40,12 @@ export default function BlogArticle() {
       ? {
           title: article.metaTitle || article.title,
           description: article.metaDescription || article.excerpt || (article.content ? article.content.slice(0, 155) + '…' : undefined),
-          fullTitle: Boolean(article.metaTitle),
           canonical: articleUrl,
           image: article.image,
           type: 'article',
         }
-      : {}
+      // Slug inconnu une fois les données chargées → noindex (évite les soft 404 indexés).
+      : { noindex: !loading && !error && !article }
   );
 
   const jsonLdData = useMemo(() => {
@@ -204,7 +204,7 @@ export default function BlogArticle() {
                   <h2 className="text-xs uppercase tracking-[0.2em] text-primary mb-4">Articles liés</h2>
                   <div className="space-y-4">
                     {otherArticles.map(a => (
-                      <Link key={a.id} to={`/blog/${getSlug(a.title)}`} className="group block">
+                      <Link key={a.id} to={`/blog/${itemSlug(a)}`} className="group block">
                         <div className="aspect-[3/2] rounded-lg overflow-hidden bg-bg-warm">
                           <img
                             src={getSafeImageSrc(a.image)}

@@ -10,8 +10,8 @@ import RecipesSkeleton from '../components/skeleton/RecipesSkeleton';
 
 export default function Recipes({ favorites, toggleFavorite }) {
   usePageMeta({
-    title: 'Recettes végé protéinées sportifs',
-    description: 'Découvrez toutes nos recettes végétariennes et végétaliennes riches en protéines. Filtrez par catégorie, régime alimentaire, tags et temps de préparation.',
+    title: 'Recettes végétariennes protéinées pour sportifs',
+    description: 'Des recettes végétariennes riches en protéines, avec les macros par portion : petit-déjeuner, déjeuner, dîner, collation. Rapides, pas chères, pensées pour le sport.',
     canonical: canonicalUrl('/recettes'),
   });
   const { recipes, loading, error } = useData();
@@ -372,7 +372,7 @@ export default function Recipes({ favorites, toggleFavorite }) {
           <div className="flex-1">
             <div className="mb-8">
               <div className="flex items-center justify-between">
-                <h1 className="font-display text-3xl sm:text-4xl text-text">Recettes végétariennes pour sportifs</h1>
+                <h1 className="font-display text-3xl sm:text-4xl text-text">Recettes végétariennes protéinées</h1>
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}

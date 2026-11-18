@@ -1,0 +1,368 @@
+{
+  "id": 28,
+  "title": "Pois chiches : protéines et valeurs nutritionnelles",
+  "excerpt": "20,5 g de protéines pour 100 g de pois chiches secs, 8,3 g cuits, 6,7 g en boîte. Les valeurs par forme (farine, houmous, falafels) et par portion.",
+  "category": "Nutrition",
+  "date": "2026-11-18",
+  "read_time": 7,
+  "author": "Maxence",
+  "meta_title": "Pois chiches : protéines et valeurs nutritionnelles",
+  "meta_description": "Pois chiches : 20,5 g de protéines pour 100 g secs, 8,3 g cuits, 6,7 g en boîte. Tableau complet, farine, houmous, portions et conseils pour sportifs.",
+  "content": "",
+  "content_json": [
+    {
+      "type": "paragraph",
+      "text": "Les pois chiches apportent 20,5 g de protéines pour 100 g secs, 8,3 g pour 100 g cuits à l'eau et 6,7 g pour 100 g en boîte, égouttés (table Ciqual de l'ANSES). Une assiette de 200 g de pois chiches cuits maison te donne donc environ 17 g de protéines, une petite boîte égouttée environ 18 g."
+    },
+    {
+      "type": "paragraph",
+      "text": "Comme pour toutes les légumineuses, la différence entre sec et cuit vient de l'eau absorbée : un pois chiche cuit pèse environ 2,5 fois son poids sec. Les protéines sont les mêmes, réparties dans un poids plus grand. Quand tu lis une étiquette ou une recette, regarde toujours à quelle forme le chiffre s'applique."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Valeurs nutritionnelles des pois chiches : le tableau"
+    },
+    {
+      "type": "paragraph",
+      "text": "Valeurs pour 100 g, table Ciqual."
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Forme",
+        "Protéines",
+        "Calories",
+        "Glucides",
+        "Fibres",
+        "Lipides",
+        "Fer"
+      ],
+      "rows": [
+        [
+          "Pois chiches secs",
+          "20,5 g",
+          "350 kcal",
+          "47,5 g",
+          "12,2 g",
+          "6,0 g",
+          "4,3 mg"
+        ],
+        [
+          "Pois chiches cuits à l'eau",
+          "8,3 g",
+          "148 kcal",
+          "17,7 g",
+          "8,2 g",
+          "3,0 g",
+          "1,3 mg"
+        ],
+        [
+          "Pois chiches en boîte, égouttés",
+          "6,7 g",
+          "122 kcal",
+          "15,0 g",
+          "5,5 g",
+          "2,7 g",
+          "1,2 mg"
+        ],
+        [
+          "Farine de pois chiche",
+          "22,4 g",
+          "359 kcal",
+          "47,0 g",
+          "10,8 g",
+          "6,7 g",
+          "4,9 mg"
+        ],
+        [
+          "Houmous du commerce",
+          "8,1 g",
+          "258 kcal",
+          "9,0 g",
+          "5,2 g",
+          "19,9 g",
+          "—"
+        ],
+        [
+          "Falafels préemballés",
+          "7,4 g",
+          "211 kcal",
+          "17,7 g",
+          "6,0 g",
+          "10,8 g",
+          "1,6 mg"
+        ]
+      ]
+    },
+    {
+      "type": "source",
+      "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments",
+      "url": "https://ciqual.anses.fr/"
+    },
+    {
+      "type": "paragraph",
+      "text": "Par rapport aux lentilles cuites (10,1 g de protéines pour 125 kcal), le pois chiche est un peu moins protéiné et un peu plus calorique : il contient davantage de lipides (3 g pour 100 g cuits) et de glucides. Pour un sportif, ce n'est pas un défaut. Une assiette de 200 g cuits apporte environ 35 g de glucides en plus des 17 g de protéines, ce qui en fait une bonne base de repas de récupération."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Combien de protéines par portion ?"
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Portion",
+        "Équivalent",
+        "Protéines"
+      ],
+      "rows": [
+        [
+          "80 g de pois chiches secs",
+          "environ 200 g cuits",
+          "17 g"
+        ],
+        [
+          "1 petite boîte de 400 g",
+          "environ 265 g égouttés",
+          "18 g"
+        ],
+        [
+          "Une demi-boîte",
+          "environ 130 g égouttés",
+          "9 g"
+        ],
+        [
+          "80 g de farine de pois chiche",
+          "une omelette végétale ou une socca",
+          "18 g"
+        ],
+        [
+          "50 g de houmous",
+          "2 cuillères à soupe bombées",
+          "4 g"
+        ],
+        [
+          "4 falafels",
+          "environ 100 g",
+          "7 g"
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Repère utile : les positions de consensus en nutrition sportive situent les besoins entre 1,2 et 2,0 g de protéines par kilo et par jour selon la discipline, avec des prises de 20 à 40 g par repas. Une boîte de pois chiches approche le bas de cette fourchette ; avec une céréale et quelques graines, tu y es."
+    },
+    {
+      "type": "source",
+      "label": "ISSN — Position Stand : protein and exercise (2017)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        65,
+        54
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Secs, cuits ou en boîte : qu'est-ce qui change ?"
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Les pois chiches secs"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ce sont les moins chers au kilo de protéines et ceux qui ont la meilleure tenue. Ils demandent de l'organisation : une nuit de trempage (environ 12 heures), une eau de trempage jetée, puis 1 h à 1 h 30 de cuisson à l'eau, nettement moins à l'autocuiseur. L'astuce des sportifs organisés : cuire 500 g secs d'un coup et congeler en portions de 200 g."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Les pois chiches en boîte ou en bocal"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ils sont prêts en 30 secondes. La table Ciqual leur attribue un peu moins de protéines (6,7 g contre 8,3 g) et de fibres (5,5 g contre 8,2 g) que les pois chiches cuits maison, vraisemblablement parce qu'ils sont plus gorgés d'eau. Ils sont aussi salés : 0,54 g de sel pour 100 g égouttés. Un rinçage à l'eau claire en retire une partie et les rend plus digestes pour beaucoup de monde."
+    },
+    {
+      "type": "paragraph",
+      "text": "Verdict : la boîte n'est pas un mauvais choix, c'est un choix pratique. Si la boîte est ce qui te fait manger des légumineuses trois fois par semaine au lieu de zéro, prends la boîte."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Farine de pois chiche : 22 g de protéines pour 100 g"
+    },
+    {
+      "type": "paragraph",
+      "text": "La farine de pois chiche est simplement du pois chiche sec moulu : 22,4 g de protéines pour 100 g, soit plus du double d'une farine de blé T55 (9 g). Elle sert à faire la socca niçoise, les panisses, des pancakes salés et l'omelette végétale sans œuf : 80 g de farine délayés dans 160 ml d'eau, versés dans une poêle chaude avec des légumes, donnent environ 18 g de protéines."
+    },
+    {
+      "type": "paragraph",
+      "text": "Elle ne contient pas de gluten par nature, donc elle ne lève pas comme une farine de blé : en pâtisserie, utilise-la en mélange. Si tu es atteint de maladie cœliaque, vérifie la mention « sans gluten » sur le paquet, car des contaminations croisées sont possibles en meunerie. Et ne la goûte pas crue : son amertume disparaît à la cuisson."
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        52
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Le houmous est-il une bonne source de protéines ?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Moyennement. Le houmous du commerce contient 8,1 g de protéines pour 100 g, mais aussi près de 20 g de lipides et 258 kcal, à cause du tahin et de l'huile. Une portion réaliste de 50 g apporte 4 g de protéines. C'est un bon aliment, riche en graisses insaturées, pratique dans un wrap ou un sandwich de ravitaillement, mais ce n'est pas lui qui fait monter le compteur de protéines : ce sont les pois chiches entiers à côté."
+    },
+    {
+      "type": "paragraph",
+      "text": "Le houmous a en revanche un intérêt sur la qualité des protéines. Le pois chiche, comme les autres légumineuses, est riche en lysine et limité en acides aminés soufrés (méthionine, cystéine). Le sésame du tahin et le pain qui l'accompagne apportent justement ces acides aminés. L'ANSES rappelle qu'une alimentation variée sur la journée suffit, sans association obligatoire à chaque repas, mais le duo houmous + pain coche la case tout seul."
+    },
+    {
+      "type": "source",
+      "label": "ANSES — Les protéines : rôle, sources et apports recommandés",
+      "url": "https://www.anses.fr/fr/article/proteines-role-sources-et-apports-recommandes"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        12,
+        77
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Pois chiches et sport : quand les manger ?"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Après l'entraînement : 200 g de pois chiches cuits avec 200 g de riz complet cuit apportent environ 24 g de protéines et 110 g de glucides, ce qu'il faut pour réparer et refaire les réserves.",
+        "Au déjeuner les jours sans séance : en salade avec du boulgour, des crudités et un filet de citron (la vitamine C améliore l'absorption du fer végétal).",
+        "En collation : pois chiches rôtis au four ou energy balls, faciles à transporter.",
+        "À éviter juste avant une séance intense ou une course : 200 g cuits contiennent environ 16 g de fibres. Garde 3 à 4 heures de marge, davantage si tu y es sensible."
+      ]
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        57,
+        25
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Digestion : limiter les ballonnements"
+    },
+    {
+      "type": "paragraph",
+      "text": "Les pois chiches contiennent des glucides fermentescibles que l'intestin digère mal et que les bactéries du côlon fermentent. Quelques gestes réduisent l'inconfort chez la plupart des gens."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Fais tremper les pois chiches secs une nuit et jette l'eau de trempage.",
+        "Cuis-les longtemps : un pois chiche bien cuit s'écrase facilement entre deux doigts.",
+        "Rince les pois chiches en boîte avant de les utiliser.",
+        "Commence par de petites portions (100 g cuits) si tu n'as pas l'habitude, et augmente progressivement.",
+        "Mixés en houmous ou en soupe, ils passent souvent mieux qu'entiers."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Si les troubles digestifs persistent malgré ces précautions, parles-en à un médecin ou à un diététicien plutôt que de supprimer toute une famille d'aliments."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "En résumé"
+    },
+    {
+      "type": "paragraph",
+      "text": "Trois chiffres : 20,5 g de protéines pour 100 g secs, 8,3 g cuits, 6,7 g en boîte. Une assiette de 200 g cuits apporte environ 17 g de protéines, 35 g de glucides et 16 g de fibres pour un peu moins de 300 kcal. La farine monte à 22 g pour 100 g, le houmous plafonne à 4 g par portion. Pour comparer avec l'autre grande légumineuse du placard, lis « Lentilles : combien de protéines pour 100 g, cuites ou sèches ? »."
+    },
+    {
+      "type": "cta_planning"
+    },
+    {
+      "type": "faq",
+      "items": [
+        {
+          "question": "Combien de protéines dans 100 g de pois chiches cuits ?",
+          "answer": "8,3 g pour des pois chiches cuits à l'eau à la maison et 6,7 g pour des pois chiches en boîte égouttés, selon la table Ciqual de l'ANSES. Secs, ils en contiennent 20,5 g pour 100 g."
+        },
+        {
+          "question": "Les pois chiches en boîte sont-ils aussi bons que les secs ?",
+          "answer": "Ils sont un peu moins concentrés en protéines (6,7 g contre 8,3 g pour 100 g) et en fibres, et ils sont salés (0,54 g de sel pour 100 g). Rincés, ils restent un très bon aliment et font gagner plus d'une heure de préparation."
+        },
+        {
+          "question": "Le houmous est-il riche en protéines ?",
+          "answer": "Pas vraiment : 8,1 g pour 100 g, soit environ 4 g pour une portion de 50 g, avec près de 20 g de lipides pour 100 g. Il est intéressant pour ses graisses insaturées et son côté pratique, moins pour atteindre un objectif de protéines."
+        },
+        {
+          "question": "Pois chiches ou lentilles : lequel contient le plus de protéines ?",
+          "answer": "Les lentilles : environ 10 g pour 100 g cuites contre 8,3 g pour les pois chiches cuits. Les pois chiches apportent en revanche un peu plus de glucides et de lipides, donc plus d'énergie (148 kcal contre 125 kcal)."
+        },
+        {
+          "question": "La farine de pois chiche est-elle riche en protéines ?",
+          "answer": "Oui : 22,4 g pour 100 g, contre environ 9 g pour une farine de blé T55. Une omelette végétale préparée avec 80 g de farine de pois chiche apporte environ 18 g de protéines."
+        }
+      ]
+    },
+    {
+      "type": "sources_list",
+      "items": [
+        {
+          "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments",
+          "url": "https://ciqual.anses.fr/"
+        },
+        {
+          "label": "ANSES — Les protéines : rôle, sources et apports recommandés",
+          "url": "https://www.anses.fr/fr/article/proteines-role-sources-et-apports-recommandes"
+        },
+        {
+          "label": "ANSES — Tout savoir sur le fer",
+          "url": "https://www.anses.fr/fr/article/savoir-fer"
+        },
+        {
+          "label": "ISSN — Position Stand : protein and exercise (2017)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/"
+        },
+        {
+          "label": "Mariotti F., Gardner C. — Dietary Protein and Amino Acids in Vegetarian Diets (Nutrients, 2019)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31690027/"
+        }
+      ]
+    }
+  ],
+  "sources_json": [
+    {
+      "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments",
+      "url": "https://ciqual.anses.fr/"
+    },
+    {
+      "label": "ISSN — Position Stand : protein and exercise (2017)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/"
+    },
+    {
+      "label": "ANSES — Les protéines : rôle, sources et apports recommandés",
+      "url": "https://www.anses.fr/fr/article/proteines-role-sources-et-apports-recommandes"
+    },
+    {
+      "label": "ANSES — Tout savoir sur le fer",
+      "url": "https://www.anses.fr/fr/article/savoir-fer"
+    },
+    {
+      "label": "Mariotti F., Gardner C. — Dietary Protein and Amino Acids in Vegetarian Diets (Nutrients, 2019)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31690027/"
+    }
+  ]
+}

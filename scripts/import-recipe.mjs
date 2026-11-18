@@ -349,7 +349,7 @@ async function main() {
 
     if (existing) {
       ingredientId = existing.id;
-      hasMacros = existing.calories_per_100 != null && existing.calories_per_100 > 0;
+      hasMacros = existing.calories_per_100 != null; // 0 kcal est une vraie valeur (sel, eau) : ne pas ré-enrichir
       report.existing.push({ name: existing.name, id: ingredientId, hasMacros });
       console.log(`  ✓ ${name} → trouvé en BDD (id=${ingredientId}${hasMacros ? ', macros OK' : ', SANS macros'})`);
     } else {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, UtensilsCrossed, ChevronRight, ChevronLeft, Check } from 'lucide-react';
-import { getSlug } from '../../lib/slug';
+import { itemSlug } from '../../lib/slug';
 import { getMealTypeFromHour, getCurrentDayId, mealTypes } from '../../utils/dashboardPlanning';
 import { days } from '../../data/plannings';
 
@@ -75,9 +75,9 @@ export default function RepasDuMoment({ planning, getRecipe, planningId, mealsDo
   const getRecipeLink = (recipe, mealTypeId) => {
     if (planningId) {
       const params = new URLSearchParams({ day: viewedDay, meal: mealTypeId });
-      return `/planning/${planningId}/recette/${getSlug(recipe.title)}?${params}`;
+      return `/planning/${planningId}/recette/${itemSlug(recipe)}?${params}`;
     }
-    return `/recettes/${getSlug(recipe.title)}`;
+    return `/recettes/${itemSlug(recipe)}`;
   };
 
   return (

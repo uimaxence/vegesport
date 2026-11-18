@@ -2,7 +2,7 @@
  * Export du planning repas en fichier .ics (compatible Google Calendar, Apple Calendar, Outlook).
  */
 
-import { getSlug } from './slug';
+import { itemSlug } from './slug';
 
 export const MEAL_TIMES = {
   'petit-dejeuner': { hour: 8, minute: 0, durationMinutes: 30 },
@@ -55,7 +55,7 @@ export function getPlanningEvents(planning, weekStart, getRecipe, mealTypes, day
       end.setMinutes(end.getMinutes() + times.durationMinutes);
 
       const summary = `${mt.label} — ${recipe.title}`;
-      const recipeUrl = `https://www.mamie-vege.fr/recettes/${getSlug(recipe.title)}`;
+      const recipeUrl = `https://www.mamie-vege.fr/recettes/${itemSlug(recipe)}`;
       const description = `Recette : ${recipe.title}\n${recipeUrl}`;
 
       events.push({

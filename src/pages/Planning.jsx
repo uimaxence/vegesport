@@ -81,33 +81,23 @@ import { Download, RefreshCw, ShoppingCart, ChevronDown, ChevronRight, Check, Co
 import { usePageMeta } from '../hooks/usePageMeta';
 import { canonicalUrl } from '../lib/seo';
 import Toast from '../components/Toast';
-import { getSlug } from '../lib/slug';
+import { itemSlug } from '../lib/slug';
 import { defaultPlannings, days, mealTypes } from '../data/plannings';
-import { objectives } from '../data/recipes';
+import { objectives, regimes } from '../data/recipes';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import { totalFactor as calcTotalFactor, ownerMacros, getOwner, appetiteToFactor } from '../lib/household';
 import { MEAL_SIZE_OPTIONS, getWeekStart, pickReplacement } from '../lib/planningEngine';
-import { getDailyTargetsFromObjective } from '../utils/dashboardPlanning';
+import { getDailyTargetsFromObjective, getCurrentDayId } from '../utils/dashboardPlanning';
+import { buildWeekPreview, OBJECTIVE_CHOICES, readGuestPlanning, writeGuestPlanning, clearGuestPlanning } from '../lib/quickPlanning';
 import { getCarrefourDriveUrl, getCoursesUDriveUrl, hasCarrefourAffiliate } from '../lib/driveLinks';
 import { buildPlanningIcs, downloadPlanningIcs } from '../lib/calendarExport';
 import { addToGoogleCalendar, hasGoogleCalendarConfig } from '../lib/googleCalendar';
-
-const SESSION_PLANNING_PREVIEW_KEY = 'planning_preview_v1';
-const SESSION_PLANNING_PREVIEW_MAX_AGE_MS = 1000 * 60 * 60 * 24; // 24h
 
 function getTodayStr() {
   const d = new Date();
   d.setHours(0, 0, 0, 0);
   return d.getTime();
-}
-
-function safeJsonParse(value) {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
-  }
 }
 
 /** Retourne true si le jour (lundi..dimanche) est avant aujourd'hui pour la semaine weekStart (YYYY-MM-DD). */
@@ -123,8 +113,8 @@ function isDayPast(day, weekStart) {
 
 export default function Planning() {
   usePageMeta({
-    title: 'Planning repas végétarien',
-    description: 'Crée ton planning hebdomadaire de repas végétariens personnalisé. Choisis ton objectif sportif (prise de masse, sèche, endurance), génère ta liste de courses et sauvegarde ton planning.',
+    title: 'Menu végétarien de la semaine : générateur gratuit',
+    description: 'Choisis ton objectif et obtiens en un clic un menu végétarien protéiné pour 7 jours, avec macros et liste de courses par rayon. Gratuit, sans inscription.',
     canonical: canonicalUrl('/planning'),
   });
   const [searchParams] = useSearchParams();
@@ -173,7 +163,7 @@ export default function Planning() {
   const [googleCalendarError, setGoogleCalendarError] = useState('');
   const [dupPanel, setDupPanel] = useState({ day: null, mealType: null, selectedDays: [] });
   const [skippedDays, setSkippedDays] = useState({});
-  const [expandedDay, setExpandedDay] = useState(() => days[0]);
+  const [expandedDay, setExpandedDay] = useState(() => getCurrentDayId());
   const [mealNotes, setMealNotes] = useState({});
   const [editingNote, setEditingNote] = useState(null);
   const [mealMultipliers, setMealMultipliers] = useState(
@@ -264,7 +254,7 @@ export default function Planning() {
 
   /** URL vers la fiche recette, contextualisée au planning si un ID existe. */
   const getRecipeUrl = (recipe, day, mealType) => {
-    const slug = getSlug(recipe.title);
+    const slug = itemSlug(recipe);
     if (editingPlanningId) {
       const params = new URLSearchParams({ day, meal: mealType });
       return `/planning/${editingPlanningId}/recette/${slug}?${params}`;
@@ -681,14 +671,14 @@ export default function Planning() {
 
   const activeMealTypes = mealTypes.slice(0, mealsPerDay);
 
+  // Liste de courses, téléchargement et calendrier : accessibles sans compte.
+  // Seule la sauvegarde (retrouver son planning partout) demande une connexion.
   const handleGroceryClick = () => {
-    if (requireAuthForAction('grocery')) return;
     setShowGroceryList(!showGroceryList);
     if (!showGroceryList) setActionFeedback('grocery');
   };
 
   const handleDownloadClick = () => {
-    if (requireAuthForAction('download')) return;
     exportGroceryList(groceryList);
     setActionFeedback('download');
   };
@@ -697,14 +687,12 @@ export default function Planning() {
   const weekStartForCalendar = editWeekStart || getWeekStart();
 
   const handleAddToCalendar = () => {
-    if (requireAuthForAction('claim_planning')) return;
     const ics = buildPlanningIcs(planning, weekStartForCalendar, getRecipe, mealTypes, days, mealsPerDay);
     downloadPlanningIcs(ics);
     setActionFeedback('calendar');
   };
 
   const handleAddToGoogleCalendar = async () => {
-    if (requireAuthForAction('claim_planning')) return;
     setAddingToGoogle(true);
     try {
       const result = await addToGoogleCalendar(planning, weekStartForCalendar, getRecipe, mealTypes, days, mealsPerDay);
@@ -767,16 +755,8 @@ export default function Planning() {
     if (mineMode || editId || loadFromState || setupPreviewInit) return;
     if (generated) return;
 
-    const raw = sessionStorage.getItem(SESSION_PLANNING_PREVIEW_KEY);
-    if (!raw) return;
-    const saved = safeJsonParse(raw);
-    if (!saved || typeof saved !== 'object') return;
-
-    const ts = Number(saved.ts) || 0;
-    if (!ts || Date.now() - ts > SESSION_PLANNING_PREVIEW_MAX_AGE_MS) {
-      sessionStorage.removeItem(SESSION_PLANNING_PREVIEW_KEY);
-      return;
-    }
+    const saved = readGuestPlanning();
+    if (!saved) return;
 
     const nextPlanning = saved.planning;
     if (!nextPlanning || typeof nextPlanning !== 'object') return;
@@ -799,15 +779,14 @@ export default function Planning() {
   // Persister le planning guest en session pour éviter de le regénérer après navigation
   useEffect(() => {
     if (user) {
-      sessionStorage.removeItem(SESSION_PLANNING_PREVIEW_KEY);
+      clearGuestPlanning();
       return;
     }
     if (!editInitDone) return;
-    if (mineMode || editId || loadFromState || setupPreviewInit) return;
+    if (mineMode || editId || loadFromState) return;
     if (!generated) return;
 
     const payload = {
-      ts: Date.now(),
       objective,
       regime,
       niveau,
@@ -818,7 +797,7 @@ export default function Planning() {
       mealMultipliers,
       skippedDays,
     };
-    sessionStorage.setItem(SESSION_PLANNING_PREVIEW_KEY, JSON.stringify(payload));
+    writeGuestPlanning(payload);
   }, [
     user,
     editInitDone,
@@ -963,6 +942,31 @@ export default function Planning() {
     [objective, niveau, normalizedWeight]
   );
 
+  /** Regénère toute la semaine avec le profil courant (ou un nouvel objectif / régime). */
+  const regenerateWeek = (overrides = {}) => {
+    const next = {
+      objective: overrides.objective ?? objective,
+      regime: overrides.regime ?? regime,
+      mealsPerDay: overrides.mealsPerDay ?? mealsPerDay,
+    };
+    const preview = buildWeekPreview({
+      recipes: recipesList,
+      objective: next.objective,
+      regime: next.regime,
+      niveau,
+      poids: normalizedWeight,
+      mealsPerDay: next.mealsPerDay,
+    });
+    setObjective(next.objective);
+    setRegime(next.regime);
+    setMealsPerDay(next.mealsPerDay);
+    setPlanning(preview.planning);
+    setMealMultipliers(preview.mealMultipliers);
+    setSkippedDays({});
+    setShowGroceryList(false);
+    setGenerated(true);
+  };
+
   const dailyNutrition = useMemo(() => {
     const activeDays = days.filter(d => !skippedDays[d]);
     if (activeDays.length === 0) return null;
@@ -981,8 +985,9 @@ export default function Planning() {
         if (recipe) {
           const mealMultiplier = getMealMultiplier(day, mt.id);
           // Macros de l'utilisateur seul (owner factor), pas du foyer entier
-          const effectivePortions = ownerFactor ?? portions;
-          const ratio = effectivePortions * mealMultiplier;
+          // Macros par personne : portion de la recette × taille du repas (le nombre de
+          // personnes à table ne joue que sur la liste de courses).
+          const ratio = (ownerFactor ?? 1) * mealMultiplier;
           dayProtein += (recipe.protein ?? 0) * ratio;
           dayCalories += (recipe.calories ?? 0) * ratio;
           dayCarbs += (recipe.carbs ?? 0) * ratio;
@@ -1005,17 +1010,18 @@ export default function Planning() {
       fat: Math.round(totalFat / daysWithMeals),
       daysCount: daysWithMeals,
     };
-  }, [planning, portions, ownerFactor, skippedDays, activeMealTypes, mealMultipliers]);
+  }, [planning, ownerFactor, skippedDays, activeMealTypes, mealMultipliers]);
 
   const nutritionBars = useMemo(() => {
     if (!dailyNutrition) return null;
     const { protein, calories, carbs, fat } = dailyNutrition;
     const t = DAILY_TARGETS;
     return {
-      protein: { value: protein, target: t.protein, pct: Math.min(100, Math.round((protein / t.protein) * 100)) },
-      calories: { value: calories, target: t.calories, pct: Math.min(120, Math.round((calories / t.calories) * 100)) },
-      carbs: { value: carbs, target: t.carbs, pct: Math.min(100, Math.round((carbs / t.carbs) * 100)) },
-      fat: { value: fat, target: t.fat, pct: Math.min(100, Math.round((fat / t.fat) * 100)) },
+      // Pourcentages réels (non plafonnés) : un dépassement doit se voir.
+      protein: { value: protein, target: t.protein, pct: Math.round((protein / t.protein) * 100) },
+      calories: { value: calories, target: t.calories, pct: Math.round((calories / t.calories) * 100) },
+      carbs: { value: carbs, target: t.carbs, pct: Math.round((carbs / t.carbs) * 100) },
+      fat: { value: fat, target: t.fat, pct: Math.round((fat / t.fat) * 100) },
     };
   }, [dailyNutrition, DAILY_TARGETS]);
 
@@ -1073,9 +1079,10 @@ export default function Planning() {
         {/* Header */}
         <div className="mb-8 text-center max-w-2xl mx-auto px-2">
           <p className="text-[10px] uppercase tracking-[0.2em] text-text-light mb-2">Programme alimentaire végétarien</p>
-          <h1 className="font-display text-3xl sm:text-4xl text-text">Découvre ton planning de la semaine</h1>
+          <h1 className="font-display text-3xl sm:text-4xl text-text">Ton menu de la semaine</h1>
           <p className="mt-3 text-sm sm:text-base text-text-light leading-relaxed">
-            Modifie comme tu souhaites ton planning et enregistre-le pour commencer à cuisiner.
+            Change un plat d'un clic, ajuste ton objectif, puis récupère ta liste de courses.
+            {!user && ' Pas besoin de compte.'}
           </p>
           {editingPlanningId && (
             <p className="mt-4 text-sm text-primary bg-primary/10 border border-primary/20 rounded-lg px-4 py-2 inline-block">
@@ -1101,6 +1108,92 @@ export default function Planning() {
           </div>
         )}
 
+        {/* Réglages rapides : objectif, régime, repas/jour, poids → la semaine se regénère */}
+        {showPreview && !editingPlanningId && (
+          <div className="mb-5 rounded-xl border border-border bg-white p-4 sm:p-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-accent uppercase tracking-wider text-text-light mr-1">Objectif</span>
+              {OBJECTIVE_CHOICES.map((o) => (
+                <button
+                  key={o.id}
+                  type="button"
+                  title={o.hint}
+                  aria-pressed={objective === o.id}
+                  onClick={() => objective !== o.id && regenerateWeek({ objective: o.id })}
+                  className={`px-3.5 py-2 rounded-full text-sm border transition-colors ${
+                    objective === o.id
+                      ? 'bg-primary text-white border-primary font-medium'
+                      : 'bg-white border-border text-text hover:border-primary/40'
+                  }`}
+                >
+                  {o.label}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => regenerateWeek()}
+                className="ml-auto inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border border-border text-text hover:border-text transition-colors"
+              >
+                <RefreshCw size={14} />
+                Nouvelle semaine
+              </button>
+            </div>
+            <div className="mt-3 pt-3 border-t border-border/60 flex flex-wrap items-center gap-x-5 gap-y-2.5 text-sm">
+              <label className="inline-flex items-center gap-2 text-text-light">
+                Régime
+                <select
+                  value={regime}
+                  onChange={(e) => regenerateWeek({ regime: e.target.value })}
+                  className="bg-black/[0.04] rounded-lg px-2.5 py-1.5 text-text border border-transparent focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  <option value="vegetarien">Végétarien</option>
+                  {regimes.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+                </select>
+              </label>
+              <label className="inline-flex items-center gap-2 text-text-light">
+                Repas / jour
+                <select
+                  value={mealsPerDay}
+                  onChange={(e) => regenerateWeek({ mealsPerDay: Number(e.target.value) })}
+                  className="bg-black/[0.04] rounded-lg px-2.5 py-1.5 text-text border border-transparent focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  <option value={3}>3</option>
+                  <option value={4}>4 (avec collation)</option>
+                </select>
+              </label>
+              <label className="inline-flex items-center gap-2 text-text-light">
+                Poids
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={40}
+                  max={150}
+                  value={poids}
+                  placeholder="70"
+                  onChange={(e) => setPoids(e.target.value)}
+                  className="w-16 bg-black/[0.04] rounded-lg px-2.5 py-1.5 text-text border border-transparent focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+                kg
+              </label>
+              {!hasHousehold && (
+                <label className="inline-flex items-center gap-2 text-text-light">
+                  Personnes à table
+                  <select
+                    value={portions}
+                    onChange={(e) => setPortions(Number(e.target.value))}
+                    className="bg-black/[0.04] rounded-lg px-2.5 py-1.5 text-text border border-transparent focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  >
+                    {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </label>
+              )}
+              <Link to="/planning/setup" className="text-primary hover:text-primary-dark font-medium">
+                Niveau, foyer… tout personnaliser
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Macro cards */}
         {showPreview && nutritionBars && (
           <div className="mb-5">
@@ -1112,8 +1205,10 @@ export default function Planning() {
                 { key: 'fat',      label: 'Lipides',   unit: 'g',    icon: null },
               ].map(({ key, label, unit, icon: Icon }) => {
                 const bar = nutritionBars[key];
-                const isOk  = bar.pct >= 85;
-                const isLow = bar.pct < 70;
+                // Protéines : atteindre la cible suffit. Calories, glucides, lipides : rester dans ±15 %.
+                const isOver = key !== 'protein' && bar.pct > 115;
+                const isOk  = bar.pct >= 85 && !isOver;
+                const isLow = bar.pct < 70 || isOver;
                 return (
                   <div key={key} className="bg-white rounded-xl p-4 sm:p-5 border border-border">
                     <div className="flex items-center justify-between mb-3">
@@ -1140,7 +1235,7 @@ export default function Planning() {
               })}
             </div>
             <p className="mt-2 text-xs text-text-light text-right font-accent">
-              {portions === 1 ? 'Juste moi' : `${portions} pers.`} · {objectives.find(o => o.id === objective)?.label ?? objective} · {niveaux.find(n => n.id === niveau)?.label ?? niveau} · {normalizedWeight} kg
+              Moyenne par jour et par personne · {objectives.find(o => o.id === objective)?.label ?? objective} · {niveaux.find(n => n.id === niveau)?.label ?? niveau} · {normalizedWeight} kg
             </p>
           </div>
         )}
@@ -1349,7 +1444,7 @@ export default function Planning() {
                                   }
                                   return (
                                     <p className="text-xs text-text-light mt-1.5">
-                                      {Math.round(recipe.protein * portions * getMealMultiplier(day, mt.id))}g prot · {Math.round(recipe.calories * portions * getMealMultiplier(day, mt.id))} kcal
+                                      {Math.round(recipe.protein * getMealMultiplier(day, mt.id))}g prot · {Math.round(recipe.calories * getMealMultiplier(day, mt.id))} kcal
                                     </p>
                                   );
                                 })()}
@@ -1487,7 +1582,7 @@ export default function Planning() {
                               }
                               return (
                                 <p className="text-sm text-text-light mt-0.5">
-                                  {Math.round(recipe.protein * portions * getMealMultiplier(day, mt.id))}g prot · {Math.round(recipe.calories * portions * getMealMultiplier(day, mt.id))} kcal
+                                  {Math.round(recipe.protein * getMealMultiplier(day, mt.id))}g prot · {Math.round(recipe.calories * getMealMultiplier(day, mt.id))} kcal
                                 </p>
                               );
                             })()}
@@ -1579,7 +1674,7 @@ export default function Planning() {
                   to={
                     previewRecipe?.__planningContext
                       ? getRecipeUrl(previewRecipe, previewRecipe.__planningContext.day, previewRecipe.__planningContext.mealType)
-                      : `/recettes/${getSlug(previewRecipe.title)}`
+                      : `/recettes/${itemSlug(previewRecipe)}`
                   }
                   state={
                     previewRecipe?.__planningContext
@@ -1788,33 +1883,23 @@ export default function Planning() {
   );
 }
 
+/** Taille du repas : un seul stepper compact (½ · ×1 · ×1.5 · Double) au lieu de 4 boutons par carte. */
 function MealPortionControl({ day, mealType, value, onChange }) {
+  const index = Math.max(0, MEAL_SIZE_OPTIONS.findIndex((o) => o.mult === value));
+  const current = MEAL_SIZE_OPTIONS[index];
+  const step = (e, delta) => {
+    e.stopPropagation();
+    const next = MEAL_SIZE_OPTIONS[index + delta];
+    if (next) onChange(day, mealType, next.mult);
+  };
+  const btn = 'w-6 h-6 flex items-center justify-center rounded-md text-text-light hover:text-text hover:bg-black/[0.05] disabled:opacity-30 disabled:pointer-events-none transition-colors';
   return (
-    <div className="mt-2.5">
-      <p className="text-[11px] uppercase tracking-wider text-text-light mb-1">Taille du repas</p>
-      <div className="flex flex-wrap gap-1">
-        {MEAL_SIZE_OPTIONS.map(({ mult, label, title }) => {
-          const active = value === mult;
-          return (
-            <button
-              key={mult}
-              type="button"
-              title={title}
-              onClick={(e) => {
-                e.stopPropagation();
-                onChange(day, mealType, mult);
-              }}
-              className={`px-2 py-1 rounded-md text-xs border transition-colors ${
-                active
-                  ? 'bg-primary/10 border-primary/30 text-primary font-medium'
-                  : 'bg-white border-border text-text-light hover:border-text/30 hover:text-text'
-              }`}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+    <div className="mt-2 inline-flex items-center gap-0.5 rounded-lg border border-border bg-white px-0.5 py-0.5" title={current.title}>
+      <button type="button" className={btn} onClick={(e) => step(e, -1)} disabled={index === 0} aria-label="Réduire la portion">−</button>
+      <span className={`min-w-[3.25rem] text-center text-xs tabular-nums ${value !== 1 ? 'text-primary font-medium' : 'text-text-light'}`}>
+        {value === 1 ? '1 portion' : value === 0.5 ? '½ portion' : `×${value}`}
+      </span>
+      <button type="button" className={btn} onClick={(e) => step(e, 1)} disabled={index === MEAL_SIZE_OPTIONS.length - 1} aria-label="Augmenter la portion">+</button>
     </div>
   );
 }

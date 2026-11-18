@@ -1,0 +1,406 @@
+{
+  "id": 32,
+  "title": "Tofu : protéines, types (ferme, soyeux, fumé) et comment le cuisiner",
+  "excerpt": "13,4 g de protéines pour 100 g de tofu ferme, 14,9 g pour le fumé, 4,6 g pour le soyeux. Les différences entre les types et la façon de cuisiner chacun.",
+  "category": "Nutrition",
+  "date": "2026-11-18",
+  "read_time": 9,
+  "author": "Maxence",
+  "meta_title": "Tofu : protéines, types et comment le cuisiner",
+  "meta_description": "Tofu ferme : 13,4 g de protéines pour 100 g ; fumé : 14,9 g ; soyeux : 4,6 g. Différences entre les types, portions, cuisson croustillante et idées express.",
+  "content": "",
+  "content_json": [
+    {
+      "text": "Le tofu ferme nature apporte 13,4 g de protéines pour 100 g, le tofu fumé 14,9 g et le tofu soyeux 4,6 g (table Ciqual de l'ANSES). Une portion de 150 g de tofu ferme te donne donc environ 20 g de protéines pour 220 kcal.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Ces trois tofus ne se cuisinent pas de la même façon et ne rendent pas le même service. Le ferme et le fumé sont des sources de protéines de plat principal. Le soyeux est surtout un ingrédient de texture, qui remplace la crème ou les œufs dans une préparation.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Protéines et valeurs nutritionnelles du tofu par type",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Valeurs pour 100 g, table Ciqual.",
+      "type": "paragraph"
+    },
+    {
+      "rows": [
+        [
+          "Tofu nature ferme",
+          "13,4 g",
+          "147 kcal",
+          "8,5 g",
+          "2,9 g",
+          "2,4 mg",
+          "100 mg",
+          "0,03 g"
+        ],
+        [
+          "Tofu fumé",
+          "14,9 g",
+          "164 kcal",
+          "9,5 g",
+          "2,9 g",
+          "2,0 mg",
+          "62 mg",
+          "0,74 g"
+        ],
+        [
+          "Tofu soyeux",
+          "4,6 g",
+          "54 kcal",
+          "2,9 g",
+          "1,5 g",
+          "0,6 mg",
+          "21 mg",
+          "< 0,02 g"
+        ],
+        [
+          "Tempeh (pour comparaison)",
+          "16,1 g",
+          "157 kcal",
+          "4,7 g",
+          "7,9 g",
+          "1,7 mg",
+          "88 mg",
+          "0,10 g"
+        ],
+        [
+          "Seitan (pour comparaison)",
+          "20,6 g",
+          "134 kcal",
+          "2,5 g",
+          "6,7 g",
+          "1,5 mg",
+          "20 mg",
+          "1,13 g"
+        ]
+      ],
+      "type": "table",
+      "headers": [
+        "Pour 100 g",
+        "Protéines",
+        "Calories",
+        "Lipides",
+        "Glucides",
+        "Fer",
+        "Calcium",
+        "Sel"
+      ]
+    },
+    {
+      "url": "https://ciqual.anses.fr/",
+      "type": "source",
+      "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments"
+    },
+    {
+      "text": "Deux précisions. Les valeurs varient d'une marque à l'autre : plus un tofu est ferme, moins il contient d'eau et plus il est concentré en protéines. Certains tofus « extra-fermes » dépassent les valeurs moyennes de la table, vérifie l'étiquette. Le calcium dépend du coagulant utilisé pour faire cailler le lait de soja : un tofu préparé au sulfate de calcium en contient davantage qu'un tofu au nigari (chlorure de magnésium). L'information figure dans la liste d'ingrédients.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Combien de protéines par portion ?",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "rows": [
+        [
+          "100 g de tofu ferme",
+          "13 g",
+          "147 kcal"
+        ],
+        [
+          "125 g de tofu ferme (un demi-bloc de 250 g)",
+          "17 g",
+          "184 kcal"
+        ],
+        [
+          "150 g de tofu ferme",
+          "20 g",
+          "221 kcal"
+        ],
+        [
+          "200 g de tofu ferme",
+          "27 g",
+          "294 kcal"
+        ],
+        [
+          "100 g de tofu fumé",
+          "15 g",
+          "164 kcal"
+        ],
+        [
+          "150 g de tofu fumé",
+          "22 g",
+          "246 kcal"
+        ],
+        [
+          "200 g de tofu soyeux",
+          "9 g",
+          "109 kcal"
+        ]
+      ],
+      "type": "table",
+      "headers": [
+        "Portion",
+        "Protéines",
+        "Calories"
+      ]
+    },
+    {
+      "text": "Les positions de consensus en nutrition sportive situent les besoins entre 1,2 et 2,0 g de protéines par kilo et par jour selon la discipline, avec des prises de 20 à 40 g par repas. 150 g de tofu ferme ou fumé atteignent le bas de cette fourchette à eux seuls ; avec du riz ou des nouilles, tu la dépasses.",
+      "type": "paragraph"
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/",
+      "type": "source",
+      "label": "ISSN — Position Stand : protein and exercise (2017)"
+    },
+    {
+      "text": "Côté qualité, les protéines de soja sont les mieux équilibrées du monde végétal : elles contiennent tous les acides aminés indispensables dans des proportions proches de celles des protéines animales, lysine comprise. C'est ce qui distingue le tofu du seitan, plus protéiné mais pauvre en lysine.",
+      "type": "paragraph"
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31690027/",
+      "type": "source",
+      "label": "Mariotti F., Gardner C. — Dietary Protein and Amino Acids in Vegetarian Diets (Nutrients, 2019)"
+    },
+    {
+      "text": "Tofu ferme : le presser, le dorer",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Le tofu ferme nature n'a presque pas de goût : c'est une éponge, qui prend celui de ce que tu lui donnes. S'il est fade ou mou dans ton assiette, le problème vient presque toujours de l'eau qu'il contient encore.",
+      "type": "paragraph"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Presse-le : enveloppe le bloc dans un torchon propre, pose un poids dessus (une planche et une casserole) pendant 15 à 20 minutes. Il perd son eau et pourra dorer.",
+        "Coupe-le en dés de 2 cm ou en tranches d'un centimètre.",
+        "Pour du croustillant : enrobe les dés d'une cuillère à soupe de fécule de maïs avant cuisson.",
+        "Au four : 200 °C pendant 25 à 30 minutes sur du papier cuisson, en retournant à mi-cuisson.",
+        "À la poêle : feu assez vif, un peu d'huile, 8 à 10 minutes en le laissant dorer sans le remuer sans cesse.",
+        "Assaisonne à la fin : sauce soja, ail, gingembre, sirop d'érable ou paprika fumé, une minute dans la poêle chaude."
+      ]
+    },
+    {
+      "text": "Tu peux aussi le faire mariner 30 minutes ou plus avant cuisson, une fois pressé. La marinade pénètre peu au cœur du bloc : des morceaux fins prennent mieux le goût que de gros cubes. La méthode pas à pas est dans « Recette tofu croustillant facile pour sportif débutant ».",
+      "type": "paragraph"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        67,
+        58
+      ]
+    },
+    {
+      "text": "Tofu fumé : le plus simple à utiliser",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Le tofu fumé est un tofu ferme fumé au bois, parfois mariné à la sauce soja. Il est déjà assaisonné, plus ferme, et il se mange tel quel, sans pressage ni cuisson. C'est le tofu à acheter si tu débutes ou si tu n'as pas le temps. Il est aussi le plus protéiné des trois (14,9 g pour 100 g) et le plus salé (0,74 g de sel pour 100 g) : ne resale pas le plat.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Recette express : tofu fumé poêlé en 10 minutes",
+      "type": "heading",
+      "level": 3
+    },
+    {
+      "type": "list",
+      "items": [
+        "Coupe 200 g de tofu fumé en dés ou en bâtonnets façon lardons.",
+        "Fais chauffer 1 cuillère à soupe d'huile dans une poêle, à feu assez vif.",
+        "Fais dorer le tofu 5 à 6 minutes en remuant de temps en temps.",
+        "Hors du feu, ajoute 1 cuillère à café de sauce soja et 1 cuillère à café de sirop d'érable, mélange.",
+        "Sers sur du riz, des pâtes ou une salade de lentilles. Pour 2 personnes : environ 15 g de protéines par portion pour le tofu seul."
+      ]
+    },
+    {
+      "text": "Quatre autres idées avec du tofu fumé",
+      "type": "heading",
+      "level": 3
+    },
+    {
+      "type": "list",
+      "items": [
+        "Cru, en dés, dans une salade composée ou un bowl de céréales.",
+        "En tranches fines dans un sandwich ou un wrap avec du houmous.",
+        "En petits lardons dorés dans des pâtes, une quiche ou une poêlée de pommes de terre.",
+        "Émietté et doré dans une soupe de légumes ou un dhal, au moment de servir."
+      ]
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        21,
+        5
+      ]
+    },
+    {
+      "text": "Tofu soyeux : au petit déjeuner et dans les desserts",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Le tofu soyeux n'est pas pressé : il a la texture d'un flan et contient beaucoup d'eau, d'où ses 4,6 g de protéines pour 100 g seulement. Il ne se poêle pas en dés, il se mixe ou s'écrase. Il remplace la crème, le fromage blanc ou les œufs dans une préparation.",
+      "type": "paragraph"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Au petit déjeuner : mixé avec une banane et du cacao, ou mélangé à un porridge en fin de cuisson. 100 g de tofu soyeux, 60 g de flocons d'avoine, 200 ml de boisson au soja et 20 g d'amandes apportent environ 21 g de protéines.",
+        "En brouillade : écrasé à la fourchette dans une poêle avec du curcuma, du sel et du poivre, 4 à 5 minutes. Avec du tofu ferme émietté, la brouillade est plus protéinée et plus proche d'œufs brouillés.",
+        "En dessert : mixé avec du chocolat fondu ou du cacao et un peu de sirop d'érable, puis une heure au frais.",
+        "En sauce : mixé avec du citron, de la moutarde et des herbes pour une sauce crémeuse sans crème."
+      ]
+    },
+    {
+      "text": "Si ton objectif est un petit déjeuner riche en protéines, le tofu soyeux seul ne suffit pas : 200 g n'en apportent que 9 g. Associe-le à de l'avoine, à une boisson au soja et à des graines.",
+      "type": "paragraph"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        40,
+        59
+      ]
+    },
+    {
+      "text": "Soja et isoflavones : ce que dit l'ANSES",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Le soja contient des isoflavones, des composés dont la structure est proche de celle des œstrogènes. En mars 2025, l'ANSES a fixé des valeurs toxicologiques de référence pour ces composés et recommandé de ne pas servir d'aliments à base de soja en restauration collective, afin d'éviter les surconsommations, pour toutes les tranches d'âge. Elle conseille de diversifier les sources de protéines végétales, les autres légumes secs étant nettement moins riches en isoflavones, et souligne que les teneurs varient fortement d'un produit à l'autre.",
+      "type": "paragraph"
+    },
+    {
+      "url": "https://www.anses.fr/fr/actualite/eviter-isoflavones-menus-restaurations-collectives",
+      "type": "source",
+      "label": "ANSES — Éviter les isoflavones dans les menus des restaurations collectives (2025)"
+    },
+    {
+      "text": "Concrètement, pour un adulte : le tofu a sa place dans une alimentation végétarienne, comme une source de protéines parmi d'autres, en alternance avec les lentilles, les pois chiches, les haricots et le seitan. Pour les enfants, pendant une grossesse ou en cas de problème thyroïdien ou hormonal, demande l'avis d'un professionnel de santé.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Conserver le tofu",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "type": "list",
+      "items": [
+        "Non ouvert : au réfrigérateur, jusqu'à la date indiquée sur l'emballage.",
+        "Entamé : dans une boîte fermée, recouvert d'eau fraîche changée chaque jour, à consommer dans les jours qui suivent selon les indications du fabricant.",
+        "Au congélateur : le tofu ferme se congèle. Sa texture devient plus spongieuse et plus ferme après décongélation, ce que certains préfèrent pour les plats en sauce.",
+        "Cuit : 3 à 4 jours au réfrigérateur dans un contenant hermétique, pratique pour le meal prep."
+      ]
+    },
+    {
+      "text": "En résumé",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Tofu ferme : 13,4 g de protéines pour 100 g, à presser et à dorer. Tofu fumé : 14,9 g, prêt à manger, le plus simple pour commencer. Tofu soyeux : 4,6 g, un ingrédient de texture pour les petits déjeuners, les sauces et les desserts. Compte 150 g de tofu ferme ou fumé pour 20 g de protéines par repas, et alterne avec d'autres sources dans la semaine. Le comparatif complet est dans « Sources de protéines végétales : le classement complet ».",
+      "type": "paragraph"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Les recettes pour passer à la pratique"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        85,
+        81
+      ]
+    },
+    {
+      "type": "cta_planning"
+    },
+    {
+      "type": "faq",
+      "items": [
+        {
+          "answer": "13,4 g pour le tofu nature ferme, 14,9 g pour le tofu fumé et 4,6 g pour le tofu soyeux, selon la table Ciqual de l'ANSES. Les valeurs varient selon les marques : plus le tofu est ferme, plus il est concentré en protéines.",
+          "question": "Combien de protéines dans 100 g de tofu ?"
+        },
+        {
+          "answer": "Le tofu ferme est pressé pour en retirer l'eau : il se coupe, se poêle et se cuit au four. Le tofu soyeux n'est pas pressé, il a une texture de flan et s'utilise mixé, dans les sauces, les desserts ou au petit déjeuner. Le tofu fumé est un tofu ferme fumé, déjà assaisonné et prêt à manger.",
+          "question": "Quelle est la différence entre tofu ferme, soyeux et fumé ?"
+        },
+        {
+          "answer": "Oui. Le tofu vendu en France est un produit déjà cuit lors de sa fabrication : il peut se manger sans cuisson, à condition de respecter la chaîne du froid et la date limite. Le tofu fumé et le tofu soyeux sont les plus agréables tels quels ; le tofu ferme nature gagne à être doré.",
+          "question": "Peut-on manger le tofu cru ?"
+        },
+        {
+          "answer": "Le seitan (20,6 g pour 100 g), puis le tempeh (16,1 g), le tofu fumé (14,9 g) et le tofu nature ferme (13,4 g). Le tofu et le tempeh, à base de soja, ont en revanche des protéines mieux équilibrées en acides aminés que le seitan, pauvre en lysine.",
+          "question": "Tofu, tempeh ou seitan : lequel a le plus de protéines ?"
+        },
+        {
+          "answer": "Il n'existe pas de quantité officielle par jour pour le tofu. L'ANSES a fixé en 2025 des valeurs de référence pour les isoflavones du soja et recommande de diversifier les sources de protéines végétales. En pratique : une portion de 100 à 150 g, en alternance avec les légumineuses, le seitan et les autres sources dans la semaine.",
+          "question": "Combien de tofu peut-on manger par jour ?"
+        }
+      ]
+    },
+    {
+      "type": "sources_list",
+      "items": [
+        {
+          "url": "https://ciqual.anses.fr/",
+          "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments"
+        },
+        {
+          "url": "https://www.anses.fr/fr/actualite/eviter-isoflavones-menus-restaurations-collectives",
+          "label": "ANSES — Éviter les isoflavones dans les menus des restaurations collectives (2025)"
+        },
+        {
+          "url": "https://www.anses.fr/fr/article/proteines-role-sources-et-apports-recommandes",
+          "label": "ANSES — Les protéines : rôle, sources et apports recommandés"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/",
+          "label": "ISSN — Position Stand : protein and exercise (2017)"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31690027/",
+          "label": "Mariotti F., Gardner C. — Dietary Protein and Amino Acids in Vegetarian Diets (Nutrients, 2019)"
+        }
+      ]
+    }
+  ],
+  "sources_json": [
+    {
+      "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments",
+      "url": "https://ciqual.anses.fr/"
+    },
+    {
+      "label": "ISSN — Position Stand : protein and exercise (2017)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/"
+    },
+    {
+      "label": "Mariotti F., Gardner C. — Dietary Protein and Amino Acids in Vegetarian Diets (Nutrients, 2019)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31690027/"
+    },
+    {
+      "label": "ANSES — Éviter les isoflavones dans les menus des restaurations collectives (2025)",
+      "url": "https://www.anses.fr/fr/actualite/eviter-isoflavones-menus-restaurations-collectives"
+    },
+    {
+      "label": "ANSES — Les protéines : rôle, sources et apports recommandés",
+      "url": "https://www.anses.fr/fr/article/proteines-role-sources-et-apports-recommandes"
+    }
+  ]
+}

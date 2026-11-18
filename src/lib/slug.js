@@ -10,3 +10,11 @@ export function getSlug(title) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
+
+/**
+ * Slug d'une recette ou d'un article : la colonne `slug` figée en base si elle existe,
+ * sinon dérivé du titre. Renommer un contenu ne casse donc plus son URL.
+ */
+export function itemSlug(item) {
+  return item?.slug || getSlug(item?.title);
+}

@@ -78,14 +78,17 @@ export function getDailyTargetsFromObjective(objective = 'masse', poidsKg = 70, 
   };
 }
 
-/** Pour un jour donné, calcule les totaux du planning (portions = 2 par défaut) */
-export function computeDayTotals(mealsForDay, getRecipe, portions = 2) {
+/**
+ * Totaux d'un jour, par personne. Les macros des recettes sont par portion ;
+ * `multipliers` = tailles de repas du planning ({ 'lundi-dejeuner': 1.5 }).
+ */
+export function computeDayTotals(mealsForDay, getRecipe, multipliers = {}, dayId = '') {
   let protein = 0, carbs = 0, fat = 0, calories = 0;
   mealTypes.forEach((mt) => {
     const recipeId = mealsForDay?.[mt.id];
     const recipe = recipeId ? getRecipe(recipeId) : null;
     if (recipe) {
-      const ratio = portions / (recipe.servings || 1);
+      const ratio = multipliers?.[`${dayId}-${mt.id}`] ?? 1;
       protein += (recipe.protein ?? 0) * ratio;
       carbs += (recipe.carbs ?? 0) * ratio;
       fat += (recipe.fat ?? 0) * ratio;
@@ -96,10 +99,10 @@ export function computeDayTotals(mealsForDay, getRecipe, portions = 2) {
 }
 
 /** Données planifiées par jour pour le graphique */
-export function computeWeekDataForChart(planning, getRecipe, portions = 2) {
+export function computeWeekDataForChart(planning, getRecipe) {
   const dayLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
   return days.map((dayId, i) => {
-    const totals = computeDayTotals(planning.meals?.[dayId], getRecipe, portions);
+    const totals = computeDayTotals(planning.meals?.[dayId], getRecipe, planning.mealMultipliers, dayId);
     return { dayId, label: dayLabels[i], ...totals };
   });
 }
@@ -109,7 +112,7 @@ export function computeWeekDataForChart(planning, getRecipe, portions = 2) {
  * mealsDoneMap = { "lundi-dejeuner": true, "mardi-collation": true, ... }
  * Seuls les repas cochés sont comptabilisés.
  */
-export function computeWeekDataDone(planning, getRecipe, mealsDoneMap = {}, portions = 2) {
+export function computeWeekDataDone(planning, getRecipe, mealsDoneMap = {}) {
   const dayLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
   return days.map((dayId, i) => {
     let protein = 0, carbs = 0, fat = 0, calories = 0;
@@ -119,7 +122,7 @@ export function computeWeekDataDone(planning, getRecipe, mealsDoneMap = {}, port
       const recipeId = planning.meals?.[dayId]?.[mt.id];
       const recipe = recipeId ? getRecipe(recipeId) : null;
       if (!recipe) return;
-      const ratio = portions / (recipe.servings || 1);
+      const ratio = planning.mealMultipliers?.[key] ?? 1;
       protein += (recipe.protein ?? 0) * ratio;
       carbs += (recipe.carbs ?? 0) * ratio;
       fat += (recipe.fat ?? 0) * ratio;

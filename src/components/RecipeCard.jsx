@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Heart, Clock } from 'lucide-react';
-import { getSlug } from '../lib/slug';
+import { itemSlug } from '../lib/slug';
 import MacroBadges from './MacroBadges';
 import { getSafeImageSrc, handleMediaImageError, isRecipeImageMissing, getOptimizedImageUrl } from '../lib/imageFallback';
 
@@ -8,7 +8,7 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
   const noPhoto = isRecipeImageMissing(recipe.image);
   if (layout === 'compact') {
     return (
-      <Link to={`/recettes/${getSlug(recipe.title)}`} className="group flex items-center gap-4 py-3 rounded-xl hover:bg-black/[0.03] transition-colors -mx-1 px-1">
+      <Link to={`/recettes/${itemSlug(recipe)}`} className="group flex items-center gap-4 py-3 rounded-xl hover:bg-black/[0.03] transition-colors -mx-1 px-1">
         <div className={`w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 ${noPhoto ? 'bg-bg-warm flex items-center justify-center' : ''}`}>
           <img
             src={getOptimizedImageUrl(getSafeImageSrc(recipe.image), 80)}
@@ -35,7 +35,7 @@ export default function RecipeCard({ recipe, isFavorite, toggleFavorite, layout 
 
   return (
     <div className="group overflow-hidden recipe-card-frame relative rounded-xl">
-      <Link to={`/recettes/${getSlug(recipe.title)}`} className="block">
+      <Link to={`/recettes/${itemSlug(recipe)}`} className="block">
         <div className={`aspect-[4/3] sm:aspect-[16/10] relative overflow-hidden rounded-t-xl flex items-center justify-center ${noPhoto ? 'bg-bg-warm' : 'bg-bg-warm p-5 sm:p-4'}`}>
           <img
             src={getOptimizedImageUrl(getSafeImageSrc(recipe.image), 300)}

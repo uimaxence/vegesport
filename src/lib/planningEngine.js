@@ -58,6 +58,38 @@ export function scoreRecipeForObjective(recipe, objective) {
   }
 }
 
+/** Part des calories de la journée attribuée à chaque repas. */
+const MEAL_CALORIE_SHARE = {
+  3: { 'petit-dejeuner': 0.28, dejeuner: 0.38, diner: 0.34 },
+  4: { 'petit-dejeuner': 0.25, dejeuner: 0.33, diner: 0.30, collation: 0.12 },
+};
+
+function calorieShares(mealsPerDay) {
+  return MEAL_CALORIE_SHARE[Number(mealsPerDay) === 3 ? 3 : 4];
+}
+
+/** Multiplicateur (½, ×1, ×1.5, double) qui rapproche le plus un plat de son budget calorique. */
+function bestMultiplierFor(kcal, budget) {
+  let best = 1;
+  let bestDiff = Infinity;
+  for (const { mult } of MEAL_SIZE_OPTIONS) {
+    const diff = Math.abs(kcal * mult - budget);
+    if (diff < bestDiff) {
+      best = mult;
+      bestDiff = diff;
+    }
+  }
+  return best;
+}
+
+/** Un plat « rentre » dans le budget si une des tailles de portion tombe à ±25 % de la cible. */
+function fitsBudget(recipe, budget) {
+  const kcal = Number(recipe?.calories) || 0;
+  if (!kcal || !budget) return true;
+  const served = kcal * bestMultiplierFor(kcal, budget);
+  return Math.abs(served - budget) / budget <= 0.25;
+}
+
 /** Pool de recettes pour un créneau : catégorie + régime, fallback catégorie seule. */
 function poolForMealType(recipes, mealTypeId, regime, excludeIds = null) {
   const matches = (r) => {
@@ -88,17 +120,24 @@ function pickScored(pool, objective) {
  * Génère une semaine complète de repas.
  * Retourne { lundi: { 'petit-dejeuner': id, ... }, ... }.
  */
-export function generateWeekPlanning({ recipes, objective, regime }) {
+export function generateWeekPlanning({ recipes, objective, regime, targetCalories, targetProtein, mealsPerDay }) {
   const list = recipes || [];
   const usedIds = new Set();
   const planning = {};
+  const shares = calorieShares(mealsPerDay);
   days.forEach((day) => {
     planning[day] = {};
     mealTypes.forEach((mt) => {
-      const pool = poolForMealType(list, mt.id, regime);
+      let pool = poolForMealType(list, mt.id, regime);
       if (pool.length === 0) {
         planning[day][mt.id] = null;
         return;
+      }
+      // Si on connaît la cible calorique, on écarte les plats qu'aucune taille de portion ne peut y faire rentrer.
+      const budget = targetCalories && shares[mt.id] ? targetCalories * shares[mt.id] : null;
+      if (budget) {
+        const fitting = pool.filter((r) => fitsBudget(r, budget));
+        if (fitting.length >= 3) pool = fitting;
       }
       const fresh = pool.filter((r) => !usedIds.has(r.id));
       const picked = pickScored(fresh.length > 0 ? fresh : pool, objective);
@@ -106,7 +145,63 @@ export function generateWeekPlanning({ recipes, objective, regime }) {
       usedIds.add(picked.id);
     });
   });
+  if (targetCalories && targetProtein) {
+    boostProtein({ planning, list, regime, shares, targetCalories, targetProtein });
+  }
   return planning;
+}
+
+/** Protéines réellement servies une fois le plat dimensionné sur son budget calorique. */
+function servedProtein(recipe, budget) {
+  const kcal = Number(recipe?.calories) || 0;
+  const mult = kcal && budget ? bestMultiplierFor(kcal, budget) : 1;
+  return (Number(recipe?.protein) || 0) * mult;
+}
+
+/**
+ * Rattrapage protéines : tant qu'une journée est sous la cible, on remplace le repas
+ * qui offre le plus gros gain par un plat plus protéiné du même créneau, à calories
+ * équivalentes. Un même plat revient au maximum 2 fois dans la semaine.
+ */
+function boostProtein({ planning, list, regime, shares, targetCalories, targetProtein }) {
+  const byId = new Map(list.map((r) => [r.id, r]));
+  const slots = Object.keys(shares);
+  const useCount = new Map();
+  days.forEach((day) => slots.forEach((mtId) => {
+    const id = planning[day]?.[mtId];
+    if (id != null) useCount.set(id, (useCount.get(id) || 0) + 1);
+  }));
+  const pools = Object.fromEntries(slots.map((mtId) => [mtId, poolForMealType(list, mtId, regime)]));
+
+  days.forEach((day) => {
+    for (let pass = 0; pass < slots.length; pass++) {
+      const dayProtein = slots.reduce(
+        (sum, mtId) => sum + servedProtein(byId.get(planning[day][mtId]), targetCalories * shares[mtId]),
+        0,
+      );
+      if (dayProtein >= targetProtein * 0.95) break;
+
+      let best = null;
+      slots.forEach((mtId) => {
+        const budget = targetCalories * shares[mtId];
+        const currentId = planning[day][mtId];
+        const currentProtein = servedProtein(byId.get(currentId), budget);
+        pools[mtId].forEach((r) => {
+          if (r.id === currentId || (useCount.get(r.id) || 0) >= 2) return;
+          if (slots.some((other) => planning[day][other] === r.id)) return;
+          if (!fitsBudget(r, budget)) return;
+          const gain = servedProtein(r, budget) - currentProtein;
+          if (gain > 3 && (!best || gain > best.gain)) best = { mtId, recipe: r, gain };
+        });
+      });
+      if (!best) break;
+
+      const previousId = planning[day][best.mtId];
+      if (previousId != null) useCount.set(previousId, Math.max(0, (useCount.get(previousId) || 1) - 1));
+      planning[day][best.mtId] = best.recipe.id;
+      useCount.set(best.recipe.id, (useCount.get(best.recipe.id) || 0) + 1);
+    }
+  });
 }
 
 /** Choisit une recette de remplacement pour un créneau (différente de l'actuelle). */
@@ -119,49 +214,24 @@ export function pickReplacement({ recipes, objective, regime, mealTypeId, exclud
 }
 
 /**
- * Trouve la combinaison portions (1..4) × multiplicateur de repas qui approche
- * le mieux l'objectif protéines journalier.
- * Retourne { portions, mealMultipliers } ou null si le planning est vide.
+ * Taille de chaque repas (½, ×1, ×1.5, double) pour que la journée colle à la cible
+ * calorique de la personne. Les macros des recettes sont exprimées par portion.
+ * Retourne { 'lundi-dejeuner': 1.5, ... } (seulement les repas ≠ ×1).
  */
-export function computeAutoPortions({ planning, recipes, mealsPerDay, targetProtein }) {
-  if (!targetProtein) return null;
-  const list = recipes || [];
-  const activeTypes = mealTypes.slice(0, mealsPerDay || 4);
-
-  let totalProtein = 0;
-  let countedDays = 0;
-  days.forEach((day) => {
-    let dayProt = 0;
-    activeTypes.forEach((mt) => {
-      const r = list.find((rx) => rx.id === planning?.[day]?.[mt.id]);
-      if (r) dayProt += r.protein ?? 0;
-    });
-    if (dayProt > 0) {
-      countedDays += 1;
-      totalProtein += dayProt;
-    }
-  });
-  if (countedDays === 0) return null;
-
-  const avgProtPerDay = totalProtein / countedDays;
-  const mults = MEAL_SIZE_OPTIONS.map((o) => o.mult);
-  let best = { portions: 1, mult: 1, diff: Infinity };
-  for (let p = 1; p <= 4; p++) {
-    for (const m of mults) {
-      const diff = Math.abs(avgProtPerDay * p * m - targetProtein);
-      if (diff < best.diff) best = { portions: p, mult: m, diff };
-    }
-  }
-
+export function computeMealMultipliers({ planning, recipes, mealsPerDay, targetCalories }) {
+  if (!targetCalories) return {};
+  const byId = new Map((recipes || []).map((r) => [r.id, r]));
+  const shares = calorieShares(mealsPerDay);
   const mealMultipliers = {};
-  if (best.mult !== 1) {
-    days.forEach((day) => {
-      activeTypes.forEach((mt) => {
-        if (planning?.[day]?.[mt.id]) mealMultipliers[`${day}-${mt.id}`] = best.mult;
-      });
+  days.forEach((day) => {
+    Object.entries(shares).forEach(([mealTypeId, share]) => {
+      const kcal = Number(byId.get(planning?.[day]?.[mealTypeId])?.calories) || 0;
+      if (!kcal) return;
+      const mult = bestMultiplierFor(kcal, targetCalories * share);
+      if (mult !== 1) mealMultipliers[`${day}-${mealTypeId}`] = mult;
     });
-  }
-  return { portions: best.portions, mealMultipliers };
+  });
+  return mealMultipliers;
 }
 
 /** Ingrédients qu'on a souvent déjà dans le placard / frigo. */

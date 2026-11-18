@@ -690,7 +690,7 @@ async function importRecipe(rawRecipe, ciqual) {
 
     if (existing) {
       ingredientId = existing.id;
-      hasMacros = existing.calories_per_100 != null && existing.calories_per_100 > 0;
+      hasMacros = existing.calories_per_100 != null; // 0 kcal est une vraie valeur (sel, eau) : ne pas ré-enrichir
       report.existing++;
     } else {
       const { data: inserted, error: errIns } = await supabase

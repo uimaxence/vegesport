@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowRight, Calendar, Clock, Eye, Flame, Leaf, Pencil, ShoppingCart, Target, TrendingUp, X } from 'lucide-react';
+import { Link, Navigate, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { Activity, ArrowRight, Calendar, Clock, Eye, Flame, Heart, Leaf, Pencil, ShoppingCart, Target, TrendingUp, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import Planning from './Planning';
@@ -11,6 +11,9 @@ import { getWeekStart, getNextWeekStart } from '../lib/planningEngine';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { canonicalUrl } from '../lib/seo';
 import { getSafeImageSrc, handleMediaImageError } from '../lib/imageFallback';
+import { buildWeekPreview, OBJECTIVE_CHOICES, readGuestPlanning } from '../lib/quickPlanning';
+
+const OBJECTIVE_ICONS = { masse: TrendingUp, seche: Flame, endurance: Activity, sante: Heart };
 
 const PREVIEW_MEALS = [
   { slot: 'Petit-déjeuner' },
@@ -196,12 +199,12 @@ function ExistingPlanningModal({ weekLabel, onView, onCreateNext, onClose }) {
 
 export default function PlanningFunnel() {
   usePageMeta({
-    title: 'Planning repas végétarien sportif en 2 minutes',
-    description: 'Crée ton planning végétarien sportif en 2 minutes. Ajuste les portions, suis tes macros, génère ta liste de courses et exporte vers ton calendrier.',
+    title: 'Menu végétarien de la semaine : générateur gratuit',
+    description: 'Choisis ton objectif et obtiens en un clic un menu végétarien protéiné pour 7 jours, avec macros et liste de courses par rayon. Gratuit, sans inscription.',
     canonical: canonicalUrl('/planning'),
   });
 
-  const { user, savedPlannings, loading: authLoading } = useAuth();
+  const { user, savedPlannings, loading: authLoading, planningPreferences } = useAuth();
   const { recipes } = useData();
   const location = useLocation();
   const navigate = useNavigate();
@@ -242,20 +245,24 @@ export default function PlanningFunnel() {
     // sinon, laisse le <Link> naviguer normalement
   };
 
+  /** Un clic sur un objectif = une semaine générée, sans formulaire ni compte. */
+  const handleQuickStart = (objectiveId) => {
+    if (!recipes.length) return;
+    if (hasCurrentWeekPlanning) {
+      setShowExistingModal(true);
+      return;
+    }
+    const setupPreview = buildWeekPreview({ recipes, objective: objectiveId });
+    sessionStorage.setItem('planning_confetti_pending', '1');
+    navigate('/planning', { state: { setupPreview } });
+  };
+
   const [showPlanningEditor, setShowPlanningEditor] = useState(() => {
     if (location.state?.setupPreview) return true;
     // Restaurer le planning guest depuis la session (après refresh)
     // Ne pas restaurer pour un user connecté (il a ses plannings en BDD)
     if (user) return false;
-    try {
-      const raw = sessionStorage.getItem('planning_preview_v1');
-      if (raw) {
-        const saved = JSON.parse(raw);
-        const ts = Number(saved?.ts) || 0;
-        if (ts && Date.now() - ts < 1000 * 60 * 60 * 24) return true;
-      }
-    } catch {}
-    return false;
+    return Boolean(readGuestPlanning()?.planning);
   });
   const [searchParams] = useSearchParams();
   const mineMode = searchParams.get('mine') === '1';
@@ -305,8 +312,9 @@ export default function PlanningFunnel() {
               <SuiviApportsChart
                 planning={currentPlanning}
                 getRecipe={getRecipe}
-                portions={2}
                 mealsDoneMap={mealsDoneMap}
+                poids={planningPreferences?.poids}
+                niveau={planningPreferences?.niveau}
               />
             </div>
           </div>
@@ -344,8 +352,16 @@ export default function PlanningFunnel() {
   if (showPlanningEditor) {
     return <Planning />;
   }
+  // Connecté avec un planning cette semaine : on l'emmène directement dessus plutôt que sur la page de présentation.
+  if (user && !authLoading && !mineMode && hasCurrentWeekPlanning) {
+    return <Navigate to="/planning?mine=1" replace />;
+  }
 
-  const previewRecipes = recipes.filter((r) => r.image && r.protein > 0).slice(0, 4);
+  // Aperçu du hero : un plat cohérent par créneau (petit-déj, déjeuner, collation, dîner).
+  const previewRecipes = ['petit-dejeuner', 'dejeuner', 'collation', 'diner'].map(
+    (cat) => recipes.find((r) => r.category === cat && r.image && r.protein >= 10)
+      || recipes.find((r) => r.category === cat) || null,
+  );
 
   return (
     <div className="overflow-x-hidden">
@@ -361,37 +377,49 @@ export default function PlanningFunnel() {
             {/* Left : Copy */}
             <div className="max-w-xl">
               <p className="font-accent text-xs uppercase tracking-[0.2em] text-primary mb-4">
-                Programme alimentaire végétarien
+                Menu végétarien de la semaine
               </p>
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-text leading-[1.08] tracking-tight">
-                Mange végé,{' '}
-                <span className="text-primary">performe</span>{' '}
-                mieux.
+                Ta semaine de repas végé,{' '}
+                <span className="text-primary">en un clic</span>.
               </h1>
               <p className="mt-5 text-base sm:text-lg text-text-light leading-relaxed">
-                Des repas végétariens gourmands, calculés pour tes macros, prêts en un clic.
-                Génère ton planning personnalisé en 2 minutes et cuisine sans stress.
+                Choisis ton objectif : on te génère 7 jours de repas végétariens protéinés,
+                avec les macros et la liste de courses. Tu ajustes ensuite ce que tu veux.
               </p>
 
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                <Link
-                  to="/planning/setup"
-                  onClick={handleCreateClick}
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
-                >
-                  Créer mon planning
-                  <ArrowRight size={16} />
-                </Link>
-                <Link
-                  to="/recettes"
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white border border-border text-sm font-medium rounded-full text-text hover:border-text transition-colors shadow-sm"
-                >
-                  Voir les recettes
-                </Link>
+              <p className="mt-8 mb-3 text-sm font-medium text-text">Quel est ton objectif ?</p>
+              <div className="grid grid-cols-2 gap-2.5 max-w-md">
+                {OBJECTIVE_CHOICES.map(({ id, label, hint }) => {
+                  const Icon = OBJECTIVE_ICONS[id];
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => handleQuickStart(id)}
+                      disabled={!recipes.length}
+                      className="group flex items-start gap-3 rounded-xl border border-border bg-white p-3.5 text-left shadow-sm transition-all duration-150 hover:border-primary hover:shadow-md active:scale-[0.98] disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    >
+                      <span className="w-9 h-9 flex-shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                        <Icon size={17} />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-sm font-medium text-text leading-snug">{label}</span>
+                        <span className="block text-[11px] text-text-light leading-snug mt-0.5">{hint}</span>
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
+              <p className="mt-3 text-xs text-text-light">
+                Envie d'aller plus loin ?{' '}
+                <Link to="/planning/setup" onClick={handleCreateClick} className="text-primary font-medium hover:underline">
+                  Personnaliser avec mon poids, mon niveau et mon foyer
+                </Link>
+              </p>
 
               <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2">
-                {['Personnalisé', '100 % gratuit', 'En 2 minutes'].map((tag) => (
+                {['Sans inscription', '100 % gratuit', 'Liste de courses incluse'].map((tag) => (
                   <span key={tag} className="flex items-center gap-2 text-xs text-text-light font-accent">
                     <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
                     {tag}
@@ -422,7 +450,7 @@ export default function PlanningFunnel() {
               Chaque repas est calibré selon ton objectif : prise de masse, sèche ou maintien. Tu vois les protéines, glucides et lipides en un coup d'œil.
             </FeatureCard>
             <FeatureCard icon={Clock} title="Gain de temps">
-              Plus besoin de chercher quoi manger. Ton planning est prêt en 2 minutes, avec des recettes simples et rapides à préparer.
+              Plus besoin de chercher quoi manger. Ta semaine est prête en un clic, avec des recettes simples et rapides à préparer.
             </FeatureCard>
             <FeatureCard icon={ShoppingCart} title="Liste de courses auto">
               Fini les oublis au supermarché. Ta liste est générée automatiquement, organisée par rayon, prête à suivre.
@@ -445,7 +473,7 @@ export default function PlanningFunnel() {
             <p className="recipe-section-title">Comment ça marche</p>
             <div className="deco-wave mx-auto mb-5" />
             <h2 className="font-display text-3xl sm:text-4xl text-text">
-              3 étapes, 2 minutes, 0 prise de tête
+              3 étapes, 0 prise de tête
             </h2>
           </div>
 
@@ -453,13 +481,13 @@ export default function PlanningFunnel() {
             {/* Connector lines (desktop) */}
             <div className="hidden md:block absolute top-7 left-1/6 right-1/6 h-px bg-border" aria-hidden="true" />
 
-            <StepCard number="1" title="Dis-nous tout">
-              Objectif sportif, régime alimentaire, poids, nombre de repas…
-              On te pose les bonnes questions pour personnaliser ton planning.
+            <StepCard number="1" title="Choisis ton objectif">
+              Prise de masse, sèche, endurance ou santé : un clic suffit.
+              Pas de formulaire, pas de compte à créer.
             </StepCard>
             <StepCard number="2" title="On génère, tu ajustes">
               Mamie te prépare une semaine complète de recettes.
-              Tu peux modifier les portions, échanger des plats, tout adapter.
+              Un plat ne te plaît pas ? Tu le remplaces d'un clic. Régime, poids, portions : tout se règle sur place.
             </StepCard>
             <StepCard number="3" title="Tu cuisines sans stress">
               Chaque repas est détaillé : ingrédients, étapes, macros.
@@ -490,22 +518,22 @@ export default function PlanningFunnel() {
 
           <p className="mt-6 text-base text-white/55 leading-relaxed max-w-xl mx-auto">
             Prise de masse, sèche ou endurance, peu importe ton objectif, on a les recettes.
-            Crée ton planning en quelques clics et commence dès cette semaine.
+            Génère ta semaine en un clic et commence dès aujourd'hui.
           </p>
 
           <div className="mt-10">
-            <Link
-              to="/planning/setup"
-              onClick={handleCreateClick}
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white text-base font-medium rounded-full hover:bg-primary-light transition-colors shadow-lg shadow-primary/30"
             >
-              Créer mon planning gratuitement
+              Choisir mon objectif
               <ArrowRight size={18} />
-            </Link>
+            </button>
           </div>
 
           <p className="mt-4 text-sm text-white/35 font-accent">
-            Sans engagement · Gratuit · Tes données restent privées
+            Sans inscription · Gratuit · Tes données restent dans ton navigateur
           </p>
         </div>
       </section>

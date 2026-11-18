@@ -7,8 +7,7 @@ import { usePageMeta } from '../hooks/usePageMeta';
 import { canonicalUrl } from '../lib/seo';
 import { defaultPlannings } from '../data/plannings';
 import { objectives, regimes } from '../data/recipes';
-import { generateWeekPlanning, computeAutoPortions } from '../lib/planningEngine';
-import { getDailyTargetsFromObjective } from '../utils/dashboardPlanning';
+import { buildWeekPreview } from '../lib/quickPlanning';
 import { APPETITE_OPTIONS, appetiteToFactor, totalFactor } from '../lib/household';
 import HouseholdEditor from '../components/HouseholdEditor';
 
@@ -174,12 +173,12 @@ export default function PlanningSetup() {
 
   const [step, setStep] = useState(1);
 
-  // Inputs vides au début (obligatoire)
+  // Seul l'objectif est à choisir : le reste est pré-rempli avec des valeurs courantes, modifiables.
   const [objective, setObjective] = useState('');
-  const [regime, setRegime] = useState('');
-  const [niveau, setNiveau] = useState('');
+  const [regime, setRegime] = useState('vegetarien');
+  const [niveau, setNiveau] = useState('amateur');
   const [poids, setPoids] = useState('');
-  const [mealsPerDay, setMealsPerDay] = useState('');
+  const [mealsPerDay, setMealsPerDay] = useState('4');
   const [householdMembers, setHouseholdMembers] = useState([]);
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberAppetite, setNewMemberAppetite] = useState('moyen');
@@ -252,18 +251,10 @@ export default function PlanningSetup() {
   }, []);
 
   const isProfileValid = useMemo(() => {
-    const w = Number(poids);
     const mpd = Number(mealsPerDay);
-    return (
-      !!objective &&
-      !!regime &&
-      !!niveau &&
-      Number.isFinite(w) &&
-      w >= 40 &&
-      w <= 170 &&
-      Number.isFinite(mpd) &&
-      (mpd === 3 || mpd === 4)
-    );
+    // Poids facultatif (70 kg par défaut) ; s'il est saisi, il doit être plausible.
+    const weightOk = poids === '' || (Number(poids) >= 40 && Number(poids) <= 170);
+    return !!objective && !!regime && !!niveau && weightOk && (mpd === 3 || mpd === 4);
   }, [objective, regime, niveau, poids, mealsPerDay]);
 
   const preferencesPayload = useMemo(() => ({
@@ -285,9 +276,9 @@ export default function PlanningSetup() {
     setGenerationProgress(0);
     setGenerationDotsIndex(0);
 
-    const DURATION_MS = 2500;
-    const STAGE_1_MS = 850;
-    const STAGE_2_MS = 1700;
+    const DURATION_MS = 1200;
+    const STAGE_1_MS = 400;
+    const STAGE_2_MS = 800;
 
     const startedAt = Date.now();
     generationIntervalRef.current = window.setInterval(() => {
@@ -307,29 +298,30 @@ export default function PlanningSetup() {
       if (generationRunIdRef.current !== runId) return;
       cancelGenerationTimers();
 
-      const newPlanning = generateWeekPlanning({
+      // Semaine + portions calibrées sur l'objectif protéines du profil
+      const preview = buildWeekPreview({
         recipes: recipesList,
         objective,
         regime,
-      });
-
-      // Portions × taille de repas calibrées sur l'objectif protéines du profil
-      const targets = getDailyTargetsFromObjective(objective, Number(poids) || 70, niveau);
-      const auto = computeAutoPortions({
-        planning: newPlanning,
-        recipes: recipesList,
+        niveau,
+        poids: Number(poids) || 70,
         mealsPerDay: Number(mealsPerDay) || 4,
-        targetProtein: targets.protein,
+        household: fullHousehold,
+        targetWeekStart,
       });
-      autoPortionsRef.current = auto?.portions ?? null;
+      autoPortionsRef.current = preview.portions;
 
-      setPlanning(newPlanning);
-      setMealMultipliers(auto?.mealMultipliers ?? {});
+      setPlanning(preview.planning);
+      setMealMultipliers(preview.mealMultipliers);
       setIsGenerating(false);
       setGenerationProgress(100);
       setPreviewUnlocked(true);
+
+      // On ouvre le planning directement : plus de clic « Voir mon planning » intermédiaire.
+      sessionStorage.setItem('planning_confetti_pending', '1');
+      navigate('/planning', { state: { setupPreview: preview } });
     }, DURATION_MS);
-  }, [objective, regime, niveau, poids, mealsPerDay, recipesList, cancelGenerationTimers]);
+  }, [objective, regime, niveau, poids, mealsPerDay, recipesList, cancelGenerationTimers, fullHousehold, targetWeekStart, navigate]);
 
   useEffect(() => {
     if (step !== 3) {
@@ -404,7 +396,7 @@ export default function PlanningSetup() {
               Retour
             </Link>
             <p className="text-xs font-accent uppercase tracking-[0.2em] text-text-light text-center mt-4">
-              Planning en 2 minutes
+              Planning personnalisé
             </p>
           </div>
 
@@ -423,7 +415,7 @@ export default function PlanningSetup() {
                       <p className="text-xs font-accent font-semibold text-text">Astuce</p>
                     </div>
                     <p className="text-xs text-text-light leading-relaxed">
-                      Après la génération, ouvre l'aperçu complet. Pour sauvegarder ton planning, crée ton compte — tu seras redirigé directement vers ton profil.
+                      Choisis juste ton objectif : le reste est déjà pré-rempli et tu pourras tout modifier ensuite. Aucun compte n'est nécessaire pour voir ton planning et ta liste de courses.
                     </p>
                   </div>
                 )}
@@ -453,7 +445,7 @@ export default function PlanningSetup() {
                         On commence par ton profil
                       </h1>
                       <p className="text-sm text-text-light">
-                        Renseigne tes infos : on adapte les macros et la génération à ton objectif.
+                        Choisis ton objectif. Le reste est pré-rempli : ajuste si tu veux des macros plus précises.
                       </p>
                     </div>
 
@@ -470,7 +462,7 @@ export default function PlanningSetup() {
                         <option value="amateur">Amateur</option>
                         <option value="confirme">Confirmé</option>
                       </FieldSelect>
-                      <FieldNumber label="Poids (kg)" value={poids} onChange={setPoids} required showValidation={showValidation} placeholder="ex : 70" />
+                      <FieldNumber label="Poids (kg) — facultatif" value={poids} onChange={setPoids} showValidation={showValidation} placeholder="70 par défaut" />
                       <FieldSegment
                         label="Repas par jour"
                         value={mealsPerDay}

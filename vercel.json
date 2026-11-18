@@ -5,25 +5,127 @@
       "schedule": "0 7 * * *"
     }
   ],
+  "redirects": [
+    {
+      "source": "/blog/:id(\\d+)/:slug",
+      "destination": "/blog/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/recettes/curry-de-lentilles-corail",
+      "destination": "/recettes/curry-express-lentilles-corail-et-tomates-moins-de-2-la-portion",
+      "permanent": true
+    },
+    {
+      "source": "/recettes/chili-vegetarien",
+      "destination": "/recettes/chili-sin-carne-proteine-pour-coureurs-et-cyclistes",
+      "permanent": true
+    },
+    {
+      "source": "/recettes/barres-energetiques-maison",
+      "destination": "/recettes/barres-energetiques-maison-avoine-dattes-et-amandes",
+      "permanent": true
+    },
+    {
+      "source": "/recettes/bowl-lentilles-quinoa-tofu-proteine-pour-sportifs-vege",
+      "destination": "/recettes/bowl-lentilles-quinoa-tofu-marine",
+      "permanent": true
+    },
+    {
+      "source": "/recettes/galettes-haricots-blancs-proteinees-pour-sportifs-presses",
+      "destination": "/recettes/galettes-haricots-blancs-flocons-d-avoine",
+      "permanent": true
+    },
+    {
+      "source": "/recettes/wraps-houmous-tofu-pour-midi-sportif-rapide",
+      "destination": "/recettes/wrap-au-tofu-grille-houmous",
+      "permanent": true
+    },
+    {
+      "source": "/recettes/barres-energetiques-vege-pour-l-entrainement",
+      "destination": "/recettes/barres-energetiques-maison-avoine-dattes-et-amandes",
+      "permanent": true
+    }
+  ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/((?!assets/).*)", "destination": "/index.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/connexion",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/auth/callback",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/profil",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/donnees-personnelles",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/planning/setup",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/planning/:planningId/recette/:slug",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/recettes/:slug",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/blog/:slug",
+      "destination": "/app.html"
+    }
   ],
   "headers": [
     {
       "source": "/(admin|profil|donnees-personnelles|connexion|auth/callback)(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
       ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
       ]
     }
   ]

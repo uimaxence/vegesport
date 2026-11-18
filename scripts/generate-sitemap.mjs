@@ -9,6 +9,7 @@
 import { writeFileSync, existsSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import { MERGED_RECIPE_IDS } from '../src/data/mergedRecipes.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
@@ -46,6 +47,11 @@ function getSlug(title) {
     .replace(/^-+|-+$/g, '');
 }
 
+/** Slug figé en base si présent, sinon dérivé du titre. */
+function slugOf(item) {
+  return item?.slug || getSlug(item?.title);
+}
+
 const staticRoutes = [
   { path: '/',         priority: '1.0', changefreq: 'weekly' },
   { path: '/recettes', priority: '0.9', changefreq: 'daily' },
@@ -79,9 +85,9 @@ async function fetchFromSupabase(table, select) {
 
 // Recettes : Supabase en priorité, fallback sur le fichier local
 try {
-  const data = await fetchFromSupabase('recipes', 'id,title,created_at');
+  const data = await fetchFromSupabase('recipes', 'id,title,slug,created_at');
   if (data && data.length > 0) {
-    recipeEntries = data.map((r) => ({ slug: getSlug(r.title), lastmod: r.created_at?.slice(0, 10) })).filter((r) => r.slug);
+    recipeEntries = data.filter((r) => !(r.id in MERGED_RECIPE_IDS)).map((r) => ({ slug: slugOf(r), lastmod: r.created_at?.slice(0, 10) })).filter((r) => r.slug);
     console.log(`  Recettes depuis Supabase : ${recipeEntries.length}`);
   } else {
     throw new Error('Aucune recette en base');
@@ -90,16 +96,16 @@ try {
   console.warn(`  ⚠ Supabase recettes indisponible (${e?.message}), fallback local…`);
   try {
     const { recipes } = await import('../src/data/recipes.js');
-    recipeEntries = (recipes || []).map((r) => ({ slug: getSlug(r.title), lastmod: r.created_at?.slice(0, 10) })).filter((r) => r.slug);
+    recipeEntries = (recipes || []).map((r) => ({ slug: slugOf(r), lastmod: r.created_at?.slice(0, 10) })).filter((r) => r.slug);
     console.log(`  Recettes depuis fichier local : ${recipeEntries.length}`);
   } catch { /* pas de données */ }
 }
 
 // Articles : Supabase uniquement
 try {
-  const data = await fetchFromSupabase('blog_articles', 'id,title,date,updated_at');
+  const data = await fetchFromSupabase('blog_articles', 'id,title,slug,date,updated_at');
   articleEntries = (data || [])
-    .map((a) => ({ id: a.id, slug: getSlug(a.title), lastmod: (a.updated_at || a.date)?.slice(0, 10) }))
+    .map((a) => ({ id: a.id, slug: slugOf(a), lastmod: (a.updated_at || a.date)?.slice(0, 10) }))
     .filter((a) => a.id != null && a.slug);
   console.log(`  Articles depuis Supabase : ${articleEntries.length}`);
 } catch (e) {

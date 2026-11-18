@@ -1,11 +1,12 @@
-import { useParams, useSearchParams, Link, useLocation } from 'react-router-dom';
+import { useParams, useSearchParams, Link, Navigate, useLocation } from 'react-router-dom';
+import { MERGED_RECIPE_SLUGS } from '../data/mergedRecipes';
 import { ArrowLeft, Clock, Heart, Users, ChefHat, X, Check, Share2, Copy, ChevronRight } from 'lucide-react';
 import { useState, useMemo, useCallback, useEffect, useRef, useLayoutEffect } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { useJsonLd } from '../hooks/useJsonLd';
-import { getSlug } from '../lib/slug';
+import { getSlug, itemSlug } from '../lib/slug';
 import { canonicalUrl, buildRecipeJsonLd, buildBreadcrumbJsonLd, categoryLabel } from '../lib/seo';
 import RecipeCard from '../components/RecipeCard';
 import RecipeComments from '../components/RecipeComments';
@@ -509,7 +510,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
   const { recipes, articles, loading, error, getRecipe } = useData();
   const { user, householdMembers: authHousehold, savedPlannings } = useAuth();
   const recipe = recipes.find(
-    (r) => getSlug(r.title) === slug || String(r.id) === slug
+    (r) => itemSlug(r) === slug || getSlug(r.title) === slug || String(r.id) === slug
   );
   const [fullRecipe, setFullRecipe] = useState(null);
   const effectiveRecipe = fullRecipe || recipe;
@@ -685,7 +686,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
   }, [effectiveRecipe, recipe]);
 
   const recipeTitle = effectiveRecipe?.title || recipe?.title || '';
-  const recipeSlug = recipeTitle ? getSlug(recipeTitle) : slug;
+  const recipeSlug = itemSlug(effectiveRecipe || recipe) || slug;
   const recipeUrl = recipeSlug ? canonicalUrl(`/recettes/${recipeSlug}`) : '';
   const recipeDesc = recipeTitle && steps[0]
     ? `${recipeTitle} — ${steps[0].slice(0, 120)}…`
@@ -700,12 +701,12 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
       ? {
           title: effectiveRecipe?.meta_title || `${recipeTitle} — Recette végétarienne protéinée`,
           description: effectiveRecipe?.meta_description || recipeDesc,
-          fullTitle: Boolean(effectiveRecipe?.meta_title),
           canonical: recipeUrl,
           image: effectiveRecipe?.image || recipe?.image,
           type: 'article',
         }
-      : {}
+      // Slug inconnu une fois les données chargées → noindex (évite les soft 404 indexés).
+      : { noindex: !loading && !error && !recipe }
   );
 
   useJsonLd(
@@ -834,6 +835,10 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
         <p className="text-red-600">Erreur : {error}</p>
       </div>
     );
+  }
+  // Ancienne URL d'une recette fusionnée → fiche conservée
+  if (!recipe && MERGED_RECIPE_SLUGS[slug]) {
+    return <Navigate to={`/recettes/${MERGED_RECIPE_SLUGS[slug]}`} replace />;
   }
   if (!recipe) {
     return (
@@ -1423,7 +1428,7 @@ export default function RecipeDetail({ favorites, toggleFavorite }) {
               {relatedArticles.map((a) => (
                 <Link
                   key={a.id}
-                  to={`/blog/${getSlug(a.title)}`}
+                  to={`/blog/${itemSlug(a)}`}
                   className="group rounded-2xl border border-border bg-white overflow-hidden hover:shadow-md hover:border-primary/20 transition-all duration-300"
                 >
                   <div className="aspect-[16/10] bg-bg-warm overflow-hidden">

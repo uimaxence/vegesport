@@ -1,0 +1,357 @@
+{
+  "id": 27,
+  "title": "Lentilles : combien de protéines pour 100 g, cuites ou sèches ?",
+  "excerpt": "25 g de protéines pour 100 g de lentilles sèches, 10 g une fois cuites. Les chiffres par variété, par portion, et comment les associer quand tu fais du sport.",
+  "category": "Nutrition",
+  "date": "2026-11-18",
+  "read_time": 7,
+  "author": "Maxence",
+  "meta_title": "Lentilles : combien de protéines (cuites, sèches) ?",
+  "meta_description": "Lentilles : 25 g de protéines pour 100 g sèches, 10 g cuites. Tableau vertes, corail, blondes, en boîte, par portion, et associations utiles au sportif.",
+  "content": "",
+  "content_json": [
+    {
+      "text": "Les lentilles apportent environ 25 g de protéines pour 100 g sèches, et environ 10 g pour 100 g une fois cuites (table Ciqual de l'ANSES). Une assiette de 200 g de lentilles cuites, soit 80 g pesées sèches, te donne donc autour de 20 g de protéines.",
+      "type": "paragraph"
+    },
+    {
+      "text": "L'écart entre les deux chiffres ne vient pas d'une perte à la cuisson. Les lentilles absorbent de l'eau et pèsent environ 2,5 fois plus lourd une fois cuites : la même quantité de protéines se retrouve diluée dans un poids plus grand. C'est la première source de confusion quand on compare des étiquettes, alors vérifie toujours si la valeur est donnée pour le produit sec ou cuit.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Protéines des lentilles : le tableau par variété",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Valeurs pour 100 g, issues de la table Ciqual. Les lentilles cuites sont cuites à l'eau, sans matière grasse.",
+      "type": "paragraph"
+    },
+    {
+      "rows": [
+        [
+          "Lentilles vertes",
+          "25,1 g",
+          "10,1 g",
+          "125 kcal",
+          "8,5 g",
+          "2,5 mg"
+        ],
+        [
+          "Lentilles corail",
+          "27,7 g",
+          "10,6 g",
+          "123 kcal",
+          "8,2 g",
+          "2,2 mg"
+        ],
+        [
+          "Lentilles blondes",
+          "26,1 g",
+          "9,7 g",
+          "122 kcal",
+          "6,0 g",
+          "2,5 mg"
+        ],
+        [
+          "Lentilles en boîte, égouttées",
+          "—",
+          "6,8 g",
+          "90 kcal",
+          "4,0 g",
+          "1,7 mg"
+        ]
+      ],
+      "type": "table",
+      "headers": [
+        "Variété",
+        "Protéines (sèches)",
+        "Protéines (cuites)",
+        "Calories (cuites)",
+        "Fibres (cuites)",
+        "Fer (cuites)"
+      ]
+    },
+    {
+      "url": "https://ciqual.anses.fr/",
+      "type": "source",
+      "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments"
+    },
+    {
+      "text": "Trois choses à retenir. Les différences entre variétés sont faibles : choisis selon le goût et le temps de cuisson, pas selon les protéines. Les lentilles en boîte affichent moins de protéines pour 100 g parce qu'elles contiennent plus d'eau, et elles sont salées (0,65 g de sel pour 100 g) : rince-les. Enfin, la table Ciqual ne contient pas de ligne propre aux lentilles beluga (les petites noires) : fie-toi à l'étiquette du paquet, les valeurs affichées sont en général proches de celles des lentilles vertes.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Combien de protéines par portion ?",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Personne ne mange « 100 g de lentilles sèches » par réflexe. Voici ce que donnent des portions réalistes, calculées à partir des valeurs Ciqual des lentilles vertes.",
+      "type": "paragraph"
+    },
+    {
+      "rows": [
+        [
+          "60 g sèches",
+          "environ 150 g cuites (accompagnement)",
+          "15 g"
+        ],
+        [
+          "80 g sèches",
+          "environ 200 g cuites (assiette)",
+          "20 g"
+        ],
+        [
+          "100 g sèches",
+          "environ 250 g cuites (grosse assiette)",
+          "25 g"
+        ],
+        [
+          "1 boîte de 400 g",
+          "environ 265 g égouttées",
+          "18 g"
+        ],
+        [
+          "Pâtes de lentilles corail",
+          "200 g cuites",
+          "23 g"
+        ]
+      ],
+      "type": "table",
+      "headers": [
+        "Portion",
+        "Équivalent",
+        "Protéines"
+      ]
+    },
+    {
+      "text": "Pour situer : les positions de consensus en nutrition sportive placent les besoins entre 1,2 et 2,0 g de protéines par kilo de poids corporel et par jour selon la discipline et la charge d'entraînement, avec des prises de 20 à 40 g par repas. Pour 70 kg, cela fait 84 à 140 g par jour. Une assiette de lentilles couvre donc le bas de la fourchette d'un repas à elle seule, et le reste de l'assiette fait le complément.",
+      "type": "paragraph"
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/",
+      "type": "source",
+      "label": "ISSN — Position Stand : protein and exercise (2017)"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        64,
+        51
+      ]
+    },
+    {
+      "text": "Les lentilles sont-elles une protéine complète ?",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Les lentilles contiennent tous les acides aminés indispensables, mais pas dans des proportions idéales. Comme les autres légumineuses, elles sont riches en lysine et plus pauvres en acides aminés soufrés (méthionine et cystéine). Les céréales ont le profil inverse : peu de lysine, davantage d'acides aminés soufrés.",
+      "type": "paragraph"
+    },
+    {
+      "text": "D'où l'association classique lentilles + céréales. L'ANSES précise toutefois qu'une alimentation variée suffit à couvrir les besoins et qu'il n'est pas nécessaire d'associer systématiquement céréales et légumineuses à chaque repas. En pratique, tu n'as pas à peser quoi que ce soit : si tu manges des lentilles et, dans la journée, du pain, du riz, des pâtes ou de l'avoine, c'est réglé.",
+      "type": "paragraph"
+    },
+    {
+      "url": "https://www.anses.fr/fr/article/proteines-role-sources-et-apports-recommandes",
+      "type": "source",
+      "label": "ANSES — Les protéines : rôle, sources et apports recommandés"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Lentilles vertes + riz complet : 200 g de lentilles cuites et 200 g de riz complet cuit apportent environ 28 g de protéines.",
+        "Dhal de lentilles corail + riz basmati ou pain : le grand classique indien repose sur cette complémentarité.",
+        "Salade de lentilles + pain complet : 200 g de lentilles cuites et 80 g de pain complet, environ 27 g de protéines.",
+        "Sauce aux lentilles corail sur des pâtes : une bolognaise végétale qui cuit en 15 minutes."
+      ]
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        31,
+        61
+      ]
+    },
+    {
+      "text": "Un point pour les sportifs : les protéines végétales sont en moyenne un peu moins digestibles que les protéines animales. Les revues consacrées aux sportifs végétaliens conseillent pour cette raison de viser plutôt le haut des fourchettes recommandées. Si ton alimentation est 100 % végétale et que tu t'entraînes beaucoup, c'est un repère utile, à affiner avec un diététicien si tu veux un chiffre personnalisé.",
+      "type": "paragraph"
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28924423/",
+      "type": "source",
+      "label": "Rogerson D. — Vegan diets: practical advice for athletes and exercisers (JISSN, 2017)"
+    },
+    {
+      "text": "Lentilles vertes, corail, blondes, beluga : laquelle choisir ?",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "type": "list",
+      "items": [
+        "Vertes : elles tiennent à la cuisson (20 à 25 minutes). Pour les salades, les bowls et les plats mijotés.",
+        "Corail : vendues décortiquées, elles cuisent en 10 à 15 minutes et se défont en purée. Pour les dhals, les soupes et les sauces.",
+        "Blondes : plus grosses, à la peau plus épaisse, 25 à 30 minutes. Pour les soupes et les plats de type petit salé végétarien.",
+        "Beluga : petites, noires, fermes, 20 à 25 minutes. Pour les salades, quand tu veux un grain qui reste entier."
+      ]
+    },
+    {
+      "text": "Côté protéines, la corail arrive légèrement devant (10,6 g cuites contre 10,1 g pour la verte), mais l'écart ne change rien dans une assiette. Le vrai critère pour un sportif pressé, c'est le temps : la corail est prête avant que le riz ait fini de cuire.",
+      "type": "paragraph"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        69,
+        18
+      ]
+    },
+    {
+      "text": "Fer : ce que les lentilles apportent vraiment",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "200 g de lentilles vertes cuites apportent environ 5 mg de fer. C'est du fer non héminique, la forme présente dans les végétaux, dont le taux d'absorption est inférieur à celui du fer héminique des produits animaux. Deux leviers simples, rappelés par l'ANSES : la vitamine C augmente l'absorption (un filet de citron, du poivron cru, une orange en dessert), et les tanins du thé la diminuent (garde le thé à distance des repas).",
+      "type": "paragraph"
+    },
+    {
+      "url": "https://www.anses.fr/fr/article/savoir-fer",
+      "type": "source",
+      "label": "ANSES — Tout savoir sur le fer"
+    },
+    {
+      "text": "Les sports d'endurance, la course à pied en particulier, sont souvent associés à des réserves en fer plus basses. Ce n'est pas un sujet à régler seul avec des compléments : si tu es souvent fatigué ou essoufflé sans raison, parles-en à ton médecin, qui pourra prescrire un bilan sanguin (ferritine) avant toute supplémentation.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Digestion : comment bien les tolérer",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Les lentilles sont riches en fibres : environ 17 g pour une assiette de 200 g cuites. C'est un atout au quotidien et un inconvénient juste avant une séance intense. La table Ciqual ne montre pas d'écart notable de fibres entre lentilles vertes et corail une fois cuites (8,5 g contre 8,2 g), même si la corail, décortiquée et réduite en purée, passe mieux chez beaucoup de personnes.",
+      "type": "paragraph"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Rince les lentilles sèches avant cuisson, et les lentilles en boîte avant de les utiliser.",
+        "Cuis-les à cœur : une lentille encore ferme sous la dent est plus difficile à digérer.",
+        "Si tu en manges rarement, commence par de petites portions (100 g cuites) et augmente sur quelques semaines.",
+        "Évite la grosse assiette dans les 3 à 4 heures qui précèdent une séance intense ou une compétition : garde-la pour le repas d'après.",
+        "Le trempage n'est pas obligatoire pour les lentilles, mais quelques heures dans l'eau peuvent aider si tu y es sensible."
+      ]
+    },
+    {
+      "text": "En résumé",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Retiens deux chiffres : 25 g de protéines pour 100 g sèches, 10 g pour 100 g cuites. Une assiette de 200 g cuites apporte environ 20 g de protéines, 17 g de fibres et 5 mg de fer pour 250 kcal. Associe-les à une céréale dans la journée, ajoute une source de vitamine C, et place-les plutôt après l'entraînement qu'avant. Pour replacer ces chiffres dans ta journée, vois aussi l'article « Combien de protéines par jour quand on est sportif végétarien ? ».",
+      "type": "paragraph"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Les recettes pour passer à la pratique"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        80
+      ]
+    },
+    {
+      "type": "cta_planning"
+    },
+    {
+      "type": "faq",
+      "items": [
+        {
+          "answer": "Environ 10 g : 10,1 g pour les lentilles vertes, 10,6 g pour les lentilles corail et 9,7 g pour les lentilles blondes, selon la table Ciqual de l'ANSES. Les lentilles en boîte égouttées en contiennent 6,8 g pour 100 g.",
+          "question": "Combien de protéines dans 100 g de lentilles cuites ?"
+        },
+        {
+          "answer": "Entre 25 et 28 g selon la variété : 25,1 g pour les vertes, 26,1 g pour les blondes et 27,7 g pour les corail. 100 g de lentilles sèches donnent environ 250 g de lentilles cuites.",
+          "question": "Combien de protéines dans 100 g de lentilles sèches (crues) ?"
+        },
+        {
+          "answer": "Elles contiennent tous les acides aminés indispensables, mais sont limitées en méthionine et cystéine. Les céréales (riz, blé, avoine) compensent ce point. Selon l'ANSES, une alimentation variée sur la journée suffit : il n'est pas nécessaire de les associer à chaque repas.",
+          "question": "Les lentilles sont-elles une protéine complète ?"
+        },
+        {
+          "answer": "Les lentilles corail, de peu : 10,6 g pour 100 g cuites contre 10,1 g pour les vertes. La différence est négligeable dans une assiette. Choisis selon l'usage : les vertes restent entières, les corail se défont en purée et cuisent en 10 à 15 minutes.",
+          "question": "Lentilles vertes ou corail : lesquelles ont le plus de protéines ?"
+        },
+        {
+          "answer": "Rien ne s'y oppose dans les repères officiels : les recommandations nutritionnelles françaises conseillent de consommer des légumes secs au moins deux fois par semaine, sans fixer de maximum. Si tu en manges peu aujourd'hui, augmente progressivement pour laisser le temps à ta digestion de s'adapter.",
+          "question": "Peut-on manger des lentilles tous les jours ?"
+        }
+      ]
+    },
+    {
+      "type": "sources_list",
+      "items": [
+        {
+          "url": "https://ciqual.anses.fr/",
+          "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments"
+        },
+        {
+          "url": "https://www.anses.fr/fr/article/proteines-role-sources-et-apports-recommandes",
+          "label": "ANSES — Les protéines : rôle, sources et apports recommandés"
+        },
+        {
+          "url": "https://www.anses.fr/fr/article/savoir-fer",
+          "label": "ANSES — Tout savoir sur le fer"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/",
+          "label": "ISSN — Position Stand : protein and exercise (2017)"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31690027/",
+          "label": "Mariotti F., Gardner C. — Dietary Protein and Amino Acids in Vegetarian Diets (Nutrients, 2019)"
+        },
+        {
+          "url": "https://www.mangerbouger.fr/manger-mieux/a-tout-age-et-a-chaque-etape-de-la-vie/les-recommandations-alimentaires-pour-les-adultes",
+          "label": "Manger Bouger — Les recommandations alimentaires pour les adultes"
+        }
+      ]
+    }
+  ],
+  "sources_json": [
+    {
+      "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments",
+      "url": "https://ciqual.anses.fr/"
+    },
+    {
+      "label": "ISSN — Position Stand : protein and exercise (2017)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/"
+    },
+    {
+      "label": "ANSES — Les protéines : rôle, sources et apports recommandés",
+      "url": "https://www.anses.fr/fr/article/proteines-role-sources-et-apports-recommandes"
+    },
+    {
+      "label": "Rogerson D. — Vegan diets: practical advice for athletes and exercisers (JISSN, 2017)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28924423/"
+    },
+    {
+      "label": "ANSES — Tout savoir sur le fer",
+      "url": "https://www.anses.fr/fr/article/savoir-fer"
+    },
+    {
+      "label": "Mariotti F., Gardner C. — Dietary Protein and Amino Acids in Vegetarian Diets (Nutrients, 2019)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31690027/"
+    },
+    {
+      "label": "Manger Bouger — Les recommandations alimentaires pour les adultes",
+      "url": "https://www.mangerbouger.fr/manger-mieux/a-tout-age-et-a-chaque-etape-de-la-vie/les-recommandations-alimentaires-pour-les-adultes"
+    }
+  ]
+}

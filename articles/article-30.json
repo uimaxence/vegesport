@@ -1,0 +1,393 @@
+{
+  "id": 30,
+  "title": "Seitan : protéines, valeurs nutritionnelles et comment le cuisiner",
+  "excerpt": "Le seitan apporte environ 21 g de protéines pour 100 g, pour 134 kcal. Ses valeurs, ses limites (gluten, lysine, sel) et la façon de le cuisiner sans le rater.",
+  "category": "Nutrition",
+  "date": "2026-11-18",
+  "read_time": 8,
+  "author": "Maxence",
+  "meta_title": "Seitan : protéines, valeurs et comment le cuisiner",
+  "meta_description": "Seitan : 21 g de protéines pour 100 g et 134 kcal. Valeurs nutritionnelles, limites (gluten, lysine, sel), comparaison avec tofu et tempeh, cuisson.",
+  "content": "",
+  "content_json": [
+    {
+      "text": "Le seitan apporte environ 21 g de protéines pour 100 g (20,6 g selon la table Ciqual de l'ANSES, pour un seitan préemballé), avec 134 kcal, 2,5 g de lipides et 6,7 g de glucides. C'est l'aliment végétal prêt à cuisiner le plus concentré en protéines : une portion de 100 g couvre la prise de 20 g visée à un repas.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Il a aussi trois limites à connaître avant d'en faire ta protéine du quotidien : il est fait de gluten, il est pauvre en lysine et la version du commerce est salée. Voici les chiffres, puis comment le cuisiner.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Qu'est-ce que le seitan ?",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Le seitan est du gluten de blé, c'est-à-dire la fraction protéique de la farine. On l'obtient en pétrissant une pâte de farine et d'eau, puis en la rinçant longuement pour éliminer l'amidon : il reste une masse élastique, qu'on cuit dans un bouillon. Sa texture ferme et fibreuse, proche de celle d'une viande, explique son succès dans la cuisine végétarienne. On le trouve au rayon frais, en bloc, en tranches ou émincé, nature ou déjà mariné.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Valeurs nutritionnelles du seitan, comparé au tofu et au tempeh",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Valeurs pour 100 g, table Ciqual.",
+      "type": "paragraph"
+    },
+    {
+      "rows": [
+        [
+          "Seitan",
+          "20,6 g",
+          "134 kcal",
+          "6,7 g",
+          "2,5 g",
+          "0,9 g",
+          "1,5 mg",
+          "1,13 g"
+        ],
+        [
+          "Tofu nature ferme",
+          "13,4 g",
+          "147 kcal",
+          "2,9 g",
+          "8,5 g",
+          "< 0,5 g",
+          "2,4 mg",
+          "0,03 g"
+        ],
+        [
+          "Tofu fumé",
+          "14,9 g",
+          "164 kcal",
+          "2,9 g",
+          "9,5 g",
+          "< 0,5 g",
+          "2,0 mg",
+          "0,74 g"
+        ],
+        [
+          "Tempeh",
+          "16,1 g",
+          "157 kcal",
+          "7,9 g",
+          "4,7 g",
+          "6,2 g",
+          "1,7 mg",
+          "0,10 g"
+        ],
+        [
+          "Protéines de soja texturées, réhydratées",
+          "18,6 g",
+          "150 kcal",
+          "7,0 g",
+          "2,9 g",
+          "5,6 g",
+          "3,3 mg",
+          "< 0,02 g"
+        ]
+      ],
+      "type": "table",
+      "headers": [
+        "Pour 100 g",
+        "Protéines",
+        "Calories",
+        "Glucides",
+        "Lipides",
+        "Fibres",
+        "Fer",
+        "Sel"
+      ]
+    },
+    {
+      "url": "https://ciqual.anses.fr/",
+      "type": "source",
+      "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments"
+    },
+    {
+      "text": "Le seitan est le plus protéiné et le moins gras de la liste : environ 15 g de protéines pour 100 kcal, contre 9 g pour le tofu nature et 10 g pour le tempeh. Il est en revanche le moins riche en fer, le plus pauvre en calcium (20 mg pour 100 g, contre 100 mg pour le tofu nature) et de loin le plus salé.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Attention aux produits dérivés. Les galettes et pavés « au blé » ou « au seitan » du rayon végétarien sont des préparations qui contiennent aussi des légumes, de l'huile et des céréales : la table Ciqual donne 12,5 g de protéines pour 100 g pour une galette au blé et aux légumes. Lis l'étiquette : les protéines pour 100 g varient beaucoup d'un produit à l'autre.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Combien de protéines par portion ?",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "rows": [
+        [
+          "75 g (quelques lamelles dans un wrap)",
+          "15 g",
+          "100 kcal",
+          "0,8 g"
+        ],
+        [
+          "100 g (une portion standard)",
+          "21 g",
+          "134 kcal",
+          "1,1 g"
+        ],
+        [
+          "150 g (une grosse portion)",
+          "31 g",
+          "201 kcal",
+          "1,7 g"
+        ]
+      ],
+      "type": "table",
+      "headers": [
+        "Portion de seitan",
+        "Protéines",
+        "Calories",
+        "Sel"
+      ]
+    },
+    {
+      "text": "Les positions de consensus en nutrition sportive situent les besoins entre 1,2 et 2,0 g de protéines par kilo et par jour selon la discipline, avec des prises de 20 à 40 g par repas. 100 à 150 g de seitan suffisent donc à remplir l'objectif d'un repas, là où il faudrait 200 g de lentilles cuites ou 150 g de tofu.",
+      "type": "paragraph"
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/",
+      "type": "source",
+      "label": "ISSN — Position Stand : protein and exercise (2017)"
+    },
+    {
+      "text": "Les limites du seitan",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Il est fait de gluten",
+      "type": "heading",
+      "level": 3
+    },
+    {
+      "text": "Le seitan est du gluten presque pur. Il est donc strictement exclu en cas de maladie cœliaque, et déconseillé si un médecin a posé un diagnostic d'allergie au blé ou d'hypersensibilité au gluten. Si tu as des troubles digestifs que tu attribues au gluten, ne t'autodiagnostique pas : le dépistage de la maladie cœliaque doit se faire avant toute éviction, sinon les examens sont faussés. Pour les personnes qui digèrent le gluten sans problème, rien n'indique qu'il faille l'éviter.",
+      "type": "paragraph"
+    },
+    {
+      "url": "https://www.ameli.fr/assure/sante/themes/intolerance-gluten-maladie-coeliaque",
+      "type": "source",
+      "label": "Ameli — Maladie cœliaque (intolérance au gluten)"
+    },
+    {
+      "text": "Il est pauvre en lysine",
+      "type": "heading",
+      "level": 3
+    },
+    {
+      "text": "Comme toutes les protéines de blé, celles du seitan sont limitées en lysine, un acide aminé indispensable. Autrement dit, 21 g de protéines de seitan ne valent pas tout à fait 21 g de protéines de soja en termes de qualité. Ce n'est pas un problème si le seitan n'est pas ta seule source : les légumineuses et le soja sont justement riches en lysine. Un chili avec des haricots rouges et du seitan, ou du seitan un jour et des lentilles le lendemain, règle la question. L'ANSES rappelle que c'est la variété sur la journée qui compte, pas l'association à chaque repas.",
+      "type": "paragraph"
+    },
+    {
+      "url": "https://www.anses.fr/fr/article/proteines-role-sources-et-apports-recommandes",
+      "type": "source",
+      "label": "ANSES — Les protéines : rôle, sources et apports recommandés"
+    },
+    {
+      "text": "Celui du commerce est salé",
+      "type": "heading",
+      "level": 3
+    },
+    {
+      "text": "La table Ciqual indique 1,13 g de sel pour 100 g de seitan préemballé, davantage pour les versions marinées. Une portion de 150 g apporte donc 1,7 g de sel, à rapprocher du repère de l'OMS de moins de 5 g par jour. Deux conséquences pratiques : ne resale pas le plat, et allège la sauce soja dans la marinade.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Il coûte plus cher que les légumineuses",
+      "type": "heading",
+      "level": 3
+    },
+    {
+      "text": "Au rayon frais, le seitan est l'une des protéines végétales les plus chères à la portion, avec le tempeh. Le faire soi-même à partir de gluten de blé en poudre divise le prix et permet de doser le sel.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Comment cuisiner le seitan",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "Le seitan du commerce est déjà cuit : il suffit de le réchauffer et de lui donner du goût. Nature, il est assez neutre, avec une légère saveur de bouillon. Trois règles simples.",
+      "type": "paragraph"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Coupe-le fin. En lamelles ou en petits dés, il dore mieux et la texture est plus agréable qu'en gros morceaux.",
+        "Saisis-le à feu vif. 3 à 4 minutes par face dans une poêle chaude avec un peu d'huile, jusqu'à ce qu'il soit bien doré. Trop cuit ou bouilli trop longtemps, il devient caoutchouteux ou spongieux.",
+        "Donne-lui du goût. Sauce soja allégée en sel, ail, paprika fumé, moutarde, herbes : ajoute la sauce en fin de cuisson, ou fais-le mariner 30 minutes avant de le saisir."
+      ]
+    },
+    {
+      "text": "Cinq façons de l'utiliser",
+      "type": "heading",
+      "level": 3
+    },
+    {
+      "type": "list",
+      "items": [
+        "Émincé au wok avec des légumes et des nouilles : remplace le tofu à poids égal.",
+        "En lamelles dorées dans un wrap ou un sandwich, avec du houmous et des crudités.",
+        "En dés dans un chili ou un curry, ajoutés en fin de cuisson pour qu'ils restent fermes.",
+        "Haché grossièrement au couteau pour une sauce bolognaise végétale.",
+        "En brochettes marinées, au four ou au barbecue."
+      ]
+    },
+    {
+      "text": "Dans les recettes ci-dessous, remplace le tofu par le même poids de seitan en lamelles : la poêlée façon wok et les wraps s'y prêtent tels quels.",
+      "type": "paragraph"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        58,
+        5
+      ]
+    },
+    {
+      "text": "Et pour compenser la lysine, pense aux plats à base de légumineuses, dans lesquels tu peux ajouter des dés de seitan en fin de cuisson.",
+      "type": "paragraph"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        36,
+        22
+      ]
+    },
+    {
+      "text": "Faire son seitan maison",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "text": "La méthode rapide part de gluten de blé en poudre, vendu en magasin bio. D'après les étiquettes, il contient autour de 75 g de protéines pour 100 g ; la valeur finale de ton seitan dépendra de la quantité de liquide qu'il aura absorbée.",
+      "type": "paragraph"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Mélange 200 g de gluten de blé avec des épices sèches (ail en poudre, paprika, poivre).",
+        "Ajoute 250 à 300 ml de bouillon de légumes froid et 1 cuillère à soupe de sauce soja. Mélange jusqu'à obtenir une pâte élastique.",
+        "Pétris 2 à 3 minutes, pas plus : plus tu pétris, plus la texture sera ferme.",
+        "Forme un pain ou des morceaux, et fais cuire 45 à 60 minutes dans un bouillon frémissant, sans gros bouillons.",
+        "Laisse refroidir dans le bouillon. Le seitan se garde quelques jours au réfrigérateur dans un contenant fermé, et il se congèle bien."
+      ]
+    },
+    {
+      "text": "Il existe aussi la méthode traditionnelle, qui consiste à rincer une pâte de farine sous l'eau jusqu'à ne garder que le gluten. Elle demande plus de temps et beaucoup d'eau.",
+      "type": "paragraph"
+    },
+    {
+      "text": "Seitan, tofu ou tempeh : lequel choisir ?",
+      "type": "heading",
+      "level": 2
+    },
+    {
+      "type": "list",
+      "items": [
+        "Le seitan si tu cherches le maximum de protéines pour un minimum de calories et une texture ferme. À condition de bien tolérer le gluten et de manger des légumineuses par ailleurs.",
+        "Le tofu pour sa polyvalence, son profil d'acides aminés plus équilibré, son fer et son calcium. Détails dans « Tofu : protéines, types (ferme, soyeux, fumé) et comment le cuisiner ».",
+        "Le tempeh pour ses fibres (6,2 g pour 100 g) et son goût plus marqué de noisette et de champignon."
+      ]
+    },
+    {
+      "text": "Le plus simple est de ne pas choisir : alterner ces trois aliments avec les lentilles et les pois chiches dans la semaine couvre les points faibles de chacun. Le classement complet est dans « Sources de protéines végétales : le classement complet ».",
+      "type": "paragraph"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Les recettes pour passer à la pratique"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        78,
+        83
+      ]
+    },
+    {
+      "type": "cta_planning"
+    },
+    {
+      "type": "faq",
+      "items": [
+        {
+          "answer": "Environ 21 g : la table Ciqual de l'ANSES indique 20,6 g de protéines pour 100 g de seitan préemballé, pour 134 kcal, 2,5 g de lipides et 6,7 g de glucides. Les valeurs varient selon les marques et les recettes : vérifie l'étiquette.",
+          "question": "Combien de protéines dans 100 g de seitan ?"
+        },
+        {
+          "answer": "Pas tout à fait. Il contient tous les acides aminés indispensables mais il est pauvre en lysine, comme toutes les protéines de blé. Les légumineuses et le soja, riches en lysine, le complètent : il suffit d'en manger dans la journée.",
+          "question": "Le seitan est-il une protéine complète ?"
+        },
+        {
+          "answer": "Oui, c'est même du gluten de blé presque pur. Il est exclu en cas de maladie cœliaque, d'allergie au blé ou d'hypersensibilité au gluten diagnostiquée. Le tofu, le tempeh et les légumineuses sont des alternatives sans gluten.",
+          "question": "Le seitan contient-il du gluten ?"
+        },
+        {
+          "answer": "Le seitan : 20,6 g de protéines pour 100 g contre 13,4 g pour le tofu nature ferme et 14,9 g pour le tofu fumé. Le tofu apporte en revanche plus de fer et de calcium, moins de sel, et des protéines mieux pourvues en lysine.",
+          "question": "Seitan ou tofu : lequel est le plus protéiné ?"
+        },
+        {
+          "answer": "Il n'existe pas de repère officiel propre au seitan. Si tu tolères le gluten, rien n'empêche d'en manger souvent, mais sa pauvreté en lysine et sa teneur en sel plaident pour l'alterner avec le tofu, le tempeh et les légumineuses plutôt que d'en faire ta seule source de protéines.",
+          "question": "Peut-on manger du seitan tous les jours ?"
+        }
+      ]
+    },
+    {
+      "type": "sources_list",
+      "items": [
+        {
+          "url": "https://ciqual.anses.fr/",
+          "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments"
+        },
+        {
+          "url": "https://www.anses.fr/fr/article/proteines-role-sources-et-apports-recommandes",
+          "label": "ANSES — Les protéines : rôle, sources et apports recommandés"
+        },
+        {
+          "url": "https://www.ameli.fr/assure/sante/themes/intolerance-gluten-maladie-coeliaque",
+          "label": "Ameli — Maladie cœliaque (intolérance au gluten)"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/",
+          "label": "ISSN — Position Stand : protein and exercise (2017)"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31690027/",
+          "label": "Mariotti F., Gardner C. — Dietary Protein and Amino Acids in Vegetarian Diets (Nutrients, 2019)"
+        }
+      ]
+    }
+  ],
+  "sources_json": [
+    {
+      "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments",
+      "url": "https://ciqual.anses.fr/"
+    },
+    {
+      "label": "ISSN — Position Stand : protein and exercise (2017)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/28642676/"
+    },
+    {
+      "label": "Ameli — Maladie cœliaque (intolérance au gluten)",
+      "url": "https://www.ameli.fr/assure/sante/themes/intolerance-gluten-maladie-coeliaque"
+    },
+    {
+      "label": "ANSES — Les protéines : rôle, sources et apports recommandés",
+      "url": "https://www.anses.fr/fr/article/proteines-role-sources-et-apports-recommandes"
+    },
+    {
+      "label": "Mariotti F., Gardner C. — Dietary Protein and Amino Acids in Vegetarian Diets (Nutrients, 2019)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31690027/"
+    }
+  ]
+}

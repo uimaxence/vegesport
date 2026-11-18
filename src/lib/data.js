@@ -1,4 +1,5 @@
 import { isSupabaseConfigured } from './supabase';
+import { MERGED_RECIPE_IDS } from '../data/mergedRecipes';
 
 const FETCH_TIMEOUT_MS = 10000;
 
@@ -107,6 +108,7 @@ function mapRecipeRow(row) {
   return {
     id: row.id,
     title: row.title,
+    slug: row.slug ?? null,
     category: row.category,
     time: row.time,
     calories: row.calories,
@@ -140,6 +142,7 @@ function mapRecipeSummaryRow(row) {
   return {
     id: row.id,
     title: row.title,
+    slug: row.slug ?? null,
     category: row.category,
     time: row.time,
     calories: row.calories,
@@ -175,6 +178,7 @@ function mapArticleRow(row) {
   return {
     id: row.id,
     title: row.title,
+    slug: row.slug ?? null,
     excerpt: row.excerpt,
     metaTitle: row.meta_title,
     metaDescription: row.meta_description,
@@ -203,9 +207,12 @@ export async function fetchRecipes() {
   if (useLocalDataOnly()) return [...(await getLocalRecipes())];
   if (isSupabaseConfigured()) {
     try {
-      const cols = 'id,title,category,time,calories,protein,carbs,fat,servings,difficulty,tags,objective,regime,season,main_ingredient,image,ingredients,meta_title,meta_description,intro,image_alt,sport_timing,conservation,variants,faq_recette';
+      const cols = 'id,title,slug,category,time,calories,protein,carbs,fat,servings,difficulty,tags,objective,regime,season,main_ingredient,image,ingredients,meta_title,meta_description,intro,image_alt,sport_timing,conservation,variants,faq_recette';
       const data = await restGet(`recipes?select=${cols}&order=id.asc`);
-      if (Array.isArray(data)) return data.map(mapRecipeSummaryRow).filter(Boolean);
+      if (Array.isArray(data)) {
+        // Les doublons fusionnés restent en base mais ne sont plus proposés.
+        return data.filter((row) => !(row.id in MERGED_RECIPE_IDS)).map(mapRecipeSummaryRow).filter(Boolean);
+      }
     } catch (e) {
       console.warn('fetchRecipes: fallback local', e?.message);
     }

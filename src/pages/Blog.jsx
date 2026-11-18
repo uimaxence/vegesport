@@ -4,7 +4,7 @@ import { Clock, ArrowRight, BookOpen } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { canonicalUrl } from '../lib/seo';
-import { getSlug } from '../lib/slug';
+import { itemSlug } from '../lib/slug';
 import { blogCategories } from '../data/blogCategories';
 import BlogSkeleton from '../components/skeleton/BlogSkeleton';
 import { getSafeImageSrc, handleMediaImageError, getOptimizedImageUrl } from '../lib/imageFallback';
@@ -94,7 +94,7 @@ export default function Blog() {
         {/* Featured */}
         {activeCategory === 'tous' && featured && (
           <Link
-            to={`/blog/${getSlug(featured.title)}`}
+            to={`/blog/${itemSlug(featured)}`}
             className="block group mb-14"
           >
             <div className="rounded-2xl overflow-hidden border border-border bg-white shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300">
@@ -146,7 +146,7 @@ export default function Blog() {
             {rest.map(article => (
               <Link
                 key={article.id}
-                to={`/blog/${getSlug(article.title)}`}
+                to={`/blog/${itemSlug(article)}`}
                 className="group rounded-2xl overflow-hidden border border-border bg-white shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300 flex flex-col"
               >
                 <div className="aspect-[3/2] overflow-hidden bg-bg-warm relative">

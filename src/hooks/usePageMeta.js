@@ -1,6 +1,14 @@
 import { useEffect } from 'react';
 
 const SITE_NAME = 'et si mamie était végé ?';
+const SHORT_BRAND = 'Mamie Végé';
+
+/** Retire un suffixe de marque déjà présent (« … | Mamie Végé ») pour éviter les doublons. */
+function stripBrand(title) {
+  return String(title || '')
+    .replace(/\s*[|–—-]\s*(mamie\s+v[ée]g[ée]|et si mamie [ée]tait v[ée]g[ée]\s*\??)\s*$/i, '')
+    .trim();
+}
 const DEFAULT_TITLE = `${SITE_NAME} — Recettes végétariennes`;
 const DEFAULT_DESCRIPTION =
   'Recettes végétariennes et végétaliennes riches en protéines pour sportifs. Planning repas hebdomadaire, liste de courses et conseils nutrition sportive végétale.';
@@ -62,7 +70,7 @@ export function usePageMeta({
     };
 
     const pageTitle = title
-      ? fullTitle ? title : `${title} | ${SITE_NAME}`
+      ? fullTitle ? title : `${stripBrand(title)} | ${SHORT_BRAND}`
       : DEFAULT_TITLE;
     const desc = description || DEFAULT_DESCRIPTION;
 

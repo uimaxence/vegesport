@@ -3,8 +3,36 @@
  * Toutes les fonctions sont pures — aucun effet de bord, aucun appel réseau.
  */
 
+/**
+ * Poids moyen (g) d'une « pièce » par ingrédient : sans lui, bananes, œufs, oignons,
+ * tortillas… étaient ignorés du calcul et les macros sous-estimées.
+ * Clés en minuscules sans accents ; la première clé contenue dans le nom gagne.
+ */
+const PIECE_WEIGHTS = [
+  ['ail', 5], ['avocat', 150], ['banane', 120], ['betterave', 150], ['carotte', 100],
+  ['jus de citron', 40], ['citron', 50], ['concombre', 300], ['courgette', 200],
+  ['fruit de la passion', 20], ['gingembre', 5], ['mangue', 200], ['oignon', 110],
+  ['patate douce', 250], ['poireau', 150], ['poivron', 150], ['pommes de terre', 150],
+  ['pomme de terre', 150], ['tomate', 120], ['tortillas de mais', 30], ['tortilla', 60],
+  ['wrap', 60], ['epinard', 30], ['oeuf', 55], ['cumin', 2], ['sel', 1],
+];
+
+function normalizeName(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/œ/g, 'oe')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '');
+}
+
+function pieceWeight(ingredientName) {
+  const n = normalizeName(ingredientName);
+  const hit = PIECE_WEIGHTS.find(([key]) => n.includes(key));
+  return hit ? hit[1] : null;
+}
+
 /** Conversion approximative d'une quantité en grammes pour le calcul nutritionnel. */
-export function quantityInGrams(quantity, unit) {
+export function quantityInGrams(quantity, unit, ingredientName) {
   if (quantity == null) return null;
   switch (unit) {
     case 'g': return quantity;
@@ -15,7 +43,11 @@ export function quantityInGrams(quantity, unit) {
     case 'c.à.s': return quantity * 15;
     case 'c.à.c': return quantity * 5;
     case 'pincée': return quantity * 0.5;
-    default: return null;             // pièce, sachet, tranche → non convertible
+    case 'pièce': {
+      const w = pieceWeight(ingredientName);
+      return w == null ? null : quantity * w;
+    }
+    default: return null;             // sachet, tranche, « à volonté » → non convertible
   }
 }
 
@@ -41,7 +73,7 @@ export function calculateRecipeMacros(recipeIngredients) {
     const ing = ri.ingredients;
     if (!ing || ing.calories_per_100 == null) continue;
 
-    const grams = quantityInGrams(ri.quantity, ri.unit);
+    const grams = quantityInGrams(ri.quantity, ri.unit, ing.name);
     if (grams == null) continue;
 
     withMacros++;

@@ -1,0 +1,431 @@
+{
+  "id": 31,
+  "title": "Repas veille de course végétarien : 10 km, semi, marathon",
+  "excerpt": "7 à 10 g de glucides par kilo la veille d'un semi, 10 à 12 g/kg sur 36 à 48 h avant un marathon. Les repères, un menu végétarien chiffré et ce qu'il vaut mieux éviter.",
+  "category": "Nutrition",
+  "date": "2026-11-18",
+  "read_time": 8,
+  "author": "Maxence",
+  "meta_title": "Repas veille de course végétarien : 10 km, semi, marathon",
+  "meta_description": "Que manger la veille d'une course en végétarien : 7 à 10 g de glucides/kg avant un semi, 10 à 12 g/kg avant un marathon. Menu chiffré et aliments à éviter.",
+  "content": "",
+  "content_json": [
+    {
+      "type": "paragraph",
+      "text": "La veille d'une course de plus de 90 minutes, vise 7 à 10 g de glucides par kilo de poids corporel sur la journée pour un semi-marathon, et 10 à 12 g/kg par jour pendant les 36 à 48 heures qui précèdent un marathon. Pour un 10 km, aucune recharge particulière n'est nécessaire. Ce sont les repères des positions de consensus en nutrition sportive, et ils s'appliquent de la même façon que tu manges de la viande ou non."
+    },
+    {
+      "type": "paragraph",
+      "text": "La particularité du coureur végétarien est ailleurs : son assiette habituelle (lentilles, pois chiches, céréales complètes, crudités) est riche en fibres, et c'est précisément ce qu'il faut alléger pendant un jour ou deux."
+    },
+    {
+      "type": "source",
+      "label": "ACSM, Academy of Nutrition and Dietetics, Dietitians of Canada — Nutrition and Athletic Performance (2016)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/26891166/"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Combien de glucides la veille : les repères par distance"
+    },
+    {
+      "type": "paragraph",
+      "text": "Les réserves de glycogène des muscles et du foie couvrent environ 90 minutes d'effort soutenu. En dessous, pas besoin de les « surcharger ». Au-dessus, partir avec des réserves pleines retarde le moment où tu cales."
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Course",
+        "Durée d'effort",
+        "Repère de glucides",
+        "En pratique"
+      ],
+      "rows": [
+        [
+          "10 km",
+          "Moins de 90 min",
+          "Pas de recharge spécifique",
+          "Journée normale avec un féculent à chaque repas, dîner digeste"
+        ],
+        [
+          "Semi-marathon",
+          "1 h 30 à 2 h 30",
+          "7 à 10 g/kg sur les 24 h précédentes",
+          "Féculents à chaque repas et en collation, fibres réduites"
+        ],
+        [
+          "Marathon",
+          "3 h à 5 h",
+          "10 à 12 g/kg par jour pendant 36 à 48 h",
+          "Recharge glucidique sur deux jours, entraînement très allégé"
+        ]
+      ]
+    },
+    {
+      "type": "source",
+      "label": "Burke L.M. et al. — Carbohydrates for training and competition (Journal of Sports Sciences, 2011)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21660838/"
+    },
+    {
+      "type": "paragraph",
+      "text": "Ce que cela représente en grammes :"
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Poids",
+        "7 g/kg",
+        "10 g/kg",
+        "12 g/kg"
+      ],
+      "rows": [
+        [
+          "55 kg",
+          "385 g",
+          "550 g",
+          "660 g"
+        ],
+        [
+          "65 kg",
+          "455 g",
+          "650 g",
+          "780 g"
+        ],
+        [
+          "75 kg",
+          "525 g",
+          "750 g",
+          "900 g"
+        ],
+        [
+          "85 kg",
+          "595 g",
+          "850 g",
+          "1 020 g"
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Ces quantités surprennent : 650 g de glucides, c'est bien plus qu'une « grosse assiette de pâtes le soir ». La recharge glucidique se fait sur toute la journée, en cinq ou six prises, et pas en un seul dîner. Si tu n'as jamais mangé autant de glucides, n'essaie pas d'atteindre 12 g/kg la première fois : une recharge un peu en dessous du repère mais bien tolérée vaut mieux qu'un ventre en vrac au départ. Teste le protocole avant une sortie longue d'entraînement."
+    },
+    {
+      "type": "paragraph",
+      "text": "Autre point : le glycogène se stocke avec de l'eau. Une prise de 1 à 2 kg sur la balance pendant la recharge est habituellement décrite et n'a rien d'anormal."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Où trouver les glucides : les portions qui comptent"
+    },
+    {
+      "type": "paragraph",
+      "text": "Valeurs calculées à partir de la table Ciqual de l'ANSES. Pour les féculents, les poids sont donnés cuits."
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Aliment",
+        "Portion",
+        "Glucides"
+      ],
+      "rows": [
+        [
+          "Riz blanc cuit",
+          "300 g",
+          "100 g"
+        ],
+        [
+          "Pâtes blanches cuites",
+          "300 g",
+          "94 g"
+        ],
+        [
+          "Gnocchis de pomme de terre cuits",
+          "250 g",
+          "85 g"
+        ],
+        [
+          "Pain blanc",
+          "100 g (un tiers de baguette)",
+          "58 g"
+        ],
+        [
+          "Pommes de terre cuites à l'eau",
+          "300 g",
+          "50 g"
+        ],
+        [
+          "Jus de raisin",
+          "250 ml",
+          "41 g"
+        ],
+        [
+          "Pain d'épices",
+          "50 g",
+          "36 g"
+        ],
+        [
+          "Flocons d'avoine",
+          "60 g",
+          "35 g"
+        ],
+        [
+          "Riz au lait",
+          "150 g",
+          "28 g"
+        ],
+        [
+          "Dattes séchées",
+          "40 g",
+          "26 g"
+        ],
+        [
+          "Banane",
+          "1 moyenne (120 g sans peau)",
+          "24 g"
+        ],
+        [
+          "Galettes de riz soufflé",
+          "30 g",
+          "23 g"
+        ],
+        [
+          "Compote de pomme",
+          "100 g",
+          "22 g"
+        ],
+        [
+          "Confiture",
+          "30 g",
+          "18 g"
+        ],
+        [
+          "Miel",
+          "20 g",
+          "16 g"
+        ]
+      ]
+    },
+    {
+      "type": "source",
+      "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments",
+      "url": "https://ciqual.anses.fr/"
+    },
+    {
+      "type": "paragraph",
+      "text": "Les boissons et les aliments sucrés peu fibreux (jus, compote, miel, confiture, pain d'épices) sont utiles ici : ils ajoutent des glucides sans volume ni fibres. La veille d'une course est l'un des rares moments où le pain blanc et le riz blanc sont de meilleurs choix que leurs versions complètes."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Exemple de menu végétarien la veille d'un semi ou d'un marathon"
+    },
+    {
+      "type": "paragraph",
+      "text": "Menu calculé pour environ 650 g de glucides, soit un peu plus de 9 g/kg pour une personne de 70 kg. Adapte les quantités de féculents à ton poids avec le tableau ci-dessus."
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Repas",
+        "Contenu",
+        "Glucides"
+      ],
+      "rows": [
+        [
+          "Petit déjeuner",
+          "120 g de pain blanc, 40 g de confiture, 1 banane, 250 ml de jus de pomme",
+          "146 g"
+        ],
+        [
+          "Collation du matin",
+          "60 g de pain d'épices, 100 g de compote de pomme",
+          "66 g"
+        ],
+        [
+          "Déjeuner",
+          "350 g de riz blanc cuit, 100 g de tofu poêlé, carottes cuites, 60 g de pain blanc, 100 g de compote",
+          "177 g"
+        ],
+        [
+          "Goûter",
+          "1 banane, 30 g de galettes de riz soufflé, 20 g de miel, 250 ml de jus de raisin",
+          "104 g"
+        ],
+        [
+          "Dîner (tôt)",
+          "350 g de pâtes blanches cuites, sauce tomate simple, 40 g de pain blanc, 150 g de riz au lait",
+          "162 g"
+        ],
+        [
+          "Total",
+          "",
+          "environ 650 g"
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Les glucides des légumes et de la sauce tomate ne sont pas comptés. Ce menu apporte autour de 70 g de protéines, surtout par le pain, les pâtes, le riz et le tofu. C'est moins que d'habitude, et c'est voulu : pendant 24 à 48 heures, la priorité va aux glucides. Tu reviendras à tes apports habituels après la course."
+    },
+    {
+      "type": "paragraph",
+      "text": "Deux idées de dîner riches en glucides et peu fibreuses pour la veille : un risotto et des gnocchis maison. Si tu ne les as jamais cuisinés, garde-les pour une veille de sortie longue, pas pour la veille de la course."
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        16,
+        32
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Ce qu'il vaut mieux éviter la veille"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Les fibres en grande quantité : lentilles, pois chiches, haricots, céréales complètes, crudités, choux. Les positions de consensus mentionnent une alimentation pauvre en fibres avant l'épreuve pour limiter les troubles digestifs. Tes protéines du jour : tofu, seitan, œufs ou laitages si tu en manges.",
+        "Les plats gras : fritures, sauces à la crème, fromage en quantité. Ils ralentissent la digestion et prennent la place des glucides.",
+        "Les plats très épicés et l'alcool.",
+        "Les nouveautés : pas de nouvel aliment, de nouveau restaurant ni de nouveau complément. Tout ce que tu manges la veille doit avoir été testé avant une sortie longue.",
+        "Le dîner géant et tardif : mange tôt, à ta faim, et laisse le petit déjeuner finir le travail.",
+        "L'oubli de l'eau : bois régulièrement dans la journée, sans te forcer. Des urines claires sont un bon indicateur."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Si tu es habitué aux légumineuses et que tu les digères bien, une petite portion au déjeuner de la veille n'est pas interdite. La règle reste la même : rien que tu n'aies déjà testé."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Et le matin de la course ?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Le dernier repas complète les réserves du foie, entamées par la nuit. Le repère : 1 à 4 g de glucides par kilo, pris 1 à 4 heures avant le départ. Plus le repas est proche du départ, plus il doit être léger et pauvre en fibres et en graisses. Pour 70 kg, 3 heures avant le départ, 2 à 3 g/kg représentent 140 à 210 g de glucides : par exemple 250 g de riz au lait, 100 g de pain blanc, 30 g de miel et une banane (environ 155 g)."
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        75,
+        37
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Pendant la course, au-delà de 60 à 90 minutes d'effort, les mêmes positions recommandent 30 à 60 g de glucides par heure, et jusqu'à 90 g par heure pour les efforts de plus de 2 h 30. Les principes sont détaillés dans « Ravitaillement vélo : quoi manger pendant une sortie (et combien de glucides par heure) » et valent aussi pour la course à pied."
+    },
+    {
+      "type": "source",
+      "label": "Jeukendrup A. — A step towards personalized sports nutrition: carbohydrate intake during exercise (Sports Medicine, 2014)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/24791914/"
+    },
+    {
+      "type": "recipes",
+      "recipeIds": [
+        70,
+        73
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "Le cas du 10 km"
+    },
+    {
+      "type": "paragraph",
+      "text": "Un 10 km dure moins d'une heure pour beaucoup de coureurs, moins de 90 minutes pour presque tous : tes réserves habituelles suffisent. Inutile de te gaver de pâtes. La veille, mange normalement avec un féculent à chaque repas, garde un dîner simple et digeste (riz ou pâtes, une protéine peu grasse, des légumes cuits), évite l'alcool et les expériences. Le matin, un petit déjeuner habituel pris 2 à 3 heures avant le départ suffit."
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "En résumé"
+    },
+    {
+      "type": "list",
+      "items": [
+        "10 km : pas de recharge, juste une journée normale et un dîner digeste.",
+        "Semi-marathon : 7 à 10 g de glucides par kilo la veille, fibres réduites.",
+        "Marathon : 10 à 12 g/kg par jour pendant 36 à 48 heures, répartis en cinq ou six prises.",
+        "Féculents blancs, compotes, jus, miel et pain d'épices plutôt que légumineuses et céréales complètes.",
+        "Rien de nouveau : tout se teste à l'entraînement."
+      ]
+    },
+    {
+      "type": "paragraph",
+      "text": "Ces repères sont des fourchettes générales pour des adultes en bonne santé. En cas de diabète, de troubles digestifs chroniques ou de traitement médical, demande l'avis de ton médecin ou d'un diététicien du sport avant de modifier fortement ton alimentation."
+    },
+    {
+      "type": "cta_planning"
+    },
+    {
+      "type": "faq",
+      "items": [
+        {
+          "question": "Que manger la veille d'un marathon ?",
+          "answer": "Des glucides à chaque prise, répartis sur la journée : riz blanc, pâtes, pain blanc, pommes de terre, compote, banane, jus de fruits, miel. Le repère des positions de consensus est de 10 à 12 g de glucides par kilo et par jour pendant les 36 à 48 heures précédant la course, avec peu de fibres et peu de graisses."
+        },
+        {
+          "question": "Que manger la veille d'un 10 km ?",
+          "answer": "Rien de spécial. Un 10 km dure moins de 90 minutes : tes réserves de glycogène habituelles suffisent. Mange normalement, avec un féculent à chaque repas, et choisis un dîner simple et digeste, par exemple du riz ou des pâtes avec du tofu et des légumes cuits."
+        },
+        {
+          "question": "Combien de glucides la veille d'un semi-marathon ?",
+          "answer": "Entre 7 et 10 g par kilo de poids corporel sur les 24 heures qui précèdent, soit 455 à 650 g pour une personne de 65 kg. Répartis-les sur trois repas et deux ou trois collations plutôt que sur un seul gros dîner."
+        },
+        {
+          "question": "La pasta party la veille suffit-elle ?",
+          "answer": "Non. Une assiette de 300 g de pâtes cuites apporte environ 94 g de glucides, loin des 500 à 700 g visés sur la journée avant une épreuve longue. La recharge se construit du petit déjeuner au dîner. Un dîner trop copieux et tardif risque surtout de gêner le sommeil et la digestion."
+        },
+        {
+          "question": "Peut-on manger des lentilles ou des pois chiches la veille d'une course ?",
+          "answer": "Mieux vaut les limiter : ce sont des aliments riches en fibres, et les recommandations vont vers une alimentation pauvre en fibres avant l'épreuve pour réduire le risque de troubles digestifs. Si tu les digères très bien, une petite portion au déjeuner reste possible. Pour les protéines, le tofu ou le seitan sont plus sûrs ce jour-là."
+        }
+      ]
+    },
+    {
+      "type": "sources_list",
+      "items": [
+        {
+          "label": "ACSM, Academy of Nutrition and Dietetics, Dietitians of Canada — Nutrition and Athletic Performance (2016)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26891166/"
+        },
+        {
+          "label": "Burke L.M. et al. — Carbohydrates for training and competition (Journal of Sports Sciences, 2011)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21660838/"
+        },
+        {
+          "label": "Jeukendrup A. — A step towards personalized sports nutrition: carbohydrate intake during exercise (Sports Medicine, 2014)",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24791914/"
+        },
+        {
+          "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments",
+          "url": "https://ciqual.anses.fr/"
+        }
+      ]
+    }
+  ],
+  "sources_json": [
+    {
+      "label": "ACSM, Academy of Nutrition and Dietetics, Dietitians of Canada — Nutrition and Athletic Performance (2016)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/26891166/"
+    },
+    {
+      "label": "Burke L.M. et al. — Carbohydrates for training and competition (Journal of Sports Sciences, 2011)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21660838/"
+    },
+    {
+      "label": "ANSES — Table Ciqual : composition nutritionnelle des aliments",
+      "url": "https://ciqual.anses.fr/"
+    },
+    {
+      "label": "Jeukendrup A. — A step towards personalized sports nutrition: carbohydrate intake during exercise (Sports Medicine, 2014)",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/24791914/"
+    }
+  ]
+}

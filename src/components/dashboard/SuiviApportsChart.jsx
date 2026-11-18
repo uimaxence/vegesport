@@ -40,26 +40,26 @@ function catmullRom(points) {
  * Si fourni, affiche deux courbes : planifié (pointillé) + réalisé (plein).
  * Si absent, affiche uniquement le planifié.
  */
-export default function SuiviApportsChart({ planning, getRecipe, portions = 2, mealsDoneMap }) {
+export default function SuiviApportsChart({ planning, getRecipe, mealsDoneMap, poids = 70, niveau = 'amateur' }) {
   const hasDoneTracking = Boolean(mealsDoneMap);
   const [activeSeries, setActiveSeries] = useState(SERIES_CONFIG.map((s) => s.id));
 
   const weekPlanned = useMemo(
-    () => computeWeekDataForChart(planning, getRecipe, portions),
-    [planning, getRecipe, portions]
+    () => computeWeekDataForChart(planning, getRecipe),
+    [planning, getRecipe]
   );
 
   const weekDone = useMemo(
     () =>
       hasDoneTracking
-        ? computeWeekDataDone(planning, getRecipe, mealsDoneMap, portions)
+        ? computeWeekDataDone(planning, getRecipe, mealsDoneMap)
         : null,
-    [planning, getRecipe, mealsDoneMap, portions, hasDoneTracking]
+    [planning, getRecipe, mealsDoneMap, hasDoneTracking]
   );
 
   const targets = useMemo(
-    () => getDailyTargetsFromObjective(planning?.objective || 'masse', 70, 'amateur'),
-    [planning?.objective]
+    () => getDailyTargetsFromObjective(planning?.objective || 'masse', poids, niveau),
+    [planning?.objective, poids, niveau]
   );
 
   const toggleSeries = (id) =>

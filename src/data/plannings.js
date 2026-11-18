@@ -11,14 +11,14 @@ export const defaultPlannings = {
       mardi: {
         "petit-dejeuner": 7,
         dejeuner: 5,
-        diner: 3,
+        diner: 69,
         collation: 6
       },
       mercredi: {
         "petit-dejeuner": 10,
         dejeuner: 20,
-        diner: 13,
-        collation: 17
+        diner: 36,
+        collation: 71
       },
       jeudi: {
         "petit-dejeuner": 4,
@@ -41,8 +41,8 @@ export const defaultPlannings = {
       dimanche: {
         "petit-dejeuner": 7,
         dejeuner: 2,
-        diner: 3,
-        collation: 17
+        diner: 69,
+        collation: 71
       }
     }
   },
@@ -52,7 +52,7 @@ export const defaultPlannings = {
       lundi: {
         "petit-dejeuner": 4,
         dejeuner: 15,
-        diner: 3,
+        diner: 69,
         collation: 12
       },
       mardi: {
@@ -70,13 +70,13 @@ export const defaultPlannings = {
       jeudi: {
         "petit-dejeuner": 4,
         dejeuner: 15,
-        diner: 13,
-        collation: 17
+        diner: 36,
+        collation: 71
       },
       vendredi: {
         "petit-dejeuner": 1,
         dejeuner: 9,
-        diner: 3,
+        diner: 69,
         collation: 6
       },
       samedi: {
@@ -100,12 +100,12 @@ export const defaultPlannings = {
         "petit-dejeuner": 19,
         dejeuner: 11,
         diner: 18,
-        collation: 17
+        collation: 71
       },
       mardi: {
         "petit-dejeuner": 1,
         dejeuner: 20,
-        diner: 3,
+        diner: 69,
         collation: 14
       },
       mercredi: {
@@ -117,8 +117,8 @@ export const defaultPlannings = {
       jeudi: {
         "petit-dejeuner": 7,
         dejeuner: 5,
-        diner: 13,
-        collation: 17
+        diner: 36,
+        collation: 71
       },
       vendredi: {
         "petit-dejeuner": 4,
@@ -135,7 +135,7 @@ export const defaultPlannings = {
       dimanche: {
         "petit-dejeuner": 1,
         dejeuner: 11,
-        diner: 3,
+        diner: 69,
         collation: 6
       }
     }
@@ -159,18 +159,18 @@ export const defaultPlannings = {
         "petit-dejeuner": 19,
         dejeuner: 9,
         diner: 16,
-        collation: 17
+        collation: 71
       },
       jeudi: {
         "petit-dejeuner": 1,
         dejeuner: 5,
-        diner: 3,
+        diner: 69,
         collation: 14
       },
       vendredi: {
         "petit-dejeuner": 7,
         dejeuner: 20,
-        diner: 13,
+        diner: 36,
         collation: 12
       },
       samedi: {
@@ -183,7 +183,7 @@ export const defaultPlannings = {
         "petit-dejeuner": 4,
         dejeuner: 15,
         diner: 18,
-        collation: 17
+        collation: 71
       }
     }
   }

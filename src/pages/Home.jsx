@@ -5,14 +5,14 @@ import { usePageMeta } from '../hooks/usePageMeta';
 import { useJsonLd } from '../hooks/useJsonLd';
 import { canonicalUrl, buildWebSiteJsonLd } from '../lib/seo';
 import RecipeCard from '../components/RecipeCard';
-import { getSlug } from '../lib/slug';
+import { itemSlug } from '../lib/slug';
 import vuePlanning from '../assets/vue-planning.webp';
 import { getSafeImageSrc, handleMediaImageError, getOptimizedImageUrl } from '../lib/imageFallback';
 
 function HeroRecipeCard({ recipe }) {
   return (
     <Link
-      to={`/recettes/${getSlug(recipe.title)}`}
+      to={`/recettes/${itemSlug(recipe)}`}
       className="group flex-shrink-0 w-[220px] snap-start block rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-1.5 relative"
     >
       <div className="aspect-[3/4] overflow-hidden">
@@ -286,7 +286,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {latestArticles.map(article => (
-              <Link key={article.id} to={`/blog/${getSlug(article.title)}`} className="group">
+              <Link key={article.id} to={`/blog/${itemSlug(article)}`} className="group">
                 <div className="aspect-[3/2] rounded-sm overflow-hidden bg-bg-warm">
                   <img
                     src={getOptimizedImageUrl(getSafeImageSrc(article.image), 300)}
